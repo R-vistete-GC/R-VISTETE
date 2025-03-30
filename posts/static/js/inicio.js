@@ -128,32 +128,61 @@ function mostrarModalCompra(publicacionId, tipo) {
     document.getElementById('modalPublicacionId').value = publicacionId;
     document.getElementById('modalTipoOperacion').value = tipo;
 
-    // Mostrar/ocultar campos de alquiler
+    // Mostrar/ocultar campos según el tipo de operación
     const camposAlquiler = document.getElementById('camposAlquiler');
     const depositoRow = document.getElementById('depositoRow');
+    const preciosPorDia = document.getElementById('preciosPorDia');
+    const diasAlquiler = document.getElementById('diasAlquiler');
+
     if (tipo === 'alquiler') {
         camposAlquiler.style.display = 'block';
         depositoRow.style.display = 'flex';
+        preciosPorDia.style.display = 'flex';
+        diasAlquiler.style.display = 'flex';
+        
+        // Configurar precio por día y depósito
+        document.getElementById('precioPorDia').textContent = precioTexto;
         document.getElementById('deposito').textContent = `$${(precio * 0.5).toFixed(2)}`;
+        
+        // Resetear y configurar fechas
+        const fechaInicio = document.getElementById('fechaInicio');
+        const fechaFin = document.getElementById('fechaFin');
+        const hoy = new Date();
+        
+        fechaInicio.min = hoy.toISOString().split('T')[0];
+        fechaInicio.value = '';
+        fechaFin.value = '';
+        
+        // Limpiar campos adicionales
+        document.getElementById('instruccionesDevolucion').value = '';
+        document.getElementById('terminosCheck').checked = false;
     } else {
         camposAlquiler.style.display = 'none';
         depositoRow.style.display = 'none';
+        preciosPorDia.style.display = 'none';
+        diasAlquiler.style.display = 'none';
     }
 
     // Actualizar subtotal y total
     document.getElementById('subtotal').textContent = precioTexto;
     actualizarTotal();
 
-    // Actualizar texto del botón
+    // Actualizar texto del botón y título
     document.getElementById('btnAccionTexto').textContent = tipo === 'compra' ? 'Pagar ahora' : 'Reservar y pagar';
-
-    // Actualizar el título del modal según el tipo
     const modalTitle = document.querySelector('#modalCompra .modal-title');
     modalTitle.textContent = tipo === 'compra' ? 'Comprar Prenda' : 'Alquilar Prenda';
 
     // Mostrar el modal
     const modalCompra = new bootstrap.Modal(document.getElementById('modalCompra'));
     modalCompra.show();
+}
+
+// Función para calcular días entre fechas
+function calcularDias(fechaInicio, fechaFin) {
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+    const diferencia = fin - inicio;
+    return Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 }
 
 // Función para actualizar el total
@@ -163,44 +192,26 @@ function actualizarTotal() {
     const envio = 5.00;
     let total = subtotal + envio;
 
-    // Agregar depósito si es alquiler
     if (document.getElementById('modalTipoOperacion').value === 'alquiler') {
-        const depositoTexto = document.getElementById('deposito').textContent;
-        const deposito = parseFloat(depositoTexto.replace('$', ''));
-        total += deposito;
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
+        
+        if (fechaInicio && fechaFin) {
+            const dias = calcularDias(fechaInicio, fechaFin);
+            if (dias > 0) {
+                document.getElementById('numeroDias').textContent = dias;
+                const precioPorDia = subtotal;
+                const subtotalAlquiler = precioPorDia * dias;
+                const deposito = subtotal * 0.5;
+                
+                document.getElementById('subtotal').textContent = `$${subtotalAlquiler.toFixed(2)}`;
+                total = subtotalAlquiler + envio + deposito;
+            }
+        }
     }
 
     document.getElementById('total').textContent = `$${total.toFixed(2)}`;
 }
-
-// Manejar el envío del formulario
-document.getElementById('formCompraAlquiler').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const tipo = document.getElementById('modalTipoOperacion').value;
-    const publicacionId = document.getElementById('modalPublicacionId').value;
-    const direccion = document.getElementById('direccion').value;
-    const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
-
-    let data = {
-        publicacion_id: publicacionId,
-        tipo: tipo,
-        direccion: direccion,
-        metodo_pago: metodoPago
-    };
-
-    if (tipo === 'alquiler') {
-        data.fecha_inicio = document.getElementById('fechaInicio').value;
-        data.fecha_fin = document.getElementById('fechaFin').value;
-    }
-
-    // Aquí iría la llamada al backend para procesar la compra/alquiler
-    console.log('Datos del formulario:', data);
-    alert('Funcionalidad en desarrollo. Los datos han sido registrados.');
-    
-    // Cerrar el modal
-    const modalCompra = bootstrap.Modal.getInstance(document.getElementById('modalCompra'));
-    modalCompra.hide();
-});
 
 // Validar fechas de alquiler
 document.getElementById('fechaInicio').addEventListener('change', function() {
@@ -211,10 +222,87 @@ document.getElementById('fechaInicio').addEventListener('change', function() {
     if (fechaFinInput.value && new Date(fechaFinInput.value) <= fechaInicio) {
         fechaFinInput.value = '';
     }
+    
+    actualizarTotal();
 });
 
-// Establecer fecha mínima para inicio de alquiler
-document.getElementById('fechaInicio').min = new Date().toISOString().split('T')[0];
+document.getElementById('fechaFin').addEventListener('change', function() {
+    actualizarTotal();
+});
+
+// Manejar el envío del formulario
+document.getElementById('formCompraAlquiler').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const tipo = document.getElementById('modalTipoOperacion').value;
+    const publicacionId = document.getElementById('modalPublicacionId').value;
+    const direccion = document.getElementById('direccion').value;
+    const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
+    const notas = document.getElementById('notas').value;
+
+    if (!document.getElementById('terminosCheck').checked) {
+        alert('Debes aceptar los términos y condiciones para continuar.');
+        return;
+    }
+
+    let data = {
+        publicacion_id: publicacionId,
+        tipo: tipo,
+        direccion: direccion,
+        metodo_pago: metodoPago,
+        notas: notas
+    };
+
+    if (tipo === 'alquiler') {
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
+        const instruccionesDevolucion = document.getElementById('instruccionesDevolucion').value;
+
+        if (!fechaInicio || !fechaFin) {
+            alert('Las fechas son obligatorias para el alquiler.');
+            return;
+        }
+
+        const dias = calcularDias(fechaInicio, fechaFin);
+        if (dias <= 0) {
+            alert('El período de alquiler debe ser de al menos un día.');
+            return;
+        }
+
+        Object.assign(data, {
+            fecha_inicio: fechaInicio,
+            fecha_fin: fechaFin,
+            instrucciones_devolucion: instruccionesDevolucion,
+            dias_alquiler: dias,
+            terminos_aceptados: true
+        });
+    }
+
+    // Enviar datos al servidor
+    fetch('/inicio/procesar-operacion/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            const modalCompra = bootstrap.Modal.getInstance(document.getElementById('modalCompra'));
+            modalCompra.hide();
+            // Opcional: recargar la página o actualizar la UI
+            window.location.reload();
+        } else {
+            alert(data.error || 'Hubo un error al procesar la operación.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un error al procesar la operación. Por favor, intenta de nuevo.');
+    });
+});
 
 function getCookie(name) {
     let cookieValue = null;

@@ -77,9 +77,9 @@
     </div>
 </div>
 
-<!-- Modal de Compra -->
+<!-- Modal de Compra/Alquiler -->
 <div class="modal fade" id="modalCompra" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Comprar Prenda</h5>
@@ -87,6 +87,7 @@
             </div>
             <div class="modal-body">
                 <div id="modalCompraDisponible">
+                    <!-- Información de la prenda -->
                     <div class="mb-4">
                         <div class="d-flex align-items-center mb-3">
                             <img id="modalImagenPrenda" src="" alt="Prenda" class="me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
@@ -104,30 +105,53 @@
 
                         <!-- Campos para alquiler -->
                         <div id="camposAlquiler" style="display: none;">
-                            <div class="mb-3">
-                                <label for="fechaInicio" class="form-label">Fecha de inicio</label>
-                                <input type="date" class="form-control" id="fechaInicio" required>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="fechaInicio" class="form-label">Fecha de inicio*</label>
+                                        <input type="date" class="form-control" id="fechaInicio" required>
+                                        <div class="form-text">Primera fecha disponible para recoger la prenda</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="fechaFin" class="form-label">Fecha de devolución*</label>
+                                        <input type="date" class="form-control" id="fechaFin" required>
+                                        <div class="form-text">Último día antes de devolver la prenda</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="fechaFin" class="form-label">Fecha de devolución</label>
-                                <input type="date" class="form-control" id="fechaFin" required>
-                            </div>
+
+                            <!-- Información del alquiler -->
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                Se requiere un depósito de seguridad que será devuelto al regresar la prenda en buen estado.
+                                <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Información importante</h6>
+                                <ul class="mb-0">
+                                    <li>Se requiere un depósito de seguridad que será devuelto al regresar la prenda en buen estado.</li>
+                                    <li>El precio se calcula por día de alquiler.</li>
+                                    <li>La devolución debe realizarse antes de las 18:00 del día de fin.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Instrucciones de devolución -->
+                            <div class="mb-3">
+                                <label for="instruccionesDevolucion" class="form-label">Instrucciones especiales de devolución</label>
+                                <textarea class="form-control" id="instruccionesDevolucion" rows="2" 
+                                    placeholder="Ejemplo: Preferencia de horario para la devolución, condiciones especiales, etc."></textarea>
                             </div>
                         </div>
 
                         <!-- Información de envío -->
                         <div class="mb-3">
-                            <label for="direccion" class="form-label">Dirección de envío</label>
-                            <textarea class="form-control" id="direccion" rows="2" required></textarea>
+                            <label for="direccion" class="form-label">Dirección de envío*</label>
+                            <textarea class="form-control" id="direccion" rows="2" required
+                                placeholder="Calle, número, piso, código postal, ciudad"></textarea>
+                            <div class="form-text">Asegúrate de incluir todos los detalles necesarios para la entrega</div>
                         </div>
 
                         <!-- Método de pago -->
                         <div class="mb-3">
-                            <label class="form-label">Método de pago</label>
-                            <div class="d-flex gap-2">
+                            <label class="form-label">Método de pago*</label>
+                            <div class="d-flex gap-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="metodoPago" id="pagoTarjeta" value="tarjeta" checked>
                                     <label class="form-check-label" for="pagoTarjeta">
@@ -143,6 +167,21 @@
                             </div>
                         </div>
 
+                        <!-- Notas adicionales -->
+                        <div class="mb-3">
+                            <label for="notas" class="form-label">Notas adicionales</label>
+                            <textarea class="form-control" id="notas" rows="2" 
+                                placeholder="Instrucciones especiales de entrega, preferencias, etc."></textarea>
+                        </div>
+
+                        <!-- Términos y condiciones -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terminosCheck" required>
+                            <label class="form-check-label" for="terminosCheck">
+                                Acepto los términos y condiciones del servicio
+                            </label>
+                        </div>
+
                         <!-- Resumen de costos -->
                         <div class="card bg-light mb-3">
                             <div class="card-body">
@@ -155,8 +194,16 @@
                                     <span>Envío:</span>
                                     <span>$5.00</span>
                                 </div>
+                                <div id="preciosPorDia" class="d-flex justify-content-between mb-2" style="display: none;">
+                                    <span>Precio por día:</span>
+                                    <span id="precioPorDia"></span>
+                                </div>
+                                <div id="diasAlquiler" class="d-flex justify-content-between mb-2" style="display: none;">
+                                    <span>Días de alquiler:</span>
+                                    <span id="numeroDias"></span>
+                                </div>
                                 <div class="d-flex justify-content-between mb-2" id="depositoRow" style="display: none;">
-                                    <span>Depósito:</span>
+                                    <span>Depósito de seguridad:</span>
                                     <span id="deposito"></span>
                                 </div>
                                 <hr>

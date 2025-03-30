@@ -12,6 +12,8 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from .recommender import RecomendadorPrendas
 from django.contrib import messages
+from decimal import Decimal
+from datetime import datetime
 
 #inicio - publicaciones
 
@@ -699,3 +701,90 @@ def obtener_recomendaciones(request):
         'recomendaciones': recomendaciones_data,
         'preferencias': analyzer.preferencias
     })
+
+@require_http_methods(["POST"])
+def procesar_operacion(request):
+    try:
+        # Verificar autenticación
+        if not request.user.is_authenticated:
+            return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
+
+        # Obtener y validar datos
+        data = json.loads(request.body)
+        publicacion = get_object_or_404(Publicacion, id=data['publicacion_id'])
+        
+        if data['tipo'] == 'alquiler':
+            # Validar disponibilidad
+            fecha_inicio = datetime.strptime(data['fecha_inicio'], '%Y-%m-%d').date()
+            fecha_fin = datetime.strptime(data['fecha_fin'], '%Y-%m-%d').date()
+            
+            # Verificar si hay alquileres que se solapan
+            alquileres_existentes = Alquiler.objects.filter(
+                publicacion=publicacion,
+                estado__in=['reservado', 'activo'],
+                fecha_inicio__lte=fecha_fin,
+                fecha_fin__gte=fecha_inicio
+            )
+            
+            if alquileres_existentes.exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'La prenda no está disponible para las fechas seleccionadas'
+                })
+
+            # Calcular precios
+            dias = (fecha_fin - fecha_inicio).days
+            precio_por_dia = publicacion.precio
+            precio_total = precio_por_dia * dias
+            deposito = publicacion.precio * Decimal('0.5')
+
+            # Crear alquiler
+            alquiler = Alquiler.objects.create(
+                publicacion=publicacion,
+                propietario=publicacion.usuario,
+                cliente=request.user.usuario,
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
+                precio_por_dia=precio_por_dia,
+                precio_total=precio_total,
+                deposito=deposito,
+                estado='reservado',
+                metodo_pago=data['metodo_pago'],
+                direccion_envio=data['direccion'],
+                instrucciones_devolucion=data.get('instrucciones_devolucion', ''),
+                notas=data.get('notas', ''),
+                terminos_aceptados=data['terminos_aceptados']
+            )
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Alquiler registrado exitosamente',
+                'alquiler_id': alquiler.id
+            })
+
+        else:  # Compra
+            # Crear venta
+            venta = Venta.objects.create(
+                publicacion=publicacion,
+                vendedor=publicacion.usuario,
+                comprador=request.user.usuario,
+                precio_final=publicacion.precio,
+                estado='pendiente',
+                metodo_pago=data['metodo_pago'],
+                direccion_envio=data['direccion'],
+                notas=data.get('notas', '')
+            )
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Compra registrada exitosamente',
+                'venta_id': venta.id
+            })
+
+    except Publicacion.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Publicación no encontrada'})
+    except ValueError as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+    except Exception as e:
+        print("Error procesando operación:", str(e))
+        return JsonResponse({'success': False, 'error': 'Error interno del servidor'})

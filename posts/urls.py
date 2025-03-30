@@ -20,4 +20,5 @@ urlpatterns = [
     path('dislike/<int:publicacion_id>/', views.toggle_dislike, name='toggle_dislike'),
     path('notificaciones/', views.notificaciones_view, name='notificaciones'),
     path('api/recomendaciones/', views.obtener_recomendaciones, name='obtener_recomendaciones'),
+    path('procesar-operacion/', views.procesar_operacion, name='procesar_operacion'),
 ]

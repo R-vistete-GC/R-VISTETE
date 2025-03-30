@@ -114,6 +114,7 @@ class Alquiler(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     precio_por_dia = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2)
     deposito = models.DecimalField(max_digits=10, decimal_places=2)
     estado = models.CharField(max_length=20, choices=[
         ('reservado', 'Reservado'),
@@ -123,6 +124,10 @@ class Alquiler(models.Model):
     ], default='reservado')
     metodo_pago = models.CharField(max_length=50)
     direccion_envio = models.TextField()
+    tracking_envio = models.CharField(max_length=100, null=True, blank=True)
+    tracking_devolucion = models.CharField(max_length=100, null=True, blank=True)
+    terminos_aceptados = models.BooleanField(default=False)
+    instrucciones_devolucion = models.TextField(null=True, blank=True)
     notas = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -134,9 +139,26 @@ class Alquiler(models.Model):
         return f"Alquiler de {self.publicacion.titulo} a {self.cliente.nombre}"
 
     def save(self, *args, **kwargs):
+        # Validar fechas
         if self.fecha_fin <= self.fecha_inicio:
             raise ValueError("La fecha de fin debe ser posterior a la fecha de inicio")
+        
+        # Validar montos
+        if self.precio_por_dia <= 0:
+            raise ValueError("El precio por día debe ser mayor a 0")
+        if self.deposito < 0:
+            raise ValueError("El depósito no puede ser negativo")
+        if self.precio_total <= 0:
+            raise ValueError("El precio total debe ser mayor a 0")
+            
         super().save(*args, **kwargs)
+
+    def calcular_precio_total(self):
+        """Calcula el precio total del alquiler basado en los días"""
+        if self.fecha_inicio and self.fecha_fin and self.precio_por_dia:
+            dias = (self.fecha_fin - self.fecha_inicio).days
+            return self.precio_por_dia * dias
+        return 0
 
 class Favorito(models.Model):
     id = models.AutoField(primary_key=True)
