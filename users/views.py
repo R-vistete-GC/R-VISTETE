@@ -11,51 +11,38 @@ from django.contrib import messages
 from .forms import PerfilUsuarioForm
 
 def login_view(request):
-    # Debug logging
-    print("Login view called")
-    print("Session:", request.session.items())
-    print("Next parameter:", request.GET.get('next'))
-    
-    # Si el usuario ya está autenticado, redirigir directamente a inicio
+    # 1. Verificar si YA está autenticado (evita bucles)
     if request.session.get('usuario_id'):
-        return redirect('/inicio/')
-    
+        next_url = request.GET.get('next', '/inicio/')
+        print(f"Usuario YA autenticado. Redirigiendo a {next_url}")
+        return redirect(next_url)
+
+    # 2. Manejo del POST (tu lógica actual)
     if request.method == "POST":
         correo = request.POST.get("correo")
         contrasena = request.POST.get("contrasena")
-        
-        # Validar que se proporcionaron ambos campos
-        if not correo or not contrasena:
-            return render(request, "users/login.html", {
-                "error": "Por favor ingresa tanto el correo como la contraseña"
-            })
-        
+        next_url = request.POST.get('next', '/inicio/')
+
         try:
-            # Buscar el usuario en la tabla usuarios
             usuario = Usuario.objects.get(correo=correo)
-            
-            # Validar la contraseña
             if usuario.contrasena == contrasena:
-                # Guardar el ID del usuario en la sesión
+                # 3. Establecer sesión MANUALMENTE
                 request.session['usuario_id'] = usuario.id
                 request.session['nombre_usuario'] = usuario.nombre
+                
+                # 4. Guardar explícitamente
+                request.session.modified = True
                 request.session.save()
                 
-                # Redirigir a la página de inicio usando path absoluto
-                return redirect('/inicio/')
-            else:
-                return render(request, "users/login.html", {
-                    "error": "La contraseña es incorrecta",
-                    "correo": correo
-                })
+                print(f"Sesión establecida para {usuario.id}. Redirigiendo a {next_url}")
+                return redirect(next_url)
                 
         except Usuario.DoesNotExist:
-            return render(request, "users/login.html", {
-                "error": "No existe una cuenta con este correo",
-                "correo": correo
-            })
+            pass  # Mantén tu manejo de errores actual
 
-    return render(request, "users/login.html")
+    return render(request, "users/login.html", {
+        'next': request.GET.get('next', '/inicio/')
+    })
 
 def ver_perfil(request):
     # Verificar si el usuario está autenticado

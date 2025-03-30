@@ -42,5 +42,6 @@ urlpatterns = [
     path('usuarios/', include('users.urls')),
     path('inicio/', include('posts.urls')),  # Todas las URLs de posts estarán bajo /inicio/
     path('', home_view, name='home'),
+    path('recomendaciones/', include('recommendations.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

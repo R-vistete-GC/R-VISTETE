@@ -1,0 +1,50 @@
+
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .brand i {
+            color: green;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .form-control:focus {
+            border-color: green;
+            box-shadow: 0 0 0 0.2rem rgba(255,64,129,0.25);
+        }
+        .btn-primary {
+            background-color: green;
+            border-color: green;
+        }
+        .btn-primary:hover {
+            background-color: green;
+            border-color: green;
+        }
+        .error-message {
+            color: green;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 0.25rem;
+        }
+        .logo {
+    width: 80%; /* Ajusta el tamaño según sea necesario */
+    margin-bottom: 10px;
+}
+

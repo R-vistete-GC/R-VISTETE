@@ -10,10 +10,8 @@ from django.utils import timezone
 import json
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from recommendations.recommendation_engine import RecommendationEngine
 from .recommender import RecomendadorPrendas
 from django.contrib import messages
-from recommendations.sentiment_analyzer import SentimentAnalyzer
 
 #inicio - publicaciones
 

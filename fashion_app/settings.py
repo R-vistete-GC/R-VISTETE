@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'posts',
     'transactions',
+    'recommendations',  # Añade esta línea
    
 ]
 
@@ -79,7 +80,7 @@ TEMPLATES = [
 ]
 
 LOGIN_URL = 'users:login'
-LOGIN_REDIRECT_URL = 'inicio'
+#LOGIN_REDIRECT_URL = 'inicio'
 LOGOUT_REDIRECT_URL = 'users:login'
 
 WSGI_APPLICATION = 'fashion_app.wsgi.application'
@@ -150,3 +151,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuración de cookies de sesión
+SESSION_COOKIE_AGE = 86400  # 1 día en segundos
+SESSION_SAVE_EVERY_REQUEST = True  # Guarda la sesión en cada petición
