@@ -25,6 +25,10 @@ class PerfilUsuario(models.Model):
         ('XL', 'XL'),
         ('XXL', 'XXL')
     ]
+    GENERO= [
+        ('hombre', 'Hombre'),  # Valor en BD: 'hombre' (minúsculas)
+        ('mujer', 'Mujer'),
+    ]
 
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil')
     descripcion = models.TextField(null=True, blank=True)
@@ -39,6 +43,7 @@ class PerfilUsuario(models.Model):
     talla = models.CharField(max_length=3, choices=TALLAS, null=True, blank=True)
     estilos_preferidos = models.CharField(max_length=500, null=True, blank=True)
     colores_preferidos = models.CharField(max_length=500, null=True, blank=True)
+    genero = models.CharField(max_length=10, choices=GENERO, null=True, blank=True)
     ocasiones_uso = models.CharField(max_length=500, null=True, blank=True)
 
     class Meta:

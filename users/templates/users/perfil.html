@@ -398,27 +398,6 @@
                 </div>
                 {% endif %}
 
-                {% if perfil.rango_precio_preferido %}
-                <div class="profile-info">
-                    <i class="fas fa-tag"></i>
-                    <div class="label">Rango de Precio:</div>
-                    <div class="value">{{ perfil.get_rango_precio_preferido_display }}</div>
-                </div>
-                {% endif %}
-
-                {% if perfil.marcas_favoritas %}
-                <div class="profile-info">
-                    <i class="fas fa-star"></i>
-                    <div class="label">Marcas Favoritas:</div>
-                    <div class="value">
-                        <div class="tag-list">
-                            {% for marca in perfil.marcas_favoritas %}
-                            <span class="tag">{{ marca }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                        {% endif %}
 
                 {% if perfil.ocasiones_uso %}
                 <div class="profile-info">
@@ -427,8 +406,17 @@
                     <div class="value" style="margin-left: 10px;">{{ perfil.ocasiones_uso|cut:"[]'\"" }}</div>
                 </div>
                 {% endif %}
+
+                {% if perfil.genero %}
+            <div class="profile-info">
+                <i class="fas fa-venus-mars"></i>
+                <div class="label">Genero:</div>
+                <div class="value">{{ perfil.get_genero_display }}</div>
+            </div>
+            {% endif %}
             </div>
 
+            
             <!-- Redes Sociales -->
                     {% if perfil.redes_sociales %}
             <div class="profile-section">

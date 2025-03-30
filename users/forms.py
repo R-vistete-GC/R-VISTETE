@@ -38,12 +38,10 @@ class PerfilUsuarioForm(forms.ModelForm):
         ('Gris', 'Gris')
     ]
 
-    RANGOS_PRECIO = [
-        ('[0,50]', 'Económico (0-50)'),
-        ('[51,150]', 'Medio (51-150)'),
-        ('[151,500]', 'Premium (151-500)'),
-        ('[501,999999]', 'Lujo (500+)'),
-    ]
+    GENERO= [
+        ('hombre', 'Hombre'),  # Valor en BD: 'hombre' (minúsculas)
+        ('mujer', 'Mujer'),
+        ]
 
     ESTADOS = [
         ('activo', 'Activo'),
@@ -63,20 +61,17 @@ class PerfilUsuarioForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
-    rango_precio_preferido = forms.ChoiceField(
-        choices=RANGOS_PRECIO,
-        required=False
-    )
-    marcas_favoritas = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 3}),
-        help_text='Ingresa tus marcas favoritas separadas por comas',
-        required=False
-    )
+    
+    
     ocasiones_uso = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 3}),
         help_text='Ingresa las ocasiones separadas por comas (ej: trabajo, fiesta, casual)',
         required=False
     )
+    genero = forms.ChoiceField(
+            choices=PerfilUsuario.GENERO,
+            widget=forms.Select(attrs={'class': 'form-control'})
+        )    
     descripcion = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 4}),
         required=False
@@ -102,17 +97,15 @@ class PerfilUsuarioForm(forms.ModelForm):
         fields = [
             'descripcion', 'estado', 'telefono', 'ubicacion', 
             'talla', 'estilos_preferidos', 'colores_preferidos',
-            'rango_precio_preferido', 'marcas_favoritas', 'ocasiones_uso',
-            'intereses', 'redes_sociales'
+            'ocasiones_uso','genero','intereses', 'redes_sociales'
         ]
         widgets = {
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'ubicacion': forms.TextInput(attrs={'class': 'form-control'}),
             'talla': forms.Select(attrs={'class': 'form-select'}),
-            'rango_precio_preferido': forms.Select(attrs={'class': 'form-select'}),
-            'marcas_favoritas': forms.TextInput(attrs={'class': 'form-control'}),
             'ocasiones_uso': forms.TextInput(attrs={'class': 'form-control'}),
+            'genero': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -131,9 +124,6 @@ class PerfilUsuarioForm(forms.ModelForm):
             widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-group'})
         )
 
-    def clean_marcas_favoritas(self):
-        marcas = self.cleaned_data.get('marcas_favoritas', '')
-        return [marca.strip() for marca in marcas.split(',') if marca.strip()]
 
     def clean_ocasiones_uso(self):
         ocasiones = self.cleaned_data.get('ocasiones_uso', '')

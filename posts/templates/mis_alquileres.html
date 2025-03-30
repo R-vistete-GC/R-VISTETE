@@ -222,25 +222,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar los modales
-        const modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
-        const modalRegistrarAlquiler = new bootstrap.Modal(document.getElementById('modalRegistrarAlquiler'));
 
-        // Manejadores para los botones de acción
-        document.querySelectorAll('.btn-outline-danger').forEach(btn => {
-            btn.addEventListener('click', function() {
-                modalEliminar.show();
-            });
-        });
-
-        // Establecer fecha mínima para el alquiler
-        const fechaInput = document.querySelector('#formRegistrarAlquiler input[type="date"]');
-        if (fechaInput) {
-            const hoy = new Date();
-            fechaInput.min = hoy.toISOString().split('T')[0];
-        }
-    });
-</script>
 {% endblock %} 
