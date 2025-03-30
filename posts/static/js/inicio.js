@@ -1,6 +1,10 @@
-
 let currentPublicacionId = null;
-const comentariosModal = new bootstrap.Modal(document.getElementById('comentariosModal'));
+let comentariosModal;
+
+// Asegurar que el modal se inicialice después de que el DOM esté cargado
+document.addEventListener('DOMContentLoaded', function() {
+    comentariosModal = new bootstrap.Modal(document.getElementById('comentariosModal'));
+});
 
 function mostrarComentarios(publicacionId) {
     currentPublicacionId = publicacionId;
