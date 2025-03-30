@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">📌 Recomendaciones para ti</h2>
+    
+    {% if error %}
+        <div class="alert alert-warning">{{ error }}</div>
+    {% else %}
+        <div class="row">
+            {% for rec in recomendaciones %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ rec.publicacion.imagen_url }}" class="card-img-top" alt="{{ rec.publicacion.titulo }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ rec.publicacion.titulo }}</h5>
+                        <p class="card-text text-muted">{{ rec.publicacion.descripcion|truncatechars:100 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">⭐ {{ rec.puntuacion }}% match</span>
+                            <span class="text-success">${{ rec.publicacion.precio }}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a href="#" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No encontramos recomendaciones. Actualiza tus <a href="{% url 'users:editar_perfil' %}">preferencias</a>.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

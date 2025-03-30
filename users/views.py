@@ -9,11 +9,13 @@ import json
 from django.urls import reverse
 from django.contrib import messages
 from .forms import PerfilUsuarioForm
+from django.shortcuts import render, redirect
+from django.urls import reverse  # Importa reverse para construir URLs
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
     if request.session.get('usuario_id'):
-        next_url = request.GET.get('next', '/inicio/')
+        next_url = request.GET.get('next', reverse('recommendations:list'))  # 🔥 Cambio aquí
         print(f"Usuario YA autenticado. Redirigiendo a {next_url}")
         return redirect(next_url)
 
@@ -21,7 +23,7 @@ def login_view(request):
     if request.method == "POST":
         correo = request.POST.get("correo")
         contrasena = request.POST.get("contrasena")
-        next_url = request.POST.get('next', '/inicio/')
+        next_url = request.POST.get('next', reverse('recommendations:list'))  # 🔥 Y aquí
 
         try:
             usuario = Usuario.objects.get(correo=correo)
@@ -31,7 +33,7 @@ def login_view(request):
                 request.session['nombre_usuario'] = usuario.nombre
                 
                 # 4. Guardar explícitamente
-                request.session.modified = True
+                request.session.modified = True 
                 request.session.save()
                 
                 print(f"Sesión establecida para {usuario.id}. Redirigiendo a {next_url}")
@@ -41,7 +43,7 @@ def login_view(request):
             pass  # Mantén tu manejo de errores actual
 
     return render(request, "users/login.html", {
-        'next': request.GET.get('next', '/inicio/')
+        'next': request.GET.get('next', reverse('recommendations:list'))  # 🔥 Y aquí
     })
 
 def ver_perfil(request):

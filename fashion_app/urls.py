@@ -38,6 +38,7 @@ def home_view(request):
     return redirect('/usuarios/login/')
 
 urlpatterns = [
+    path('users/', include('users.urls')),
     path('admin/', admin.site.urls),
     path('usuarios/', include('users.urls')),
     path('inicio/', include('posts.urls')),  # Todas las URLs de posts estarán bajo /inicio/
