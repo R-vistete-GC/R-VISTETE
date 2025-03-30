@@ -48,11 +48,4 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Reutilizar las funciones de comprar y alquilar del inicio
-function comprar(publicacionId) {
-    window.location.href = `/inicio/#publicacion-${publicacionId}`;
-}
 
-function alquilar(publicacionId) {
-    window.location.href = `/inicio/#publicacion-${publicacionId}`;
-}

@@ -32,10 +32,10 @@
                 </div>
                 <div class="card-footer bg-white border-top-0">
                     <div class="d-flex justify-content-between">
-                        <button class="btn btn-primary flex-grow-1 me-2" onclick="comprar({{ favorito.publicacion.id }})">
+                        <button class="btn btn-success" onclick="mostrarModalCompra({{ publicacion.id }}, 'compra')">
                             <i class="fas fa-shopping-cart"></i> Comprar
                         </button>
-                        <button class="btn btn-success flex-grow-1" onclick="alquilar({{ favorito.publicacion.id }})">
+                        <button class="btn btn-warning" onclick="mostrarModalCompra({{ publicacion.id }}, 'alquiler')">
                             <i class="fas fa-key"></i> Alquilar
                         </button>
                     </div>
