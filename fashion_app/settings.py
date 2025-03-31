@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'transactions',
     'recommendations',  # Añade esta línea
     'alquileres',  # Nueva aplicación de alquileres
+    'compras',  # Nueva aplicación de compras
+    #'compras',  # Nueva aplicación de compras
 ]
 
 MIDDLEWARE = [
@@ -67,6 +69,7 @@ TEMPLATES = [
             BASE_DIR / "users/templates",
             BASE_DIR / "posts/templates",
             BASE_DIR / "alquileres/templates",  # Añadimos la ruta de templates de alquileres
+            BASE_DIR / "compras/templates",  # Añadimos la ruta de templates de compras
         ],
         'APP_DIRS': True,
         'OPTIONS': {
