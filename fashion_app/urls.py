@@ -44,5 +44,6 @@ urlpatterns = [
     path('inicio/', include('posts.urls')),  # Todas las URLs de posts estarán bajo /inicio/
     path('', home_view, name='home'),
     path('recomendaciones/', include('recommendations.urls')),
+    path('alquileres/', include('alquileres.urls')),  # Nueva URL para alquileres
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
