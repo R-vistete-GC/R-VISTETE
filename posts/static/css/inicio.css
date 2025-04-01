@@ -1,41 +1,77 @@
-
 /* 📌 Estilos para los Cards de Publicaciones */
 .publicacion-card {
-    max-width: 140px; /* Más pequeño */
-    height: auto; /* Se ajusta automáticamente */
-    padding: 8px;
+    max-width: 300px; /* Ancho máximo más pequeño */
+    height: auto;
+    margin: 0.5rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
-    overflow: hidden; /* Evita que el contenido sobresalga */
+    overflow: hidden;
+}
+
+.publicacion-card:hover {
+    transform: translateY(-5px);
+}
+
+/* 📌 Grid para organizar las cards */
+.row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
 }
 
 /* 📌 Ajuste de imágenes dentro del Card */
-.publicacion-card img {
-    max-height: 100px; /* Reduce más la altura */
-    width: 30%;
+.card-img-top {
+    height: 200px;
+    width: 100%;
     object-fit: cover;
-    border-radius: 6px;
 }
 
 /* 📌 Ajuste del contenido dentro del Card */
-.publicacion-card .contenido {
-    font-size: 13px; /* Reduce un poco más el tamaño del texto */
-    padding: 4px;
-    text-align: center;
+.card-body {
+    padding: 1rem;
 }
 
-/* 📌 Responsive: Reduce aún más en móviles */
+.card-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 📌 Responsive: Ajustes para diferentes tamaños de pantalla */
 @media (max-width: 768px) {
-    .publicacion-card {
-        max-width: 200px; /* Cards más pequeños en móviles */
+    .row {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.75rem;
+        padding: 0.75rem;
     }
 
-    .publicacion-card img {
-        max-height: 120px; /* Reduce más la imagen en móviles */
+    .publicacion-card {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .card-img-top {
+        height: 180px;
     }
 }
 
+@media (max-width: 576px) {
+    .row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .card-img-top {
+        height: 200px;
+    }
+}
 
     .main-container {
         margin-top: 5rem;
@@ -204,3 +240,4 @@
         margin-left: 5px;
         font-size: 0.9rem;
     }
+

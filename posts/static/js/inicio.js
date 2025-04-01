@@ -395,3 +395,29 @@ function toggleFavorito(publicacionId) {
         alert('Hubo un error al procesar tu favorito. Por favor, intenta de nuevo.');
     });
 }
+
+// Función para resaltar y hacer scroll a una publicación específica
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener el ID de la publicación de la URL si existe
+    const urlParams = new URLSearchParams(window.location.search);
+    const publicacionId = urlParams.get('publicacion');
+
+    if (publicacionId) {
+        const publicacionCard = document.querySelector(`[data-publicacion-id="${publicacionId}"]`);
+        if (publicacionCard) {
+            // Hacer scroll a la publicación
+            publicacionCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Resaltar la publicación temporalmente
+            publicacionCard.style.transition = 'all 0.3s ease';
+            publicacionCard.style.boxShadow = '0 0 20px rgba(0, 123, 255, 0.5)';
+            publicacionCard.style.transform = 'scale(1.02)';
+            
+            // Quitar el resaltado después de un momento
+            setTimeout(() => {
+                publicacionCard.style.boxShadow = '';
+                publicacionCard.style.transform = '';
+            }, 2000);
+        }
+    }
+});

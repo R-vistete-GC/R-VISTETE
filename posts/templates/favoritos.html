@@ -29,6 +29,11 @@
                         <h4 class="text-primary mb-0">${{ favorito.publicacion.precio }}</h4>
                         <small class="text-muted">Agregado el {{ favorito.fecha_favorito|date:"d/m/Y" }}</small>
                     </div>
+                    <div class="mt-3">
+                        <a href="/inicio/?publicacion={{ favorito.publicacion.id }}" class="btn btn-info w-100">
+                            <i class="fas fa-eye"></i> Ver Publicación
+                        </a>
+                    </div>
                 </div>
                 <div class="card-footer bg-white border-top-0">
                     <div class="d-flex justify-content-between">

@@ -6,74 +6,68 @@
 {% block content %}
 <div class="container mt-5">
     {% csrf_token %}
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-
-    {% for publicacion in publicaciones %}
-    
-            <div class="card mb-4" data-publicacion-id="{{ publicacion.id }}">
-                <div class="card-header d-flex align-items-center">
+    <div class="row">
+        {% for publicacion in publicaciones %}
+        <div class="col-12 col-sm-6 col-lg-4 mb-4">
+            <div class="card h-100" data-publicacion-id="{{ publicacion.id }}">
+                <div class="card-header d-flex align-items-center py-2">
                     <img src="{{ publicacion.usuario.foto_perfil }}" 
                          alt="Foto de {{ publicacion.usuario.nombre }}" 
                          class="rounded-circle me-2" 
-                         style="width: 40px; height: 40px; object-fit: cover;">
-                    <strong>{{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}</strong>
+                         style="width: 35px; height: 35px; object-fit: cover;">
+                    <strong>{{ publicacion.usuario.nombre }}</strong>
                 </div>
-                <img src="{{ publicacion.imagen_url }}" class="card-img-top" alt="{{ publicacion.titulo }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ publicacion.titulo }}</h5>
-                    <p class="card-text">{{ publicacion.descripcion }}</p>
-                    <p class="card-text">
-                        <strong>Público:</strong> {{ publicacion.publico }} <br>
-                        <strong>Estilo:</strong> {{ publicacion.estilo }} <br>
-                        <strong>Colores:</strong> {{ publicacion.colores }} <br>
-                        <strong>Talla:</strong> {{ publicacion.talla }}
-                    </p>
-                    <p class="card-text">
-                        <small class="text-muted">Publicado el {{ publicacion.fecha_publicacion|date:"d/m/Y H:i" }}</small>
-                    </p>
+                <img src="{{ publicacion.imagen_url }}" class="card-img-top" alt="{{ publicacion.titulo }}" style="height: 250px; object-fit: cover;">
+                <div class="card-body p-3">
+                    <h5 class="card-title mb-2">{{ publicacion.titulo }}</h5>
+                    <p class="card-text mb-2">{{ publicacion.descripcion|truncatechars:100 }}</p>
+                    <div class="text-muted mb-2">
+                        <div><strong>Público:</strong> {{ publicacion.publico }}</div>
+                        <div><strong>Talla:</strong> {{ publicacion.talla }}</div>
+                    </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                            <button class="btn btn-success" onclick="mostrarModalCompra({{ publicacion.id }}, 'compra')">
+                        <h5 class="text-success mb-0">${{ publicacion.precio }}</h5>
+                        <small class="text-muted">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+                <div class="card-footer p-2 bg-white">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex justify-content-between gap-1">
+                            <button class="btn btn-sm btn-success flex-grow-1" onclick="mostrarModalCompra({{ publicacion.id }}, 'compra')">
                                 <i class="fas fa-shopping-cart"></i> Comprar
                             </button>
-                            <button class="btn btn-warning" onclick="mostrarModalCompra({{ publicacion.id }}, 'alquiler')">
+                            <button class="btn btn-sm btn-warning flex-grow-1" onclick="mostrarModalCompra({{ publicacion.id }}, 'alquiler')">
                                 <i class="fas fa-key"></i> Alquilar
                             </button>
-                            
-                            <!-- Botón de like -->
-                            <button class="btn btn-outline-primary like-btn {% if publicacion.id in likes %}active{% endif %}" 
+                        </div>
+                        <div class="d-flex justify-content-between gap-1">
+                            <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="toggleLike({{ publicacion.id }})"
                                     data-publicacion-id="{{ publicacion.id }}"
-                                    onclick="toggleLike({{ publicacion.id }})">
-                                <i class="fas fa-thumbs-up {% if publicacion.id in likes %}text-white{% endif %}"></i>
-                                <span class="likes-count">{{ publicacion.likes_count }}</span>
+                                    {% if publicacion.id in likes %}aria-pressed="true"{% endif %}>
+                                <i class="fas fa-thumbs-up"></i>
+                                <small>{{ publicacion.likes_count }}</small>
                             </button>
-                            
-                            <!-- Botón de favoritos -->
-                            <button class="btn btn-outline-danger favorite-btn {% if publicacion.id in favoritos %}active{% endif %}" 
+                            <button class="btn btn-sm btn-outline-danger flex-grow-1" onclick="toggleFavorito({{ publicacion.id }})"
                                     data-publicacion-id="{{ publicacion.id }}"
-                                    onclick="toggleFavorito({{ publicacion.id }})">
-                                <i class="fas fa-heart {% if publicacion.id in favoritos %}text-white{% endif %}"></i>
+                                    {% if publicacion.id in favoritos %}aria-pressed="true"{% endif %}>
+                                <i class="fas fa-heart"></i>
                             </button>
-
-                            <!-- Botón de comentarios -->
-                            <button class="btn btn-outline-secondary" onclick="mostrarComentarios({{ publicacion.id }})">
+                            <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="mostrarComentarios({{ publicacion.id }})">
                                 <i class="fas fa-comment"></i>
-                                <span class="comentarios-count-{{ publicacion.id }}">
-                                    {{ publicacion.comentarios.count }}
-                                </span>
+                                <small>{{ publicacion.comentarios.count }}</small>
                             </button>
                         </div>
-                        <strong class="text-success">${{ publicacion.precio }}</strong>
                     </div>
                 </div>
             </div>
-            {% empty %}
+        </div>
+        {% empty %}
+        <div class="col-12">
             <div class="alert alert-info">
                 No hay publicaciones disponibles en este momento.
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
     </div>
 </div>
 

@@ -1,5 +1,94 @@
+/* Estilos generales */
+body {
+    padding-top: 5rem; /* Cambiado a rem para mejor escalabilidad */
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
 
-  /* Estilos para la barra de navegación */
+/* Estilos del navbar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: white !important;
+    padding: 0.75rem 1rem;
+    min-height: 4rem; /* Usando rem en lugar de px fijo */
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+}
+
+/* Contenedores principales */
+.container {
+    padding: 1.5rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Ajustes para cards */
+.card {
+    margin-bottom: 1.5rem;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card-img-top {
+    width: 100%;
+    height: 18rem; /* Usando rem para mejor escalabilidad */
+    object-fit: cover;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+
+/* Ajustes para modales */
+.modal-content {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+.modal-dialog {
+    margin-top: 5rem;
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+    body {
+        padding-top: 4rem; /* Ajustado para móviles usando rem */
+    }
+
+    .navbar {
+        min-height: 3.5rem; /* Altura mínima en móviles */
+    }
+
+    .container {
+        padding: 1rem 0.75rem;
+    }
+
+    .card-img-top {
+        height: 15rem; /* Altura ajustada para móviles */
+    }
+}
+
+/* Mejoras de accesibilidad */
+:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Ajustes para el contenido principal */
+main, .main-content {
+    min-height: calc(100vh - 5rem);
+    padding: 1.5rem 0;
+    margin-top: 1rem;
+}
+
+/* Ajustes para imágenes en general */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Estilos para la barra de navegación */
 .navbar {
     background: rgba(255, 255, 255, 0.6); /* Transparente con un poco de opacidad */
     backdrop-filter: blur(10px); /* Efecto difuminado */
