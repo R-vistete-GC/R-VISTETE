@@ -25,22 +25,17 @@
                         </button>
                     </div>
                     <p class="card-text">{{ favorito.publicacion.descripcion }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="text-primary mb-0">${{ favorito.publicacion.precio }}</h4>
                         <small class="text-muted">Agregado el {{ favorito.fecha_favorito|date:"d/m/Y" }}</small>
                     </div>
-                    <div class="mt-3">
-                        <a href="/inicio/?publicacion={{ favorito.publicacion.id }}" class="btn btn-info w-100">
-                            <i class="fas fa-eye"></i> Ver Publicación
-                        </a>
-                    </div>
                 </div>
-                <div class="card-footer bg-white border-top-0">
-                    <div class="d-flex justify-content-between">
-                        <button class="btn btn-success" onclick="mostrarModalCompra({{ favorito.publicacion.id }}, 'compra')" data-bs-toggle="modal" data-bs-target="#modalCompraFavoritos">
+                <div class="card-footer bg-white">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-success flex-grow-1" onclick="mostrarModalCompra({{ favorito.publicacion.id }}, 'compra')" data-bs-toggle="modal" data-bs-target="#modalCompraFavoritos">
                             <i class="fas fa-shopping-cart"></i> Comprar
                         </button>
-                        <button class="btn btn-warning" onclick="mostrarModalCompra({{ favorito.publicacion.id }}, 'alquiler')" data-bs-toggle="modal" data-bs-target="#modalAlquilerFavoritos">
+                        <button class="btn btn-sm btn-warning flex-grow-1" onclick="mostrarModalCompra({{ favorito.publicacion.id }}, 'alquiler')" data-bs-toggle="modal" data-bs-target="#modalAlquilerFavoritos">
                             <i class="fas fa-key"></i> Alquilar
                         </button>
                     </div>
