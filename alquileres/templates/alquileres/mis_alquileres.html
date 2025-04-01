@@ -6,52 +6,74 @@
     <h2 class="mb-4">Mis Alquileres</h2>
 
     {% if error %}
-        <div class="alert alert-danger" role="alert">
-            {{ error }}
-        </div>
-    {% elif tiene_alquileres %}
-        <div class="row">
-            {% for alquiler in alquileres %}
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ alquiler.publicacion.titulo }}</h5>
-                            <p class="card-text">
-                                <strong>Estado:</strong> {{ alquiler.estado }}<br>
-                                <strong>Fecha de inicio:</strong> {{ alquiler.fecha_inicio|date:"d/m/Y" }}<br>
-                                <strong>Fecha de fin:</strong> {{ alquiler.fecha_fin|date:"d/m/Y" }}<br>
-                                <strong>Precio por día:</strong> ${{ alquiler.precio_por_dia }}<br>
-                                <strong>Precio total:</strong> ${{ alquiler.precio_total }}<br>
-                                <strong>Depósito:</strong> ${{ alquiler.deposito }}<br>
-                                {% if alquiler.tracking_envio %}
-                                    <strong>Tracking de envío:</strong> {{ alquiler.tracking_envio }}<br>
-                                {% endif %}
-                                {% if alquiler.tracking_devolucion %}
-                                    <strong>Tracking de devolución:</strong> {{ alquiler.tracking_devolucion }}<br>
-                                {% endif %}
-                            </p>
-                            {% if alquiler.estado == 'reservado' %}
-                                <div class="alert alert-info" role="alert">
-                                    Tu alquiler está reservado. Pronto recibirás más información.
+        <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+        {% if tiene_alquileres %}
+            <div class="row">
+                {% for alquiler in alquileres %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if alquiler.publicacion.imagen_url %}
+                                        <img src="{{ alquiler.publicacion.imagen_url }}" class="img-fluid rounded-start" alt="{{ alquiler.publicacion.titulo }}" style="height: 200px; width: 100%; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% elif alquiler.estado == 'activo' %}
-                                <div class="alert alert-success" role="alert">
-                                    Alquiler activo. Recuerda devolver la prenda antes del {{ alquiler.fecha_fin|date:"d/m/Y" }}.
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ alquiler.publicacion.titulo }}</h5>
+                                        <div class="mb-2">
+                                            <span class="badge {% if alquiler.estado == 'reservado' %}bg-warning
+                                                          {% elif alquiler.estado == 'activo' %}bg-primary
+                                                          {% elif alquiler.estado == 'completado' %}bg-success
+                                                          {% else %}bg-danger{% endif %}">
+                                                {{ alquiler.get_estado_display }}
+                                            </span>
+                                        </div>
+                                        <p class="card-text">
+                                            <strong>Fecha de inicio:</strong> {{ alquiler.fecha_inicio|date:"d/m/Y" }}<br>
+                                            <strong>Fecha de fin:</strong> {{ alquiler.fecha_fin|date:"d/m/Y" }}<br>
+                                            <strong>Precio por día:</strong> ${{ alquiler.precio_por_dia }}<br>
+                                            <strong>Precio total:</strong> ${{ alquiler.precio_total }}<br>
+                                            <strong>Depósito:</strong> ${{ alquiler.deposito }}<br>
+                                            <strong>Método de pago:</strong> {{ alquiler.metodo_pago }}<br>
+                                            <strong>Propietario:</strong> {{ alquiler.propietario.nombre }}<br>
+                                            <strong>Dirección de envío:</strong> {{ alquiler.direccion_envio }}<br>
+                                            {% if alquiler.tracking_envio %}
+                                                <strong>Tracking de envío:</strong> {{ alquiler.tracking_envio }}<br>
+                                            {% endif %}
+                                            {% if alquiler.tracking_devolucion %}
+                                                <strong>Tracking de devolución:</strong> {{ alquiler.tracking_devolucion }}<br>
+                                            {% endif %}
+                                            {% if alquiler.notas %}
+                                                <strong>Notas:</strong> {{ alquiler.notas }}<br>
+                                            {% endif %}
+                                        </p>
+                                        {% if alquiler.estado == 'completado' %}
+                                            <div class="alert alert-success">
+                                                Alquiler completado. ¡Gracias por usar nuestro servicio!
+                                            </div>
+                                        {% elif alquiler.estado == 'reservado' %}
+                                            <div class="alert alert-info">
+                                                Tu alquiler está reservado. Pronto recibirás más información.
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            {% elif alquiler.estado == 'completado' %}
-                                <div class="alert alert-secondary" role="alert">
-                                    Alquiler completado. ¡Gracias por usar nuestro servicio!
-                                </div>
-                            {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="alert alert-info" role="alert">
-            No tienes alquileres registrados en este momento.
-        </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No tienes alquileres realizados aún.
+            </div>
+        {% endif %}
     {% endif %}
 </div>
 {% endblock %} 

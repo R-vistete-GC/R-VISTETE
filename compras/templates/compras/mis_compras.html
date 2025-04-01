@@ -13,25 +13,38 @@
                 {% for compra in compras %}
                     <div class="col-md-6 mb-4">
                         <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ compra.publicacion.titulo }}</h5>
-                                <div class="mb-2">
-                                    <span class="badge {% if compra.estado == 'pendiente' %}bg-warning
-                                                      {% elif compra.estado == 'completada' %}bg-success
-                                                      {% else %}bg-danger{% endif %}">
-                                        {{ compra.get_estado_display }}
-                                    </span>
-                                </div>
-                                <p class="card-text">
-                                    <strong>Fecha:</strong> {{ compra.fecha_venta|date:"d/m/Y H:i" }}<br>
-                                    <strong>Precio:</strong> ${{ compra.precio_final }}<br>
-                                    <strong>Método de pago:</strong> {{ compra.metodo_pago }}<br>
-                                    <strong>Vendedor:</strong> {{ compra.vendedor.nombre }}<br>
-                                    <strong>Dirección de envío:</strong> {{ compra.direccion_envio }}<br>
-                                    {% if compra.notas %}
-                                        <strong>Notas:</strong> {{ compra.notas }}<br>
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if compra.publicacion.imagen_url %}
+                                        <img src="{{ compra.publicacion.imagen_url }}" class="img-fluid rounded-start" alt="{{ compra.publicacion.titulo }}" style="height: 200px; width: 100%; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                                        </div>
                                     {% endif %}
-                                </p>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ compra.publicacion.titulo }}</h5>
+                                        <div class="mb-2">
+                                            <span class="badge {% if compra.estado == 'pendiente' %}bg-warning
+                                                          {% elif compra.estado == 'completada' %}bg-success
+                                                          {% else %}bg-danger{% endif %}">
+                                                {{ compra.get_estado_display }}
+                                            </span>
+                                        </div>
+                                        <p class="card-text">
+                                            <strong>Fecha:</strong> {{ compra.fecha_venta|date:"d/m/Y H:i" }}<br>
+                                            <strong>Precio:</strong> ${{ compra.precio_final }}<br>
+                                            <strong>Método de pago:</strong> {{ compra.metodo_pago }}<br>
+                                            <strong>Vendedor:</strong> {{ compra.vendedor.nombre }}<br>
+                                            <strong>Dirección de envío:</strong> {{ compra.direccion_envio }}<br>
+                                            {% if compra.notas %}
+                                                <strong>Notas:</strong> {{ compra.notas }}<br>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
