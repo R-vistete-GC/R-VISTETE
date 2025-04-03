@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import ArrayField  # Importar ArrayField
 from django.db import models
 from users.models import Usuario
+from django.db.models import Avg
+from django.utils import timezone
 
 class Publicacion(models.Model):
     id = models.AutoField(primary_key=True)
@@ -74,9 +76,13 @@ class Comentario(models.Model):
     publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE, db_column='publicacion_id')
     comentario = models.TextField()
     fecha_comentario = models.DateTimeField(auto_now_add=True)
+    # Nuevos campos para análisis de sentimiento
+    polaridad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    subjetividad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    fecha_analisis = models.DateTimeField(null=True)
 
     class Meta:
-        db_table = 'comentarios'  # 🔗 Conectar con la tabla en PostgreSQL
+        db_table = 'comentarios'
         ordering = ['-fecha_comentario']
 
     def __str__(self):
@@ -173,3 +179,47 @@ class Favorito(models.Model):
 
     def __str__(self):
         return f"Favorito de {self.usuario.nombre} - {self.publicacion.titulo}"
+
+class MetricasSentimiento(models.Model):
+    publicacion = models.OneToOneField(
+        Publicacion, 
+        on_delete=models.CASCADE, 
+        primary_key=True, 
+        db_column='publicacion_id'
+    )
+    sentimiento_promedio = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    subjetividad_promedio = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    total_comentarios = models.IntegerField(default=0)
+    comentarios_positivos = models.IntegerField(default=0)
+    comentarios_negativos = models.IntegerField(default=0)
+    comentarios_neutros = models.IntegerField(default=0)
+    ultima_actualizacion = models.DateTimeField(null=True)
+
+    class Meta:
+        db_table = 'metricas_sentimiento'
+
+    def __str__(self):
+        return f"Métricas de sentimiento para {self.publicacion.titulo}"
+
+    def actualizar_metricas(self):
+        """Actualiza las métricas de sentimiento basadas en los comentarios"""
+        comentarios = Comentario.objects.filter(
+            publicacion=self.publicacion,
+            polaridad__isnull=False
+        )
+        
+        self.total_comentarios = comentarios.count()
+        if self.total_comentarios > 0:
+            self.sentimiento_promedio = comentarios.aggregate(
+                Avg('polaridad')
+            )['polaridad__avg']
+            self.subjetividad_promedio = comentarios.aggregate(
+                Avg('subjetividad')
+            )['subjetividad__avg']
+            
+            self.comentarios_positivos = comentarios.filter(polaridad__gt=0).count()
+            self.comentarios_negativos = comentarios.filter(polaridad__lt=0).count()
+            self.comentarios_neutros = comentarios.filter(polaridad=0).count()
+            
+        self.ultima_actualizacion = timezone.now()
+        self.save()

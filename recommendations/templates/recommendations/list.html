@@ -10,43 +10,178 @@
         <div class="row">
             {% for rec in recomendaciones %}
             <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="{{ rec.publicacion.imagen_url }}" class="card-img-top" alt="{{ rec.publicacion.titulo }}" style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ rec.publicacion.titulo }}</h5>
-                        <p class="card-text text-muted">{{ rec.publicacion.descripcion|truncatechars:100 }}</p>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge bg-primary">⭐ {{ rec.puntuacion }}% match</span>
-                            <span class="text-success">${{ rec.publicacion.precio }}</span>
+                <div class="card h-100 shadow-hover">
+                    <div class="position-relative">
+                        <img src="{{ rec.publicacion.imagen_url }}" class="card-img-top" alt="{{ rec.publicacion.titulo }}" style="height: 300px; object-fit: cover;">
+                        <div class="match-badge">
+                            <span class="match-score">{{ rec.puntuacion }}%</span>
+                            <span class="match-label">match</span>
                         </div>
-                        {% if rec.basado_en_historial %}
-                        <div class="d-flex align-items-center">
-                            <small class="text-muted">
-                                <i class="fas fa-history me-1"></i> Basado en tu historial
-                            </small>
-                        </div>
-                        {% endif %}
                     </div>
-                    <div class="card-footer bg-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="#" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">{{ rec.publicacion.titulo }}</h5>
+                        
+                        <!-- Precio y Tipo -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="precio">${{ rec.publicacion.precio }}</span>
                             {% if rec.publicacion.tipo == 'venta' %}
-                                <span class="badge bg-success">Venta</span>
+                                <span class="badge bg-gradient-success">Venta</span>
                             {% else %}
-                                <span class="badge bg-info">Alquiler</span>
+                                <span class="badge bg-gradient-info">Alquiler</span>
                             {% endif %}
                         </div>
+
+                        <p class="card-text text-muted mb-3">{{ rec.publicacion.descripcion|truncatechars:100 }}</p>
+
+                        <!-- Razones de recomendación -->
+                        <div class="razones-recomendacion">
+                            <h6 class="razones-titulo">¿Por qué te puede interesar?</h6>
+                            {% for razon in rec.razones %}
+                                <div class="razon-item">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <span>{{ razon }}</span>
+                                </div>
+                            {% endfor %}
+                            
+                            {% if rec.basado_en_historial %}
+                            <div class="razon-item historial">
+                                <i class="fas fa-history text-info"></i>
+                                <span>Basado en tu historial de compras</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if rec.basado_en_sentimiento %}
+                            <div class="razon-item sentimiento">
+                                <i class="fas fa-smile text-warning"></i>
+                                <span>Bien valorado por la comunidad</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="/posts/{{ rec.publicacion.id }}/" class="btn btn-primary btn-block w-100">
+                            Ver detalle
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
             {% empty %}
             <div class="col-12">
                 <div class="alert alert-info">
-                    No encontramos recomendaciones. Actualiza tus <a href="{% url 'users:editar_perfil' %}">preferencias</a>.
+                    <i class="fas fa-info-circle me-2"></i>
+                    No encontramos recomendaciones. 
+                    <a href="{% url 'users:editar_perfil' %}" class="alert-link">Actualiza tus preferencias</a>.
                 </div>
             </div>
             {% endfor %}
         </div>
     {% endif %}
 </div>
+
+{% block extra_css %}
+<style>
+    .shadow-hover {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .shadow-hover:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+
+    .match-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: linear-gradient(45deg, #007bff, #00bcd4);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1;
+    }
+
+    .match-score {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .match-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+
+    .precio {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #28a745;
+    }
+
+    .badge {
+        padding: 8px 12px;
+        font-weight: 500;
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(45deg, #28a745, #20c997);
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(45deg, #17a2b8, #00bcd4);
+    }
+
+    .razones-recomendacion {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .razones-titulo {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .razon-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .razon-item i {
+        margin-right: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .razon-item.historial {
+        color: #17a2b8;
+    }
+
+    .razon-item.sentimiento {
+        color: #ffc107;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #007bff, #00bcd4);
+        border: none;
+        padding: 0.8rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+    }
+</style>
+{% endblock %}
+
 {% endblock %}

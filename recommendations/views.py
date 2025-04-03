@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from users.models import PerfilUsuario
-from posts.models import Publicacion, Venta, Alquiler
+from posts.models import Publicacion, Venta, Alquiler, Comentario, MetricasSentimiento
 from collections import defaultdict
+from django.db.models import Avg, Q
+from sentiment_analysis.utils import SentimentAnalyzer
 
 def recomendaciones_view(request):
     # Verificar autenticación
@@ -21,6 +23,11 @@ def recomendaciones_view(request):
         publicaciones = Publicacion.objects.exclude(usuario_id=usuario_id).filter(
             publico=perfil.genero
         )
+        
+        # Obtener métricas de sentimiento para todas las publicaciones
+        metricas_por_publicacion = {
+            m.publicacion_id: m for m in MetricasSentimiento.objects.all()
+        }
         
         # Obtener historial de compras y alquileres
         compras = Venta.objects.filter(comprador_id=usuario_id, estado='completada')
@@ -64,21 +71,29 @@ def recomendaciones_view(request):
         for publicacion in publicaciones:
             puntuacion = 0
             puntuacion_historial = 0
+            puntuacion_sentimiento = 0
+            razones = []
             
             # Puntuación basada en preferencias del perfil
             if perfil.talla and publicacion.talla == perfil.talla:
-                puntuacion += 30
+                puntuacion += 50
+                razones.append("Coincide con tu talla preferida")
             
             if estilos_usuario and publicacion.estilo:
                 coincidencias = len(set(estilos_usuario) & set(publicacion.estilo))
-                puntuacion += 30 * (coincidencias / len(estilos_usuario))
+                if coincidencias > 0:
+                    puntuacion += 50 * (coincidencias / len(estilos_usuario))
+                    razones.append(f"Coincide con {coincidencias} de tus estilos preferidos")
             
             if colores_usuario and publicacion.colores:
                 coincidencias = len(set(colores_usuario) & set(publicacion.colores))
-                puntuacion += 20 * (coincidencias / len(colores_usuario))
+                if coincidencias > 0:
+                    puntuacion += 40 * (coincidencias / len(colores_usuario))
+                    razones.append(f"Incluye {coincidencias} de tus colores favoritos")
             
             if perfil.genero and publicacion.publico == perfil.genero:
-                puntuacion += 20
+                puntuacion += 40
+                razones.append("Diseñado para tu género")
                 
             # Puntuación basada en historial de transacciones
             if total_transacciones > 0:
@@ -96,14 +111,36 @@ def recomendaciones_view(request):
                 # Normalizar puntuación del historial
                 puntuacion_historial = min(100, puntuacion_historial)
                 
-                # Combinar puntuaciones (50% perfil, 50% historial)
-                puntuacion = (puntuacion + puntuacion_historial) / 2
+                if puntuacion_historial > 0:
+                    razones.append("Basado en tus compras anteriores")
+
+            # Puntuación basada en sentimiento
+            metricas = metricas_por_publicacion.get(publicacion.id)
+            if metricas and metricas.total_comentarios > 0:
+                # Calcular puntuación de sentimiento (0-100)
+                sentimiento_normalizado = (metricas.sentimiento_promedio + 1) * 50  # Convertir de [-1,1] a [0,100]
+                puntuacion_sentimiento = sentimiento_normalizado
+                
+                if metricas.comentarios_positivos > metricas.comentarios_negativos:
+                    razones.append(f"Valoración positiva de la comunidad ({metricas.comentarios_positivos} comentarios positivos)")
+                
+                if metricas.subjetividad_promedio < 0.5:
+                    razones.append("Opiniones objetivas de usuarios")
+
+            # Combinar puntuaciones (40% perfil, 30% historial, 30% sentimiento)
+            puntuacion_final = (
+                (puntuacion * 0.4) +
+                (puntuacion_historial * 0.3) +
+                (puntuacion_sentimiento * 0.3)
+            )
             
-            if puntuacion > 0:
+            if puntuacion_final > 0:
                 recomendaciones.append({
                     'publicacion': publicacion,
-                    'puntuacion': round(puntuacion, 2),
-                    'basado_en_historial': puntuacion_historial > 0
+                    'puntuacion': round(puntuacion_final, 2),
+                    'basado_en_historial': puntuacion_historial > 0,
+                    'basado_en_sentimiento': puntuacion_sentimiento > 0,
+                    'razones': razones
                 })
         
         # Ordenar y mostrar
