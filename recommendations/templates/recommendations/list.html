@@ -15,13 +15,27 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ rec.publicacion.titulo }}</h5>
                         <p class="card-text text-muted">{{ rec.publicacion.descripcion|truncatechars:100 }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="badge bg-primary">⭐ {{ rec.puntuacion }}% match</span>
                             <span class="text-success">${{ rec.publicacion.precio }}</span>
                         </div>
+                        {% if rec.basado_en_historial %}
+                        <div class="d-flex align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-history me-1"></i> Basado en tu historial
+                            </small>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="card-footer bg-white">
-                        <a href="#" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="#" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                            {% if rec.publicacion.tipo == 'venta' %}
+                                <span class="badge bg-success">Venta</span>
+                            {% else %}
+                                <span class="badge bg-info">Alquiler</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

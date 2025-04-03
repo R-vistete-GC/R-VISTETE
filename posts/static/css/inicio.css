@@ -1,40 +1,41 @@
 /* 📌 Estilos para los Cards de Publicaciones */
 .card {
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     transition: transform 0.2s ease-in-out;
-    margin-bottom: 1rem;
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,0.125);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 /* 📌 Grid para organizar las cards */
 .row {
-    --bs-gutter-x: 1.5rem;
-    --bs-gutter-y: 1.5rem;
     display: flex;
     flex-wrap: wrap;
-    margin-top: calc(-1 * var(--bs-gutter-y));
-    margin-right: calc(-.5 * var(--bs-gutter-x));
-    margin-left: calc(-.5 * var(--bs-gutter-x));
+    margin: -0.5rem;
+    width: calc(100% + 1rem);
 }
 
 /* 📌 Ajuste de imágenes dentro del Card */
 .card-img-top {
-    height: 250px;
     width: 100%;
+    height: 250px;
     object-fit: cover;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
 }
 
 /* 📌 Ajuste del contenido dentro del Card */
 .card-body {
+    flex: 1;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-title {
@@ -62,7 +63,7 @@
 
 .card-footer {
     background-color: #fff;
-    border-top: 1px solid rgba(0, 0, 0, 0.125);
+    border-top: 1px solid rgba(0,0,0,0.125);
     padding: 0.75rem;
 }
 
@@ -74,6 +75,16 @@
 }
 
 /* 📌 Responsive: Ajustes para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+    .publicaciones-container {
+        padding-top: 0.5rem;
+    }
+    
+    .card-img-top {
+        height: 200px;
+    }
+}
+
 @media (min-width: 576px) {
     .col-sm-6 {
         flex: 0 0 auto;
@@ -265,4 +276,41 @@
         margin-left: 5px;
         font-size: 0.9rem;
     }
+
+/* Contenedor principal de publicaciones */
+.publicaciones-container {
+    width: 100%;
+    min-height: 100%;
+    padding-top: 1rem;
+    position: relative;
+}
+
+/* Ajustes para las columnas */
+.col-12,
+.col-sm-6,
+.col-lg-4 {
+    padding: 0.5rem;
+}
+
+/* Contenedor principal */
+.container-fluid {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Ajustes de espaciado */
+.py-4 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+}
+
+.mt-4 {
+    margin-top: 2rem !important;
+}
 

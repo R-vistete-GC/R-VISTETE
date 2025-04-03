@@ -1,31 +1,153 @@
-/* Estilos generales */
+/* Reset básico */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body {
-    padding-top: 5rem; /* Cambiado a rem para mejor escalabilidad */
-    min-height: 100vh;
     background-color: #f8f9fa;
+    padding-top: 70px;
+    min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+    height: 70px;
+    background-color: #fff !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
+.nav-link {
+    color: #333 !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.nav-link:hover {
+    color: #000 !important;
+}
+
+.nav-link.active {
+    color: #198754 !important;
+}
+
+/* Contenedor principal */
+.main-wrapper {
+    min-height: calc(100vh - 70px);
+    width: 100%;
+    padding-top: 2rem;
+}
+
+.container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+    body {
+        padding-top: 60px;
+    }
+
+    .navbar {
+        height: 60px;
+    }
+
+    .main-wrapper {
+        min-height: calc(100vh - 60px);
+        padding-top: 1rem;
+    }
 }
 
 /* Estilos del navbar */
 .navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    background-color: white !important;
-    padding: 0.75rem 1rem;
-    min-height: 4rem; /* Usando rem en lugar de px fijo */
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 1030;
+    background: rgba(255, 255, 255, 0.6); /* Transparente con un poco de opacidad */
+    backdrop-filter: blur(10px); /* Efecto difuminado */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
 }
 
-/* Contenedores principales */
-.container {
-    padding: 1.5rem 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
+/* Logo y marca */
+.navbar-brand {
+    font-weight: 600;
+    color: #000000 !important;
+    font-size: 1.5rem;
 }
 
-/* Ajustes para cards */
+/* Estilos para los enlaces */
+.nav-link {
+    color: #000000 !important;
+    font-weight: 50;
+    padding: 1rem 0.5rem !important;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.nav-link:hover {
+    color: #0b0b0b !important;
+    background-color: #afcbadaf; /* Verde del logo */
+}
+
+/* Estado activo */
+.nav-link.active {
+    color: #fff !important;
+    background-color: #A4C3A2;
+}
+
+/* Menú desplegable */
+.dropdown-menu {
+    background-color: rgb(255, 255, 255);
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    color: #000000;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #A4C3A2;
+    color: rgb(0, 0, 0);
+}
+
+/* Navbar responsive */
+@media (max-width: 991px) {
+    .navbar {
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .navbar-toggler {
+        border: none;
+        outline: none;
+    }
+
+    .navbar-toggler-icon {
+        filter: invert(1);
+    }
+}
+
+/* Mantener el resto de los estilos existentes... */
 .card {
     margin-bottom: 1.5rem;
     border: none;
@@ -50,22 +172,27 @@ body {
     margin-top: 5rem;
 }
 
-/* Ajustes responsive */
-@media (max-width: 768px) {
-    body {
-        padding-top: 4rem; /* Ajustado para móviles usando rem */
-    }
-
-    .navbar {
-        min-height: 3.5rem; /* Altura mínima en móviles */
-    }
-
+@media (min-width: 1200px) {
     .container {
-        padding: 1rem 0.75rem;
+        max-width: 1140px;
     }
+}
 
-    .card-img-top {
-        height: 15rem; /* Altura ajustada para móviles */
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
     }
 }
 
@@ -73,13 +200,6 @@ body {
 :focus {
     outline: 2px solid #0d6efd;
     outline-offset: 2px;
-}
-
-/* Ajustes para el contenido principal */
-main, .main-content {
-    min-height: calc(100vh - 5rem);
-    padding: 1.5rem 0;
-    margin-top: 1rem;
 }
 
 /* Ajustes para imágenes en general */
@@ -157,192 +277,203 @@ img {
         filter: invert(1);
     }
 }
-      /* Estilos comunes */
-        .logo{
-            width: 130px;
-        }
-        
-        .navbar-brand i {
-            color: green;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .btn-group {
-            gap: 5px;
-        }
-        .badge {
-            font-size: 0.8em;
-            padding: 0.4em 0.8em;
-        }
-        .stats-card {
-            transition: transform 0.2s;
-        }
-        .stats-card:hover {
-            transform: translateY(-5px);
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-        /* Estilos para el panel de notificaciones tipo Instagram */
-        .notifications-panel {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            width: 500px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            z-index: 1050;
-            display: none;
-            max-height: 600px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
 
-        .notifications-panel:before {
-            content: '';
-            position: absolute;
-            top: -8px;
-            right: 20px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            transform: rotate(45deg);
-            border-left: 1px solid rgba(0,0,0,0.1);
-            border-top: 1px solid rgba(0,0,0,0.1);
-        }
+/* Estilos comunes */
+.navbar-brand i {
+    color: green;
+}
 
-        .notifications-panel.show {
-            display: block;
-            animation: fadeIn 0.2s ease-out;
-        }
+.card {
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.btn-group {
+    gap: 5px;
+}
 
-        .notification-item {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
+.badge {
+    font-size: 0.8em;
+    padding: 0.4em 0.8em;
+}
 
-        .notification-item:hover {
-            background-color: #f8f9fa;
-        }
+.stats-card {
+    transition: transform 0.2s;
+}
 
-        .notification-item:last-child {
-            border-bottom: none;
-        }
+.stats-card:hover {
+    transform: translateY(-5px);
+}
 
-        .notification-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            margin-right: 12px;
-            object-fit: cover;
-        }
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
 
-        .notification-content {
-            flex: 1;
-        }
+/* Estilos para el panel de notificaciones tipo Instagram */
+.notifications-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1050;
+    display: none;
+    max-height: 600px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
 
-        .notification-text {
-            margin: 0;
-            font-size: 14px;
-            color: #262626;
-        }
+.notifications-panel:before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    transform: rotate(45deg);
+    border-left: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
 
-        .notification-time {
-            font-size: 12px;
-            color: #8e8e8e;
-            margin-top: 4px;
-        }
+.notifications-panel.show {
+    display: block;
+    animation: fadeIn 0.2s ease-out;
+}
 
-        .notification-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f0f0;
-            font-weight: 600;
-        }
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        .notifications-empty {
-            padding: 32px 16px;
-            text-align: center;
-            color: #8e8e8e;
-        }
+.notification-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
 
-        .notifications-empty i {
-            font-size: 32px;
-            margin-bottom: 8px;
-            color: #c7c7c7;
-        }
-        
-        .btn-publish {
-            color: white;
-            border-radius: 50%;
-            padding: 8px;
-            transition: all 0.3s ease;
-            border: none;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-publish:hover {
-            background-color: green;
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        .btn-publish i {
-            margin-right: 0;
-            font-size: 0.9rem;
-        }
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
 
-        .tag-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 0.5rem 0;
-        }
+.notification-item:last-child {
+    border-bottom: none;
+}
 
-        .tag {
-            background-color: #f8f9fa;
-            color: #2c3e50;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            border: 1px solid #e9ecef;
-        }
+.notification-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    margin-right: 12px;
+    object-fit: cover;
+}
 
-        .color-tag {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+.notification-content {
+    flex: 1;
+}
 
-        .color-preview {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0 0 4px rgba(0,0,0,0.1);
-        }
+.notification-text {
+    margin: 0;
+    font-size: 14px;
+    color: #262626;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #8e8e8e;
+    margin-top: 4px;
+}
+
+.notification-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: 600;
+}
+
+.notifications-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: #8e8e8e;
+}
+
+.notifications-empty i {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: #c7c7c7;
+}
+
+.btn-publish {
+    color: white;
+    border-radius: 50%;
+    padding: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-publish:hover {
+    background-color: green;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-publish i {
+    margin-right: 0;
+    font-size: 0.9rem;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.tag {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid #e9ecef;
+}
+
+.color-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.color-preview {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
+
+/* Grid system override */
+.row {
+    margin-right: 0;
+    margin-left: 0;
+    width: 100%;
+}
