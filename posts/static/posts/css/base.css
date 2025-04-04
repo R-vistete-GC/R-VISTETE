@@ -14,13 +14,13 @@ html, body {
 }
 
 body {
-    padding-top: 70px;
+    padding-top: 90px;
     background-color: #f8f9fa;
 }
 
 /* Navbar */
 .navbar {
-    height: 70px;
+    height: 100px;
     background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -39,9 +39,10 @@ body {
 }
 
 .logo {
-    height: 60px;
+    height: 100px;
     width: auto;
     margin-right: 0.5rem;
+    margin-bottom: 5px;
 }
 
 /* Enlaces del navbar */
@@ -220,15 +221,15 @@ body {
 
 @media (max-width: 767.98px) {
     body {
-        padding-top: 60px;
+        padding-top: 70px;
     }
 
     .navbar {
-        height: 60px;
+        height: 70px;
     }
 
     .logo {
-        height: 32px;
+        height: 50px;
     }
 
     .main-wrapper {
