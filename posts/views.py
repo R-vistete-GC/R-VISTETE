@@ -27,17 +27,9 @@ def inicio_view(request):
     usuario_id = request.session.get('usuario_id')
     print("Usuario ID from session:", usuario_id)
     
-    if not usuario_id:
-        print("No usuario_id in session, redirecting to login")
-        return redirect('/usuarios/login/')
-    
     try:
-        # Verificar que el usuario existe
-        usuario = Usuario.objects.get(id=usuario_id)
-        print("Usuario encontrado:", usuario.nombre)
-        
-        # Obtener las publicaciones con sus comentarios
-        publicaciones = Publicacion.objects.all().order_by('-fecha_publicacion')
+        # Obtener las publicaciones con sus comentarios y métricas de sentimiento
+        publicaciones = Publicacion.objects.all().order_by('-fecha_publicacion').select_related('metricassentimiento')
         
         # Convertir arrays a strings para la plantilla
         for publicacion in publicaciones:
@@ -50,48 +42,55 @@ def inicio_view(request):
                 publicacion=publicacion
             ).select_related('usuario').order_by('fecha_comentario')
         
-        # Obtener los IDs de las publicaciones favoritas del usuario
-        favoritos = Favorito.objects.filter(usuario=usuario)
-        favoritos_ids = favoritos.values_list('publicacion_id', flat=True)
-        
-        # Obtener los IDs de las publicaciones con like del usuario
-        likes = Like.objects.filter(usuario=usuario)
-        likes_ids = likes.values_list('publicacion_id', flat=True)
-        
-        # Obtener el conteo de likes para cada publicación
-        for publicacion in publicaciones:
-            publicacion.likes_count = Like.objects.filter(publicacion=publicacion).count()
-        
-        # Obtener los dislikes del usuario actual si está autenticado
-        dislikes_usuario = set()
-        if request.user.is_authenticated:
-            dislikes_usuario = set(Dislike.objects.filter(usuario=request.user).values_list('publicacion_id', flat=True))
-        
-        # Agregar conteo de dislikes a cada publicación
-        for publicacion in publicaciones:
-            publicacion.dislikes_count = Dislike.objects.filter(publicacion=publicacion).count()
-        
         context = {
             'publicaciones': publicaciones,
-            'usuario': usuario,
-            'nombre_usuario': usuario.nombre,
-            'favoritos': list(favoritos_ids),
-            'favoritos_count': favoritos.count(),
-            'likes': list(likes_ids),
-            'likes_count': likes.count(),
-            'dislikes_usuario': dislikes_usuario
         }
+
+        # Si hay usuario en sesión, agregar información adicional al contexto
+        if usuario_id:
+            try:
+                usuario = Usuario.objects.get(id=usuario_id)
+                # Obtener los IDs de las publicaciones favoritas del usuario
+                favoritos = Favorito.objects.filter(usuario=usuario)
+                favoritos_ids = favoritos.values_list('publicacion_id', flat=True)
+                
+                # Obtener los IDs de las publicaciones con like del usuario
+                likes = Like.objects.filter(usuario=usuario)
+                likes_ids = likes.values_list('publicacion_id', flat=True)
+                
+                # Obtener el conteo de likes para cada publicación
+                for publicacion in publicaciones:
+                    publicacion.likes_count = Like.objects.filter(publicacion=publicacion).count()
+                
+                # Obtener los dislikes del usuario actual
+                dislikes_usuario = set(Dislike.objects.filter(usuario=usuario).values_list('publicacion_id', flat=True))
+                
+                # Agregar conteo de dislikes a cada publicación
+                for publicacion in publicaciones:
+                    publicacion.dislikes_count = Dislike.objects.filter(publicacion=publicacion).count()
+                
+                context.update({
+                    'usuario': usuario,
+                    'nombre_usuario': usuario.nombre,
+                    'favoritos': list(favoritos_ids),
+                    'favoritos_count': favoritos.count(),
+                    'likes': list(likes_ids),
+                    'likes_count': likes.count(),
+                    'dislikes_usuario': dislikes_usuario
+                })
+            except Usuario.DoesNotExist:
+                pass
+        
         print("Rendering inicio.html with context")
         return render(request, 'inicio.html', context)
     
-    except Usuario.DoesNotExist as e:
-        print("Usuario no existe en la base de datos:", str(e))
-        request.session.flush()
-        return redirect('/usuarios/login/')
     except Exception as e:
         print("Error inesperado:", str(e))
-        request.session.flush()
-        return redirect('/usuarios/login/')
+        context = {
+            'publicaciones': [],
+            'error': 'Ocurrió un error al cargar las publicaciones.'
+        }
+        return render(request, 'inicio.html', context)
 
 
 #comentarios

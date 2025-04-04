@@ -118,7 +118,7 @@ def recomendaciones_view(request):
             metricas = metricas_por_publicacion.get(publicacion.id)
             if metricas and metricas.total_comentarios > 0:
                 # Calcular puntuación de sentimiento (0-100)
-                sentimiento_normalizado = (metricas.sentimiento_promedio + 1) * 50  # Convertir de [-1,1] a [0,100]
+                sentimiento_normalizado = float((metricas.sentimiento_promedio + 1) * 50)  # Convertir de [-1,1] a [0,100]
                 puntuacion_sentimiento = sentimiento_normalizado
                 
                 if metricas.comentarios_positivos > metricas.comentarios_negativos:
@@ -126,6 +126,11 @@ def recomendaciones_view(request):
                 
                 if metricas.subjetividad_promedio < 0.5:
                     razones.append("Opiniones objetivas de usuarios")
+
+            # Convertir todas las puntuaciones a float antes de combinar
+            puntuacion = float(puntuacion)
+            puntuacion_historial = float(puntuacion_historial)
+            puntuacion_sentimiento = float(puntuacion_sentimiento)
 
             # Combinar puntuaciones (40% perfil, 30% historial, 30% sentimiento)
             puntuacion_final = (
