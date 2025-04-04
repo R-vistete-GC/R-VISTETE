@@ -39,7 +39,7 @@ body {
 }
 
 .logo {
-    height: 40px;
+    height: 60px;
     width: auto;
     margin-right: 0.5rem;
 }
@@ -116,16 +116,18 @@ body {
     background-color: #A4C3A2 !important;
 }
 
-/* Botones */
-.btn-success {
+/* Botón Publicar */
+.btn-publicar {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.75rem;
     background-color: #A4C3A2;
     border-color: #A4C3A2;
     color: white;
-    padding: 0.5rem 1rem;
+    border-radius: 4px;
     transition: all 0.3s ease;
 }
 
-.btn-success:hover {
+.btn-publicar:hover {
     background-color: #93b191;
     border-color: #93b191;
     transform: translateY(-1px);
