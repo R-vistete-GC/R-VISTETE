@@ -1,0 +1,17 @@
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.btn-link {
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    transform: scale(1.1);
+}
