@@ -29,7 +29,10 @@ def inicio_view(request):
     
     try:
         # Obtener las publicaciones con sus comentarios y métricas de sentimiento
-        publicaciones = Publicacion.objects.all().order_by('-fecha_publicacion').select_related('metricassentimiento')
+        publicaciones = Publicacion.objects.all().order_by('-fecha_publicacion')
+        print("Total publicaciones encontradas:", publicaciones.count())
+        for pub in publicaciones:
+            print(f"Publicación ID: {pub.id}, Título: {pub.titulo}, Usuario: {pub.usuario.nombre}")
         
         # Convertir arrays a strings para la plantilla
         for publicacion in publicaciones:
@@ -499,57 +502,115 @@ def agregar_comentario(request, publicacion_id):
 def publicar_prenda(request):
     if request.method == 'POST':
         try:
+            print("=== Iniciando publicación de prenda ===")
+            print("POST data:", request.POST)
+            print("FILES:", request.FILES)
+            
             # Obtener el usuario de la sesión
             usuario_id = request.session.get('usuario_id')
+            print("Usuario ID:", usuario_id)
+            
             if not usuario_id:
-                messages.error(request, 'Usuario no autenticado')
-                return redirect('login')
+                print("Error: Usuario no autenticado")
+                return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
 
-            # Obtener datos del formulario
+            # Obtener y validar datos del formulario
             titulo = request.POST.get('titulo')
-            descripcion = request.POST.get('descripcion')
-            tipo = request.POST.get('tipo')
-            precio = request.POST.get('precio')
-            deposito = request.POST.get('deposito') if tipo == 'alquiler' else None
-            publico = request.POST.get('publico')
-            talla = request.POST.get('talla')
+            descripcion = request.POST.get('descripcion', '')  # Opcional
+            tipo = request.POST.get('tipo', 'venta')  # Default: venta
+            
+            try:
+                precio = Decimal(request.POST.get('precio', '0'))
+            except:
+                print("Error: Precio inválido")
+                return JsonResponse({'success': False, 'error': 'El precio debe ser un número válido'}, status=400)
+            
+            deposito = None
+            if tipo == 'alquiler':
+                try:
+                    deposito = Decimal(request.POST.get('deposito', '0'))
+                except:
+                    print("Error: Depósito inválido")
+                    return JsonResponse({'success': False, 'error': 'El depósito debe ser un número válido'}, status=400)
+            
+            publico = request.POST.get('publico', 'mujer')  # Default: mujer
+            talla = request.POST.get('talla', 'M')  # Default: M
+            
+            # Obtener arrays de estilos y colores
             estilos = request.POST.getlist('estilo[]')
             colores = request.POST.getlist('colores[]')
+            
+            print("=== Datos validados ===")
+            print(f"Título: {titulo}")
+            print(f"Tipo: {tipo}")
+            print(f"Precio: {precio}")
+            print(f"Depósito: {deposito}")
+            print(f"Público: {publico}")
+            print(f"Talla: {talla}")
+            print(f"Estilos: {estilos}")
+            print(f"Colores: {colores}")
 
             # Validar campos requeridos
-            if not all([titulo, tipo, precio, publico, talla, estilos, colores]):
-                messages.error(request, 'Por favor completa todos los campos obligatorios')
-                return redirect('publicar')
+            if not titulo:
+                print("Error: Título requerido")
+                return JsonResponse({'success': False, 'error': 'El título es obligatorio'}, status=400)
+            
+            if not precio or precio <= 0:
+                print("Error: Precio inválido")
+                return JsonResponse({'success': False, 'error': 'El precio debe ser mayor a 0'}, status=400)
 
-            # Procesar imagen si se proporcionó
-            imagen_url = None
-            if 'imagen' in request.FILES:
-                imagen = request.FILES['imagen']
-                # Guardar la imagen y obtener la URL
-                path = default_storage.save(f'prendas/{imagen.name}', ContentFile(imagen.read()))
-                imagen_url = default_storage.url(path)
+            if tipo == 'alquiler' and (not deposito or deposito <= 0):
+                print("Error: Depósito requerido para alquiler")
+                return JsonResponse({'success': False, 'error': 'El depósito es obligatorio para alquileres'}, status=400)
 
+            # Validar imagen
+            if 'imagen' not in request.FILES:
+                print("Error: Imagen no proporcionada")
+                return JsonResponse({'success': False, 'error': 'La imagen es obligatoria'}, status=400)
+            
+            imagen = request.FILES['imagen']
+            print("Imagen recibida:", imagen.name)
+            
             # Crear la publicación
-            publicacion = Publicacion.objects.create(
-                usuario_id=usuario_id,
-                titulo=titulo,
-                descripcion=descripcion,
-                imagen_url=imagen_url,
-                precio=precio,
-                tipo=tipo,
-                deposito=deposito,
-                publico=publico,
-                talla=talla,
-                estilo=estilos,
-                colores=colores
-            )
-
-            messages.success(request, 'Publicación creada exitosamente')
-            return redirect('inicio')
+            try:
+                publicacion = Publicacion.objects.create(
+                    usuario_id=usuario_id,
+                    titulo=titulo,
+                    descripcion=descripcion,
+                    imagen=imagen,
+                    precio=precio,
+                    tipo=tipo,
+                    deposito=deposito,
+                    publico=publico,
+                    talla=talla,
+                    estilo=estilos if estilos else [],
+                    colores=colores if colores else [],
+                    fecha_publicacion=timezone.now()  # Asegurar que se use la fecha actual
+                )
+                print("Publicación creada exitosamente:", publicacion.id)
+                
+                # Verificar que la publicación se creó correctamente
+                publicacion_verificada = Publicacion.objects.get(id=publicacion.id)
+                print("=== Publicación verificada ===")
+                print(f"ID: {publicacion_verificada.id}")
+                print(f"Usuario: {publicacion_verificada.usuario_id}")
+                print(f"Título: {publicacion_verificada.titulo}")
+                print(f"Imagen: {publicacion_verificada.imagen}")
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Publicación creada exitosamente',
+                    'redirect_url': '/inicio/',
+                    'publicacion_id': publicacion.id
+                })
+                
+            except Exception as e:
+                print("Error al crear la publicación:", str(e))
+                raise e
 
         except Exception as e:
-            messages.error(request, f'Error al crear la publicación: {str(e)}')
-            return redirect('publicar')
+            print("Error en publicar_prenda:", str(e))
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
     return render(request, 'posts/publicar.html')
 

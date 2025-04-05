@@ -144,9 +144,23 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="publicarForm" method="POST">
+                    <form id="publicarForm" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         
+                        <!-- Imagen -->
+                        <div class="form-section">
+                            <label class="form-label">Imagen de la Prenda*</label>
+                            <div class="image-preview empty" id="imagePreview">
+                                <div class="upload-placeholder text-center">
+                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                    <p class="mt-2">Haz clic para subir una imagen</p>
+                                    <small class="text-muted">o arrastra y suelta aquí</small>
+                                </div>
+                                <img src="" alt="" style="display: none;">
+                            </div>
+                            <input type="file" class="form-control" name="imagen" id="imageInput" accept="image/*" required style="display: none;">
+                        </div>
+
                         <!-- Título -->
                         <div class="mb-3">
                             <label for="titulo" class="form-label">Título*</label>
@@ -159,21 +173,19 @@
                             <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
                         </div>
 
-                        <!-- URL de la imagen -->
-                        <div class="mb-3">
-                            <label for="imagen_url" class="form-label">URL de la imagen*</label>
-                            <input type="url" class="form-control" id="imagen_url" name="imagen_url" required 
-                                   placeholder="https://ejemplo.com/imagen.jpg">
-                        </div>
-
                         <!-- Tipo de Publicación -->
                         <div class="mb-3">
                             <label class="form-label">Tipo de Publicación*</label>
-                            <select class="form-control" name="tipo" id="tipoPublicacion" required>
-                                <option value="">Selecciona un tipo</option>
-                                <option value="venta">Venta</option>
-                                <option value="alquiler">Alquiler</option>
-                            </select>
+                            <div class="tipo-toggle">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tipo" id="tipoVenta" value="venta" required>
+                                    <label class="form-check-label" for="tipoVenta">Venta</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tipo" id="tipoAlquiler" value="alquiler">
+                                    <label class="form-check-label" for="tipoAlquiler">Alquiler</label>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Precio -->
@@ -217,56 +229,54 @@
 
                         <!-- Estilo -->
                         <div class="mb-3">
-                            <label class="form-label">
-                                <i class="fas fa-palette text-success me-2"></i>Estilo*
-                            </label>
+                            <label class="form-label">Estilo*</label>
                             <div class="row g-3">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Casual" id="modal-estilo-casual">
-                                        <label class="form-check-label" for="modal-estilo-casual">Casual</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Casual" id="estilo-casual">
+                                        <label class="form-check-label" for="estilo-casual">Casual</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Formal" id="modal-estilo-formal">
-                                        <label class="form-check-label" for="modal-estilo-formal">Formal</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Formal" id="estilo-formal">
+                                        <label class="form-check-label" for="estilo-formal">Formal</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Deportivo" id="modal-estilo-deportivo">
-                                        <label class="form-check-label" for="modal-estilo-deportivo">Deportivo</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Deportivo" id="estilo-deportivo">
+                                        <label class="form-check-label" for="estilo-deportivo">Deportivo</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Elegante" id="modal-estilo-elegante">
-                                        <label class="form-check-label" for="modal-estilo-elegante">Elegante</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Elegante" id="estilo-elegante">
+                                        <label class="form-check-label" for="estilo-elegante">Elegante</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Bohemio" id="modal-estilo-bohemio">
-                                        <label class="form-check-label" for="modal-estilo-bohemio">Bohemio</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Bohemio" id="estilo-bohemio">
+                                        <label class="form-check-label" for="estilo-bohemio">Bohemio</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Vintage" id="modal-estilo-vintage">
-                                        <label class="form-check-label" for="modal-estilo-vintage">Vintage</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Vintage" id="estilo-vintage">
+                                        <label class="form-check-label" for="estilo-vintage">Vintage</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Minimalista" id="modal-estilo-minimalista">
-                                        <label class="form-check-label" for="modal-estilo-minimalista">Minimalista</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Minimalista" id="estilo-minimalista">
+                                        <label class="form-check-label" for="estilo-minimalista">Minimalista</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Streetwear" id="modal-estilo-streetwear">
-                                        <label class="form-check-label" for="modal-estilo-streetwear">Streetwear</label>
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Streetwear" id="estilo-streetwear">
+                                        <label class="form-check-label" for="estilo-streetwear">Streetwear</label>
                                     </div>
                                 </div>
                             </div>
@@ -274,9 +284,7 @@
 
                         <!-- Colores -->
                         <div class="mb-3">
-                            <label class="form-label">
-                                <i class="fas fa-fill-drip text-success me-2"></i>Colores*
-                            </label>
+                            <label class="form-label">Colores*</label>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-check">
@@ -344,7 +352,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="publicarForm" class="btn btn-primary">Publicar</button>
+                    <button type="submit" class="btn btn-primary" id="btnPublicar">Publicar</button>
                 </div>
             </div>
         </div>

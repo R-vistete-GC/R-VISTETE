@@ -9,7 +9,7 @@ class Publicacion(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario_id')
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField(null=True)
-    imagen_url = models.TextField(null=True)
+    imagen = models.ImageField(upload_to='publicaciones/', null=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     fecha_publicacion = models.DateTimeField(auto_now_add=True)
     tipo = models.CharField(max_length=10, default='venta', choices=[('venta', 'Venta'), ('alquiler', 'Alquiler')])
