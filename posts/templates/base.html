@@ -217,31 +217,128 @@
 
                         <!-- Estilo -->
                         <div class="mb-3">
-                            <label class="form-label">Estilo*</label>
-                            <select class="form-control" name="estilo[]" multiple required>
-                                <option value="casual">Casual</option>
-                                <option value="formal">Formal</option>
-                                <option value="deportivo">Deportivo</option>
-                                <option value="elegante">Elegante</option>
-                                <option value="vintage">Vintage</option>
-                            </select>
-                            <small class="text-muted">Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples opciones</small>
+                            <label class="form-label">
+                                <i class="fas fa-palette text-success me-2"></i>Estilo*
+                            </label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Casual" id="modal-estilo-casual">
+                                        <label class="form-check-label" for="modal-estilo-casual">Casual</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Formal" id="modal-estilo-formal">
+                                        <label class="form-check-label" for="modal-estilo-formal">Formal</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Deportivo" id="modal-estilo-deportivo">
+                                        <label class="form-check-label" for="modal-estilo-deportivo">Deportivo</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Elegante" id="modal-estilo-elegante">
+                                        <label class="form-check-label" for="modal-estilo-elegante">Elegante</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Bohemio" id="modal-estilo-bohemio">
+                                        <label class="form-check-label" for="modal-estilo-bohemio">Bohemio</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Vintage" id="modal-estilo-vintage">
+                                        <label class="form-check-label" for="modal-estilo-vintage">Vintage</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Minimalista" id="modal-estilo-minimalista">
+                                        <label class="form-check-label" for="modal-estilo-minimalista">Minimalista</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="estilo[]" value="Streetwear" id="modal-estilo-streetwear">
+                                        <label class="form-check-label" for="modal-estilo-streetwear">Streetwear</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Colores -->
                         <div class="mb-3">
-                            <label class="form-label">Colores*</label>
-                            <select class="form-control" name="colores[]" multiple required>
-                                <option value="negro">Negro</option>
-                                <option value="blanco">Blanco</option>
-                                <option value="rojo">Rojo</option>
-                                <option value="azul">Azul</option>
-                                <option value="verde">Verde</option>
-                                <option value="amarillo">Amarillo</option>
-                                <option value="rosa">Rosa</option>
-                                <option value="morado">Morado</option>
-                            </select>
-                            <small class="text-muted">Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples opciones</small>
+                            <label class="form-label">
+                                <i class="fas fa-fill-drip text-success me-2"></i>Colores*
+                            </label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Negro" id="modal-color-negro">
+                                        <label class="form-check-label" for="modal-color-negro">Negro</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Blanco" id="modal-color-blanco">
+                                        <label class="form-check-label" for="modal-color-blanco">Blanco</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Rojo" id="modal-color-rojo">
+                                        <label class="form-check-label" for="modal-color-rojo">Rojo</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Azul" id="modal-color-azul">
+                                        <label class="form-check-label" for="modal-color-azul">Azul</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Verde" id="modal-color-verde">
+                                        <label class="form-check-label" for="modal-color-verde">Verde</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Amarillo" id="modal-color-amarillo">
+                                        <label class="form-check-label" for="modal-color-amarillo">Amarillo</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Rosa" id="modal-color-rosa">
+                                        <label class="form-check-label" for="modal-color-rosa">Rosa</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Morado" id="modal-color-morado">
+                                        <label class="form-check-label" for="modal-color-morado">Morado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Marrón" id="modal-color-marron">
+                                        <label class="form-check-label" for="modal-color-marron">Marrón</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="colores[]" value="Gris" id="modal-color-gris">
+                                        <label class="form-check-label" for="modal-color-gris">Gris</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
