@@ -78,10 +78,19 @@
                     <div class="card-footer p-2 bg-white">
                         <div class="d-flex flex-column gap-2">
                             <div class="d-flex justify-content-between gap-1">
-                                <button class="btn btn-sm btn-success flex-grow-1" onclick="mostrarModalCompra({{ publicacion.id }}, 'compra')">
+                                <button class="btn btn-sm btn-success flex-grow-1" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalCompra"
+                                        data-publicacion-id="{{ publicacion.id }}"
+                                        data-precio="{{ publicacion.precio }}">
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
-                                <button class="btn btn-sm btn-warning flex-grow-1" onclick="mostrarModalCompra({{ publicacion.id }}, 'alquiler')">
+                                <button class="btn btn-sm btn-warning flex-grow-1"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalAlquiler"
+                                        data-publicacion-id="{{ publicacion.id }}"
+                                        data-precio-dia="{{ publicacion.precio }}"
+                                        data-deposito="{{ publicacion.deposito|default:publicacion.precio }}">
                                     <i class="fas fa-key"></i> Alquilar
                                 </button>
                             </div>
@@ -117,196 +126,6 @@
     </div>
 </div>
 
-<!-- Modal de Compra/Alquiler -->
-<div class="modal fade" id="modalCompra" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Comprar Prenda</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="modalCompraDisponible">
-                    <!-- Información de la prenda -->
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <img id="modalImagenPrenda" src="" alt="Prenda" class="me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                            <div>
-                                <h6 id="modalTituloPrenda" class="mb-1"></h6>
-                                <p id="modalPrecioPrenda" class="price-tag mb-0"></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Formulario de compra/alquiler -->
-                    <form id="formCompraAlquiler">
-                        <input type="hidden" id="modalPublicacionId">
-                        <input type="hidden" id="modalTipoOperacion">
-
-                        <!-- Campos para alquiler -->
-                        <div id="camposAlquiler" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="fechaInicio" class="form-label">Fecha de inicio*</label>
-                                        <input type="date" class="form-control" id="fechaInicio" required>
-                                        <div class="form-text">Primera fecha disponible para recoger la prenda</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="fechaFin" class="form-label">Fecha de devolución*</label>
-                                        <input type="date" class="form-control" id="fechaFin" required>
-                                        <div class="form-text">Último día antes de devolver la prenda</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Información del alquiler -->
-                            <div class="alert alert-info">
-                                <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Información importante</h6>
-                                <ul class="mb-0">
-                                    <li>Se requiere un depósito de seguridad que será devuelto al regresar la prenda en buen estado.</li>
-                                    <li>El precio se calcula por día de alquiler.</li>
-                                    <li>La devolución debe realizarse antes de las 18:00 del día de fin.</li>
-                                </ul>
-                            </div>
-
-                            <!-- Instrucciones de devolución -->
-                            <div class="mb-3">
-                                <label for="instruccionesDevolucion" class="form-label">Instrucciones especiales de devolución</label>
-                                <textarea class="form-control" id="instruccionesDevolucion" rows="2" 
-                                    placeholder="Ejemplo: Preferencia de horario para la devolución, condiciones especiales, etc."></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Información de envío -->
-                        <div class="mb-3">
-                            <label for="direccion" class="form-label">Dirección de envío*</label>
-                            <textarea class="form-control" id="direccion" rows="2" required
-                                placeholder="Calle, número, piso, código postal, ciudad"></textarea>
-                            <div class="form-text">Asegúrate de incluir todos los detalles necesarios para la entrega</div>
-                        </div>
-
-                        <!-- Método de pago -->
-                        <div class="mb-3">
-                            <label class="form-label">Método de pago*</label>
-                            <div class="d-flex gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodoPago" id="pagoTarjeta" value="tarjeta" checked>
-                                    <label class="form-check-label" for="pagoTarjeta">
-                                        <i class="fas fa-credit-card"></i> Tarjeta
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodoPago" id="pagoPaypal" value="paypal">
-                                    <label class="form-check-label" for="pagoPaypal">
-                                        <i class="fab fa-paypal"></i> PayPal
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Notas adicionales -->
-                        <div class="mb-3">
-                            <label for="notas" class="form-label">Notas adicionales</label>
-                            <textarea class="form-control" id="notas" rows="2" 
-                                placeholder="Instrucciones especiales de entrega, preferencias, etc."></textarea>
-                        </div>
-
-                        <!-- Términos y condiciones -->
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="terminosCheck" required>
-                            <label class="form-check-label" for="terminosCheck">
-                                Acepto los términos y condiciones del servicio
-                            </label>
-                        </div>
-
-                        <!-- Resumen de costos -->
-                        <div class="card bg-light mb-3">
-                            <div class="card-body">
-                                <h6 class="card-title">Resumen</h6>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Subtotal:</span>
-                                    <span id="subtotal"></span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Envío:</span>
-                                    <span>$5.00</span>
-                                </div>
-                                <div id="preciosPorDia" class="d-flex justify-content-between mb-2" style="display: none;">
-                                    <span>Precio por día:</span>
-                                    <span id="precioPorDia"></span>
-                                </div>
-                                <div id="diasAlquiler" class="d-flex justify-content-between mb-2" style="display: none;">
-                                    <span>Días de alquiler:</span>
-                                    <span id="numeroDias"></span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2" id="depositoRow" style="display: none;">
-                                    <span>Depósito de seguridad:</span>
-                                    <span id="deposito"></span>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <strong>Total:</strong>
-                                    <strong id="total"></strong>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="formCompraAlquiler" class="btn btn-primary">
-                    <i class="fas fa-lock me-1"></i>
-                    <span id="btnAccionTexto">Pagar ahora</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Comentarios -->
-<div class="modal fade" id="comentariosModal" tabindex="-1" aria-labelledby="comentariosModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="comentariosModalLabel">Comentarios</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Spinner de carga -->
-                <div id="loadingSpinner" class="text-center" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Cargando...</span>
-                    </div>
-                </div>
-
-                <!-- Alerta de error -->
-                <div id="errorAlert" class="alert alert-danger" style="display: none;" role="alert">
-                    Error al cargar los comentarios
-                </div>
-
-                <!-- Lista de comentarios -->
-                <div id="comentariosList" class="list-group list-group-flush">
-                    <!-- Los comentarios se cargarán aquí dinámicamente -->
-                </div>
-
-                <!-- Formulario para nuevo comentario -->
-                <form id="comentarioForm" class="mt-3">
-                    <div class="input-group">
-                        <input type="text" id="comentarioInput" class="form-control" 
-                               placeholder="Escribe un comentario..." required>
-                        <button class="btn btn-primary" type="submit" id="enviarComentario">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 
