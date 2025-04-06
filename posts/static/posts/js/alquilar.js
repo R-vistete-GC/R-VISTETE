@@ -115,69 +115,60 @@ document.addEventListener('DOMContentLoaded', function() {
         btnConfirmarAlquiler.addEventListener('click', async function(e) {
             e.preventDefault();
             
-            // Validar el formulario
-            if (!alquilerForm.checkValidity()) {
-                alquilerForm.reportValidity();
-                return;
-            }
+            // Mostrar el spinner en el botón
+            const submitButton = document.querySelector('#confirmarAlquilerBtn');
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+            submitButton.disabled = true;
 
-            // Validar las fechas
-            const fechaInicio = document.getElementById('fechaInicio').value;
-            const fechaFin = document.getElementById('fechaFin').value;
-            if (new Date(fechaFin) <= new Date(fechaInicio)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error en las fechas',
-                    text: 'La fecha de devolución debe ser posterior a la fecha de inicio'
-                });
-                return;
-            }
+            // Crear FormData con los datos del formulario
+            const formData = new FormData(alquilerForm);
 
-            // Mostrar spinner y deshabilitar botón
-            spinnerAlquiler.classList.remove('d-none');
-            btnConfirmarAlquiler.disabled = true;
-
-            try {
-                const formData = new FormData(alquilerForm);
-                const response = await fetch('/procesar_alquiler/', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                const data = await response.json();
+            // Realizar la petición fetch
+            fetch('/posts/procesar_alquiler/', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Restaurar el botón
+                submitButton.innerHTML = 'Confirmar Alquiler';
+                submitButton.disabled = false;
 
                 if (data.success) {
-                    // Cerrar modal y mostrar mensaje de éxito
-                    const modalInstance = bootstrap.Modal.getInstance(modalAlquilar);
-                    modalInstance.hide();
-                    
+                    // Mostrar mensaje de éxito
                     Swal.fire({
                         icon: 'success',
-                        title: '¡Alquiler Confirmado!',
+                        title: '¡Éxito!',
                         text: data.message,
                         showConfirmButton: true
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = '/mis_alquileres/';
+                            window.location.href = '/inicio/';
                         }
                     });
                 } else {
-                    throw new Error(data.message || 'Error al procesar el alquiler');
+                    // Mostrar mensaje de error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Ocurrió un error al procesar el alquiler'
+                    });
                 }
-            } catch (error) {
+            })
+            .catch(error => {
+                // Restaurar el botón
+                submitButton.innerHTML = 'Confirmar Alquiler';
+                submitButton.disabled = false;
+
+                // Mostrar mensaje de error
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: error.message || 'Ocurrió un error al procesar el alquiler'
+                    text: 'Ocurrió un error al procesar la solicitud'
                 });
-            } finally {
-                // Ocultar spinner y habilitar botón
-                spinnerAlquiler.classList.add('d-none');
-                btnConfirmarAlquiler.disabled = false;
-            }
+                console.error('Error:', error);
+            });
         });
     }
 }); 

@@ -387,14 +387,14 @@
                         <!-- Preview de la prenda -->
                         <div class="col-md-4">
                             <div class="prenda-preview text-center">
-                                <img id="prendaImagenAlquiler" src="" alt="Imagen de la prenda" class="img-fluid mb-3" style="max-width: 100%; height: auto;">
+                                <img id="prendaImagenAlquiler" src="" alt="Imagen de la prenda" class="img-fluid mb-3">
                                 <h6 id="prendaTituloAlquiler" class="mb-2"></h6>
                                 <p id="prendaPrecioAlquiler" class="mb-2"></p>
                             </div>
                         </div>
                         <!-- Formulario de alquiler -->
                         <div class="col-md-8">
-                            <form id="alquilerForm" method="POST">
+                            <form id="alquilerForm" method="POST" action="{% url 'posts:procesar_alquiler' %}">
                                 {% csrf_token %}
                                 <input type="hidden" id="publicacionIdAlquiler" name="publicacion_id">
                                 
@@ -470,7 +470,7 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <!-- Nuestros scripts -->
     <script src="{% static 'posts/js/inicio.js' %}"></script>
     <script src="{% static 'posts/js/base.js' %}"></script>

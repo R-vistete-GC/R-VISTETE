@@ -912,9 +912,16 @@ def procesar_alquiler(request):
                 'message': 'Faltan campos requeridos'
             })
 
-        # Validar que la fecha de fin sea posterior a la de inicio
-        fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
-        fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+        # Convertir fechas a timestamp
+        try:
+            fecha_inicio_dt = datetime.strptime(f"{fecha_inicio} 00:00:00", '%Y-%m-%d %H:%M:%S')
+            fecha_fin_dt = datetime.strptime(f"{fecha_fin} 23:59:59", '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return JsonResponse({
+                'success': False,
+                'message': 'Formato de fecha inválido'
+            })
+
         if fecha_fin_dt <= fecha_inicio_dt:
             return JsonResponse({
                 'success': False,
@@ -952,7 +959,7 @@ def procesar_alquiler(request):
             })
 
         # Calcular precios
-        dias = (fecha_fin_dt - fecha_inicio_dt).days
+        dias = (fecha_fin_dt.date() - fecha_inicio_dt.date()).days
         precio_por_dia = publicacion.precio
         precio_total = precio_por_dia * dias
         deposito = precio_por_dia * Decimal('0.5')  # 50% del precio por día como depósito
@@ -961,23 +968,24 @@ def procesar_alquiler(request):
         with connection.cursor() as cursor:
             cursor.execute("SELECT setval('alquileres_id_seq', (SELECT MAX(id) FROM alquileres));")
 
-        # Crear el alquiler
-        alquiler = Alquiler.objects.create(
-            publicacion=publicacion,
-            propietario=publicacion.usuario,
-            cliente_id=usuario_id,
+        # Crear el alquiler usando el usuario_id de la sesión
+        alquiler = Alquiler(
+            publicacion_id=publicacion_id,
             fecha_inicio=fecha_inicio_dt,
             fecha_fin=fecha_fin_dt,
+            propietario_id=publicacion.usuario_id,  # ID del dueño de la publicación
+            cliente_id=usuario_id,  # ID del usuario que alquila (de la sesión)
             precio_por_dia=precio_por_dia,
-            precio_total=precio_total,
             deposito=deposito,
             estado='reservado',
             metodo_pago=metodo_pago,
             direccion_envio=direccion_envio,
-            instrucciones_devolucion=instrucciones_devolucion,
             notas=notas,
-            terminos_aceptados=terminos_aceptados
+            precio_total=precio_total,
+            terminos_aceptados=terminos_aceptados,
+            instrucciones_devolucion=instrucciones_devolucion
         )
+        alquiler.save()
 
         return JsonResponse({
             'success': True,
