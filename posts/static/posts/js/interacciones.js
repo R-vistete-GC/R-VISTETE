@@ -19,7 +19,7 @@ async function toggleLike(publicacionId) {
         }
 
         // Buscar el ícono dentro del botón
-        const likeIcon = likeBtn.querySelector('i');
+        const likeIcon = likeBtn.querySelector('i.fa-thumbs-up');
         if (!likeIcon) {
             console.error('No se encontró el ícono de like');
             return;
@@ -107,8 +107,14 @@ async function toggleLike(publicacionId) {
 // Función para agregar/quitar de favoritos
 async function toggleFavorito(publicacionId) {
     try {
-        // Verificar primero si está en favoritos
-        const heartIcon = document.querySelector(`button[onclick*="${publicacionId}"] i`);
+        // Verificar primero si está en favoritos - usando un selector más específico
+        const favoriteBtn = document.querySelector(`button[onclick*="toggleFavorito(${publicacionId})"]`);
+        if (!favoriteBtn) {
+            console.error('No se encontró el botón de favorito');
+            return;
+        }
+
+        const heartIcon = favoriteBtn.querySelector('i');
         const isCurrentlyFavorite = heartIcon && (heartIcon.classList.contains('text-danger') || heartIcon.classList.contains('fa-heart-broken'));
 
         if (isCurrentlyFavorite) {
@@ -152,7 +158,7 @@ async function toggleFavorito(publicacionId) {
             // Si se quitó de favoritos
             if (window.location.pathname.includes('/favoritos/')) {
                 // Si estamos en la página de favoritos, remover la card con animación
-                const card = document.querySelector(`button[onclick*="${publicacionId}"]`).closest('.col-md-4');
+                const card = favoriteBtn.closest('.col-md-4');
                 if (card) {
                     card.style.transition = 'all 0.3s ease';
                     card.style.opacity = '0';
@@ -165,12 +171,14 @@ async function toggleFavorito(publicacionId) {
                         const remainingCards = document.querySelectorAll('.col-md-4');
                         if (remainingCards.length === 0) {
                             const container = document.querySelector('.container');
-                            container.innerHTML = `
-                                <h2 class="mb-4"><i class="fas fa-heart text-danger"></i> Mis Favoritos</h2>
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> No tienes prendas en favoritos.
-                                </div>
-                            `;
+                            if (container) {
+                                container.innerHTML = `
+                                    <h2 class="mb-4"><i class="fas fa-heart text-danger"></i> Mis Favoritos</h2>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i> No tienes prendas en favoritos.
+                                    </div>
+                                `;
+                            }
                         }
                     }, 300);
                 }
