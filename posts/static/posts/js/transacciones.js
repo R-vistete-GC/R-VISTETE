@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Mostrar mensaje de éxito
                     Swal.fire({
                         title: '¡Compra exitosa!',
-                        text: 'Tu compra se ha realizado correctamente',
+                        text: data.message || 'Tu compra se ha realizado correctamente',
                         icon: 'success',
                         confirmButtonText: 'Aceptar'
                     }).then(() => {

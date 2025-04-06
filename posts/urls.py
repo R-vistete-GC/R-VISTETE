@@ -21,4 +21,5 @@ urlpatterns = [
     path('notificaciones/', views.notificaciones_view, name='notificaciones'),
     path('api/recomendaciones/', views.obtener_recomendaciones, name='obtener_recomendaciones'),
     path('procesar-operacion/', views.procesar_operacion, name='procesar_operacion'),
+    path('comprar/', views.procesar_compra, name='procesar_compra'),  # Nueva URL para procesar compras
 ]

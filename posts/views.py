@@ -14,6 +14,7 @@ from .recommender import RecomendadorPrendas
 from django.contrib import messages
 from decimal import Decimal
 from datetime import datetime
+from django.db import connection
 
 #inicio - publicaciones
 
@@ -804,3 +805,81 @@ def procesar_operacion(request):
     except Exception as e:
         print("Error procesando operación:", str(e))
         return JsonResponse({'success': False, 'error': 'Error interno del servidor'})
+
+@require_http_methods(["POST"])
+def procesar_compra(request):
+    try:
+        # Verificar si el usuario está autenticado
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({'success': False, 'message': 'Usuario no autenticado'}, status=401)
+
+        # Obtener datos del formulario
+        publicacion_id = request.POST.get('publicacion_id')
+        metodo_pago = request.POST.get('metodo_pago')
+        direccion_envio = request.POST.get('direccion_envio')
+        notas = request.POST.get('notas', '')
+
+        # Validar datos requeridos
+        if not all([publicacion_id, metodo_pago, direccion_envio]):
+            return JsonResponse({
+                'success': False,
+                'message': 'Faltan campos requeridos'
+            })
+
+        # Obtener la publicación y validar que existe
+        try:
+            publicacion = Publicacion.objects.get(id=publicacion_id)
+        except Publicacion.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'La publicación no existe'
+            })
+
+        # Validar que la publicación no sea del mismo usuario
+        if publicacion.usuario_id == usuario_id:
+            return JsonResponse({
+                'success': False,
+                'message': 'No puedes comprar tu propia publicación'
+            })
+
+        # Validar que la publicación no esté ya vendida
+        venta_existente = Venta.objects.filter(
+            publicacion=publicacion,
+            estado__in=['pendiente', 'completada']
+        ).exists()
+
+        if venta_existente:
+            return JsonResponse({
+                'success': False,
+                'message': 'Esta publicación ya ha sido vendida'
+            })
+
+        # Obtener el último ID de venta y sumar 1
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT setval('ventas_id_seq', (SELECT MAX(id) FROM ventas));")
+
+        # Crear la venta
+        venta = Venta.objects.create(
+            publicacion=publicacion,
+            vendedor=publicacion.usuario,
+            comprador_id=usuario_id,
+            precio_final=publicacion.precio,
+            estado='pendiente',
+            metodo_pago=metodo_pago,
+            direccion_envio=direccion_envio,
+            notas=notas
+        )
+
+        return JsonResponse({
+            'success': True,
+            'message': '¡Compra realizada con éxito!',
+            'venta_id': venta.id
+        })
+
+    except Exception as e:
+        print("Error al procesar la compra:", str(e))
+        return JsonResponse({
+            'success': False,
+            'message': f'Error al procesar la compra: {str(e)}'
+        }, status=500)
