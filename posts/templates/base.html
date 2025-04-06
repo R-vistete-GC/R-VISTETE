@@ -374,119 +374,103 @@
         </div>
     </div>
 
-    <!-- Modal Alquiler -->
-    <div class="modal fade" id="modalAlquiler" tabindex="-1" aria-labelledby="modalAlquilerLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <!-- Modal de Alquiler -->
+    <div class="modal fade" id="modalAlquilar" tabindex="-1" aria-labelledby="modalAlquilarLabel">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalAlquilerLabel">Alquilar Prenda</h5>
+                    <h5 class="modal-title" id="modalAlquilarLabel">Alquilar Prenda</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="alquilerForm" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" id="alquilerPublicacionId" name="publicacion_id">
-                        
-                        <!-- Fechas -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha de Inicio*</label>
-                                <input type="date" class="form-control" name="fecha_inicio" required 
-                                       min="{{ today|date:'Y-m-d' }}" id="fechaInicio">
-                                <div class="form-text">Primera fecha disponible para recoger la prenda</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha de Devolución*</label>
-                                <input type="date" class="form-control" name="fecha_fin" required id="fechaFin">
-                                <div class="form-text">Último día antes de devolver la prenda</div>
+                    <div class="row">
+                        <!-- Preview de la prenda -->
+                        <div class="col-md-4">
+                            <div class="prenda-preview text-center">
+                                <img id="prendaImagenAlquiler" src="" alt="Imagen de la prenda" class="img-fluid mb-3" style="max-width: 100%; height: auto;">
+                                <h6 id="prendaTituloAlquiler" class="mb-2"></h6>
+                                <p id="prendaPrecioAlquiler" class="mb-2"></p>
                             </div>
                         </div>
+                        <!-- Formulario de alquiler -->
+                        <div class="col-md-8">
+                            <form id="alquilerForm" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" id="publicacionIdAlquiler" name="publicacion_id">
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="fechaInicio" class="form-label">Fecha de Inicio*</label>
+                                        <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="fechaFin" class="form-label">Fecha de Devolución*</label>
+                                        <input type="date" class="form-control" id="fechaFin" name="fecha_fin" required>
+                                    </div>
+                                </div>
 
-                        <!-- Resumen del alquiler -->
-                        <div class="mb-4">
-                            <h6 class="mb-3">Resumen del alquiler</h6>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Precio por día:</span>
-                                <span class="fw-bold" id="alquilerPrecioDia"></span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Días totales:</span>
-                                <span id="alquilerDiasTotales">-</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Subtotal:</span>
-                                <span class="fw-bold" id="alquilerSubtotal">-</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Depósito de seguridad:</span>
-                                <span class="fw-bold" id="alquilerDeposito"></span>
-                            </div>
-                            <div class="d-flex justify-content-between border-top pt-2">
-                                <span>Total a pagar:</span>
-                                <span class="fw-bold text-primary" id="alquilerTotal">-</span>
-                            </div>
-                        </div>
+                                <div class="mb-3">
+                                    <label for="metodoPagoAlquiler" class="form-label">Método de Pago*</label>
+                                    <select class="form-select" id="metodoPagoAlquiler" name="metodo_pago" required>
+                                        <option value="">Selecciona un método de pago</option>
+                                        <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                                        <option value="tarjeta_debito">Tarjeta de Débito</option>
+                                        <option value="transferencia">Transferencia Bancaria</option>
+                                    </select>
+                                </div>
 
-                        <!-- Método de pago -->
-                        <div class="mb-3">
-                            <label class="form-label">Método de Pago*</label>
-                            <select class="form-control" name="metodo_pago" required>
-                                <option value="">Selecciona un método de pago</option>
-                                <option value="tarjeta">Tarjeta de Crédito/Débito</option>
-                                <option value="transferencia">Transferencia Bancaria</option>
-                                <option value="efectivo">Efectivo</option>
-                            </select>
-                        </div>
+                                <div class="mb-3">
+                                    <label for="direccionEnvioAlquiler" class="form-label">Dirección de Envío*</label>
+                                    <textarea class="form-control" id="direccionEnvioAlquiler" name="direccion_envio" rows="2" required></textarea>
+                                </div>
 
-                        <!-- Dirección de envío -->
-                        <div class="mb-3">
-                            <label class="form-label">Dirección de Envío*</label>
-                            <textarea class="form-control" name="direccion_envio" rows="3" required 
-                                    placeholder="Ingresa la dirección completa de envío"></textarea>
-                        </div>
+                                <div class="mb-3">
+                                    <label for="instruccionesDevolucion" class="form-label">Instrucciones de Devolución</label>
+                                    <textarea class="form-control" id="instruccionesDevolucion" name="instrucciones_devolucion" rows="2"></textarea>
+                                </div>
 
-                        <!-- Instrucciones de devolución -->
-                        <div class="mb-3">
-                            <label class="form-label">Instrucciones de Devolución</label>
-                            <textarea class="form-control" name="instrucciones_devolucion" rows="2" 
-                                    placeholder="Instrucciones especiales para la devolución"></textarea>
-                        </div>
+                                <div class="mb-3">
+                                    <label for="notasAlquiler" class="form-label">Notas Adicionales</label>
+                                    <textarea class="form-control" id="notasAlquiler" name="notas" rows="2"></textarea>
+                                </div>
 
-                        <!-- Notas adicionales -->
-                        <div class="mb-3">
-                            <label class="form-label">Notas Adicionales</label>
-                            <textarea class="form-control" name="notas" rows="2" 
-                                    placeholder="Cualquier otra información relevante"></textarea>
-                        </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="terminosAlquiler" name="terminos_aceptados" required>
+                                        <label class="form-check-label" for="terminosAlquiler">
+                                            Acepto los términos y condiciones del alquiler*
+                                        </label>
+                                    </div>
+                                </div>
 
-                        <!-- Términos y condiciones -->
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="terminos_aceptados" required id="terminosCheck">
-                                <label class="form-check-label" for="terminosCheck">
-                                    Acepto los términos y condiciones del alquiler*
-                                </label>
-                            </div>
-                            <div class="form-text">
-                                Al marcar esta casilla, acepto devolver la prenda en el mismo estado en que la recibí y entiendo que el depósito de seguridad se retendrá en caso de daños.
-                            </div>
+                                <div class="resumen-alquiler mb-3">
+                                    <h6>Resumen del Alquiler</h6>
+                                    <div id="resumenAlquiler">
+                                        <p>Precio por día: <span id="precioPorDia">$0</span></p>
+                                        <p>Días de alquiler: <span id="diasAlquiler">0</span></p>
+                                        <p>Depósito de seguridad: <span id="depositoSeguridad">$0</span></p>
+                                        <p class="fw-bold">Total a pagar: <span id="totalPagar">$0</span></p>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="alquilerForm" class="btn btn-primary">Confirmar Alquiler</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmarAlquiler">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Confirmar Alquiler
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS y Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 JS -->
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    
     <!-- Nuestros scripts -->
     <script src="{% static 'posts/js/inicio.js' %}"></script>
     <script src="{% static 'posts/js/base.js' %}"></script>
@@ -495,8 +479,11 @@
     <script src="{% static 'posts/js/mis_ventas.js' %}"></script>
     <script src="{% static 'posts/js/notificaciones.js' %}"></script>
     <script src="{% static 'posts/js/publicar.js' %}"></script>
+    <script src="{% static 'posts/js/alquilar.js' %}"></script>
     <script src="{% static 'users/js/login.js' %}"></script>
     <script src="{% static 'posts/js/transacciones.js' %}"></script>
+    
+    {% block scripts %}{% endblock %}
 
 </body>
 </html> 

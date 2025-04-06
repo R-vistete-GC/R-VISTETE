@@ -883,3 +883,111 @@ def procesar_compra(request):
             'success': False,
             'message': f'Error al procesar la compra: {str(e)}'
         }, status=500)
+
+@require_http_methods(["POST"])
+def procesar_alquiler(request):
+    try:
+        # Verificar si el usuario está autenticado
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({
+                'success': False,
+                'message': 'Usuario no autenticado'
+            }, status=401)
+
+        # Obtener datos del formulario
+        publicacion_id = request.POST.get('publicacion_id')
+        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        metodo_pago = request.POST.get('metodo_pago')
+        direccion_envio = request.POST.get('direccion_envio')
+        instrucciones_devolucion = request.POST.get('instrucciones_devolucion', '')
+        notas = request.POST.get('notas', '')
+        terminos_aceptados = request.POST.get('terminos_aceptados') == 'on'
+
+        # Validar campos requeridos
+        if not all([publicacion_id, fecha_inicio, fecha_fin, metodo_pago, direccion_envio]):
+            return JsonResponse({
+                'success': False,
+                'message': 'Faltan campos requeridos'
+            })
+
+        # Validar que la fecha de fin sea posterior a la de inicio
+        fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+        fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+        if fecha_fin_dt <= fecha_inicio_dt:
+            return JsonResponse({
+                'success': False,
+                'message': 'La fecha de devolución debe ser posterior a la fecha de inicio'
+            })
+
+        # Obtener la publicación
+        try:
+            publicacion = Publicacion.objects.get(id=publicacion_id)
+        except Publicacion.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'La publicación no existe'
+            })
+
+        # Validar que la publicación no sea del mismo usuario
+        if publicacion.usuario_id == usuario_id:
+            return JsonResponse({
+                'success': False,
+                'message': 'No puedes alquilar tu propia publicación'
+            })
+
+        # Verificar disponibilidad para las fechas seleccionadas
+        alquileres_existentes = Alquiler.objects.filter(
+            publicacion=publicacion,
+            estado__in=['reservado', 'activo'],
+            fecha_inicio__lte=fecha_fin_dt,
+            fecha_fin__gte=fecha_inicio_dt
+        )
+
+        if alquileres_existentes.exists():
+            return JsonResponse({
+                'success': False,
+                'message': 'La prenda no está disponible para las fechas seleccionadas'
+            })
+
+        # Calcular precios
+        dias = (fecha_fin_dt - fecha_inicio_dt).days
+        precio_por_dia = publicacion.precio
+        precio_total = precio_por_dia * dias
+        deposito = precio_por_dia * Decimal('0.5')  # 50% del precio por día como depósito
+
+        # Obtener el último ID de alquiler y sumar 1
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT setval('alquileres_id_seq', (SELECT MAX(id) FROM alquileres));")
+
+        # Crear el alquiler
+        alquiler = Alquiler.objects.create(
+            publicacion=publicacion,
+            propietario=publicacion.usuario,
+            cliente_id=usuario_id,
+            fecha_inicio=fecha_inicio_dt,
+            fecha_fin=fecha_fin_dt,
+            precio_por_dia=precio_por_dia,
+            precio_total=precio_total,
+            deposito=deposito,
+            estado='reservado',
+            metodo_pago=metodo_pago,
+            direccion_envio=direccion_envio,
+            instrucciones_devolucion=instrucciones_devolucion,
+            notas=notas,
+            terminos_aceptados=terminos_aceptados
+        )
+
+        return JsonResponse({
+            'success': True,
+            'message': '¡Alquiler realizado con éxito!',
+            'alquiler_id': alquiler.id
+        })
+
+    except Exception as e:
+        print("Error al procesar el alquiler:", str(e))
+        return JsonResponse({
+            'success': False,
+            'message': f'Error al procesar el alquiler: {str(e)}'
+        }, status=500)
