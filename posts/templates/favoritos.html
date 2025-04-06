@@ -20,7 +20,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <h5 class="card-title mb-0">{{ favorito.publicacion.titulo }}</h5>
-                        <button class="btn btn-link text-danger p-0" onclick="quitarFavorito({{ favorito.publicacion.id }}, this)">
+                        <button onclick="event.preventDefault(); toggleFavorito({{ favorito.publicacion.id }});" class="btn btn-link text-danger p-0">
                             <i class="fas fa-heart-broken"></i>
                         </button>
                     </div>

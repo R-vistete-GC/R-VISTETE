@@ -1,0 +1,86 @@
+/* Estilos personalizados para SweetAlert2 */
+.swal2-popup {
+    border-radius: 15px !important;
+    padding: 2em !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+}
+
+.swal2-title {
+    color: #333 !important;
+    font-size: 1.5em !important;
+    font-weight: 600 !important;
+}
+
+.swal2-html-container {
+    color: #666 !important;
+    font-size: 1.1em !important;
+}
+
+.swal2-confirm.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    padding: 0.5em 1.5em !important;
+}
+
+.swal2-cancel.btn-secondary {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    padding: 0.5em 1.5em !important;
+}
+
+/* Animaciones personalizadas */
+.animated {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+@keyframes bounceIn {
+    from {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+    to {
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+@keyframes bounceOut {
+    20% {
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+    50%, 55% {
+        opacity: 1;
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+    to {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -20px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes shake {
+    from, to {
+        transform: translate3d(0, 0, 0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translate3d(-5px, 0, 0);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translate3d(5px, 0, 0);
+    }
+} 
