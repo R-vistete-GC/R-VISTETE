@@ -57,14 +57,16 @@ def ver_perfil(request):
         usuario = Usuario.objects.get(id=usuario_id)
         perfil, created = PerfilUsuario.objects.get_or_create(usuario=usuario)
         
+        # Obtener las publicaciones del usuario
+        publicaciones = Publicacion.objects.filter(usuario=usuario).order_by('-fecha_publicacion')
+        
         context = {
             'usuario': usuario,
             'perfil': perfil,
-            'estadisticas': {
-                'publicaciones': Publicacion.objects.filter(usuario=usuario).count(),
-                'ventas': Venta.objects.filter(vendedor=usuario).count(),
-                'alquileres': Alquiler.objects.filter(cliente=usuario).count()
-            }
+            'publicaciones': publicaciones,  # Para la lista de publicaciones
+            'publicaciones_count': publicaciones.count(),  # Para el contador en estadísticas
+            'ventas': Venta.objects.filter(vendedor=usuario).count(),
+            'alquileres': Alquiler.objects.filter(cliente=usuario).count()
         }
         return render(request, 'users/perfil.html', context)
     except Usuario.DoesNotExist:
