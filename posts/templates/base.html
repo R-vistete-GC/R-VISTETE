@@ -325,6 +325,13 @@
                         <!-- Resumen de la compra -->
                         <div class="mb-4">
                             <h6 class="mb-3">Resumen de la compra</h6>
+                            <!-- Vista previa de la imagen -->
+                            <div class="text-center mb-3">
+                                <img id="compraImagenPreview" src="" alt="Imagen de la prenda" 
+                                     style="max-width: 200px; max-height: 200px; object-fit: cover;" class="rounded">
+                            </div>
+                            <!-- Título de la publicación -->
+                            <h6 id="compraTitulo" class="text-center mb-3"></h6>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Precio:</span>
                                 <span class="fw-bold" id="compraPrecio"></span>
@@ -334,11 +341,11 @@
                         <!-- Método de pago -->
                         <div class="mb-3">
                             <label class="form-label">Método de Pago*</label>
-                            <select class="form-control" name="metodo_pago" required>
+                            <select class="form-select" name="metodo_pago" required>
                                 <option value="">Selecciona un método de pago</option>
-                                <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                                <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                                <option value="tarjeta_debito">Tarjeta de Débito</option>
                                 <option value="transferencia">Transferencia Bancaria</option>
-                                <option value="efectivo">Efectivo</option>
                             </select>
                         </div>
 
@@ -359,7 +366,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="compraForm" class="btn btn-primary">Confirmar Compra</button>
+                    <button type="submit" form="compraForm" class="btn btn-success">
+                        <i class="fas fa-shopping-cart"></i> Confirmar Compra
+                    </button>
                 </div>
             </div>
         </div>
