@@ -102,11 +102,6 @@ def inicio_view(request):
 @require_http_methods(["GET"])
 def get_comentarios(request, publicacion_id):
     try:
-        # Verificar si el usuario está autenticado
-        usuario_id = request.session.get('usuario_id')
-        if not usuario_id:
-            return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
-            
         # Obtener los comentarios de la publicación
         comentarios = Comentario.objects.filter(
             publicacion_id=publicacion_id
@@ -116,15 +111,22 @@ def get_comentarios(request, publicacion_id):
         for comentario in comentarios:
             comentarios_data.append({
                 'id': comentario.id,
-                'usuario_nombre': comentario.usuario.nombre,
-                'comentario': comentario.comentario,
-                'fecha_comentario': comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M')
+                'usuario': comentario.usuario.nombre if comentario.usuario else 'Usuario Anónimo',
+                'texto': comentario.comentario,
+                'fecha': comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M')
             })
         
-        return JsonResponse(comentarios_data, safe=False)
+        return JsonResponse({
+            'success': True,
+            'comentarios': comentarios_data
+        }, safe=False)
     except Exception as e:
         print("Error al obtener comentarios:", str(e))
-        return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({
+            'success': False,
+            'error': str(e),
+            'comentarios': []
+        }, status=500)
 
 #crear comentarios
 @login_required
@@ -464,39 +466,55 @@ def agregar_comentario(request, publicacion_id):
         # Verificar si el usuario está autenticado
         usuario_id = request.session.get('usuario_id')
         if not usuario_id:
-            return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
-            
+            return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
+
         # Obtener el usuario y la publicación
         usuario = Usuario.objects.get(id=usuario_id)
         publicacion = Publicacion.objects.get(id=publicacion_id)
-        
-        # Obtener el comentario del cuerpo de la petición
+
+        # Obtener el comentario del cuerpo de la solicitud
         data = json.loads(request.body)
         comentario_texto = data.get('comentario')
-        
+
         if not comentario_texto:
-            return JsonResponse({'error': 'El comentario no puede estar vacío'}, status=400)
-            
+            return JsonResponse({
+                'success': False,
+                'error': 'El comentario no puede estar vacío'
+            }, status=400)
+
         # Crear el comentario
         comentario = Comentario.objects.create(
             usuario=usuario,
             publicacion=publicacion,
-            comentario=comentario_texto
+            comentario=comentario_texto,
+            fecha_comentario=timezone.now()
         )
-        
+
         return JsonResponse({
-            'status': 'success',
-            'message': 'Comentario agregado',
-            'usuario_nombre': usuario.nombre,
-            'comentario': comentario_texto,
-            'fecha': comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M')
+            'success': True,
+            'comentario': {
+                'id': comentario.id,
+                'usuario': comentario.usuario.nombre,
+                'texto': comentario.comentario,
+                'fecha': comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M')
+            }
         })
-            
+    except Usuario.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Usuario no encontrado'
+        }, status=404)
     except Publicacion.DoesNotExist:
-        return JsonResponse({'error': 'Publicación no encontrada'}, status=404)
+        return JsonResponse({
+            'success': False,
+            'error': 'Publicación no encontrada'
+        }, status=404)
     except Exception as e:
         print("Error al agregar comentario:", str(e))
-        return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 #publicar prendas
 def publicar_prenda(request):
