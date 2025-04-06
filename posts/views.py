@@ -498,129 +498,77 @@ def agregar_comentario(request, publicacion_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 #publicar prendas
-@login_required
 def publicar_prenda(request):
     if request.method == 'POST':
         try:
-            print("=== Iniciando publicación de prenda ===")
-            print("POST data:", request.POST)
-            print("FILES:", request.FILES)
-            
-            # Obtener el usuario de la sesión
+            # Verificar si hay una sesión activa
             usuario_id = request.session.get('usuario_id')
-            print("Usuario ID:", usuario_id)
-            
             if not usuario_id:
-                print("Error: Usuario no autenticado")
-                return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
+                return JsonResponse({
+                    'success': False,
+                    'message': 'No hay una sesión activa'
+                }, status=401)
 
-            # Obtener y validar datos del formulario
+            # Obtener datos del formulario
             titulo = request.POST.get('titulo')
-            descripcion = request.POST.get('descripcion', '')  # Opcional
-            tipo = request.POST.get('tipo', 'venta')  # Default: venta
+            descripcion = request.POST.get('descripcion')
+            tipo = request.POST.get('tipo')
+            precio = request.POST.get('precio')
+            deposito = request.POST.get('deposito') if tipo == 'alquiler' else None
+            publico = request.POST.get('publico')
+            talla = request.POST.get('talla')
+            imagen = request.FILES.get('imagen')
             
-            try:
-                precio = Decimal(request.POST.get('precio', '0'))
-            except:
-                print("Error: Precio inválido")
-                return JsonResponse({'success': False, 'error': 'El precio debe ser un número válido'}, status=400)
-            
-            deposito = None
-            if tipo == 'alquiler':
-                try:
-                    deposito = Decimal(request.POST.get('deposito', '0'))
-                except:
-                    print("Error: Depósito inválido")
-                    return JsonResponse({'success': False, 'error': 'El depósito debe ser un número válido'}, status=400)
-            
-            publico = request.POST.get('publico', 'mujer')  # Default: mujer
-            talla = request.POST.get('talla', 'M')  # Default: M
-            
-            # Obtener arrays de estilos y colores
+            # Validar campos requeridos
+            if not all([titulo, tipo, precio, publico, talla, imagen]):
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Por favor, completa todos los campos requeridos'
+                })
+
+            # Validar estilos y colores
             estilos = request.POST.getlist('estilo[]')
             colores = request.POST.getlist('colores[]')
-            
-            # Validar que se hayan seleccionado estilos y colores
-            if not estilos:
-                return JsonResponse({'success': False, 'error': 'Debes seleccionar al menos un estilo'}, status=400)
-            if not colores:
-                return JsonResponse({'success': False, 'error': 'Debes seleccionar al menos un color'}, status=400)
-            
-            print("=== Datos validados ===")
-            print(f"Título: {titulo}")
-            print(f"Tipo: {tipo}")
-            print(f"Precio: {precio}")
-            print(f"Depósito: {deposito}")
-            print(f"Público: {publico}")
-            print(f"Talla: {talla}")
-            print(f"Estilos: {estilos}")
-            print(f"Colores: {colores}")
 
-            # Validar campos requeridos
-            if not titulo:
-                print("Error: Título requerido")
-                return JsonResponse({'success': False, 'error': 'El título es obligatorio'}, status=400)
-            
-            if not precio or precio <= 0:
-                print("Error: Precio inválido")
-                return JsonResponse({'success': False, 'error': 'El precio debe ser mayor a 0'}, status=400)
-
-            if tipo == 'alquiler' and (not deposito or deposito <= 0):
-                print("Error: Depósito requerido para alquiler")
-                return JsonResponse({'success': False, 'error': 'El depósito es obligatorio para alquileres'}, status=400)
-
-            # Validar imagen
-            if 'imagen' not in request.FILES:
-                print("Error: Imagen no proporcionada")
-                return JsonResponse({'success': False, 'error': 'La imagen es obligatoria'}, status=400)
-            
-            imagen = request.FILES['imagen']
-            print("Imagen recibida:", imagen.name)
-            
-            # Crear la publicación
-            try:
-                publicacion = Publicacion.objects.create(
-                    usuario_id=usuario_id,
-                    titulo=titulo,
-                    descripcion=descripcion,
-                    imagen=imagen,
-                    precio=precio,
-                    tipo=tipo,
-                    deposito=deposito,
-                    publico=publico,
-                    talla=talla,
-                    estilo=estilos,
-                    colores=colores,
-                    fecha_publicacion=timezone.now()
-                )
-                print("Publicación creada exitosamente:", publicacion.id)
-                
-                # Verificar que la publicación se creó correctamente
-                publicacion_verificada = Publicacion.objects.get(id=publicacion.id)
-                print("=== Publicación verificada ===")
-                print(f"ID: {publicacion_verificada.id}")
-                print(f"Usuario: {publicacion_verificada.usuario_id}")
-                print(f"Título: {publicacion_verificada.titulo}")
-                print(f"Imagen: {publicacion_verificada.imagen}")
-                print(f"Estilos: {publicacion_verificada.estilo}")
-                print(f"Colores: {publicacion_verificada.colores}")
-                
+            if not estilos or not colores:
                 return JsonResponse({
-                    'success': True,
-                    'message': 'Publicación creada exitosamente',
-                    'redirect_url': '/inicio/',
-                    'publicacion_id': publicacion.id
+                    'success': False,
+                    'message': 'Debes seleccionar al menos un estilo y un color'
                 })
-                
-            except Exception as e:
-                print("Error al crear la publicación:", str(e))
-                raise e
+
+            # Crear la publicación
+            publicacion = Publicacion(
+                usuario_id=usuario_id,  # Usar el ID de la sesión
+                titulo=titulo,
+                descripcion=descripcion,
+                tipo=tipo,
+                precio=float(precio),
+                deposito=float(deposito) if deposito else None,
+                publico=publico,
+                talla=talla,
+                imagen=imagen,
+                estilo=estilos,
+                colores=colores,
+                fecha_publicacion=timezone.now()
+            )
+            publicacion.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Publicación creada exitosamente',
+                'redirect_url': '/inicio/'
+            })
 
         except Exception as e:
-            print("Error en publicar_prenda:", str(e))
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+            return JsonResponse({
+                'success': False,
+                'message': f'Error al crear la publicación: {str(e)}'
+            })
 
-    return render(request, 'posts/publicar.html')
+    return JsonResponse({
+        'success': False,
+        'message': 'Método no permitido'
+    })
 
 #ver publicaciones
 @login_required
