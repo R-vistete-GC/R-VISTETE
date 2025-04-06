@@ -1,0 +1,211 @@
+/* Estilos para la página de notificaciones */
+.notifications-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.notifications-header {
+    margin-bottom: 30px;
+}
+
+.notifications-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.notifications-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Estilos para el panel de notificaciones */
+.notifications-panel {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.notification-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+    background-color: #f8f9fa;
+}
+
+.notification-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.notification-icon.like {
+    background-color: #dc3545;
+}
+
+.notification-icon.comment {
+    background-color: #17a2b8;
+}
+
+.notification-icon.follow {
+    background-color: #28a745;
+}
+
+.notification-icon.purchase {
+    background-color: #ffc107;
+}
+
+.notification-text {
+    flex: 1;
+}
+
+.notification-message {
+    color: #333;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.notification-time {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+/* Estilos para el botón de marcar como leído */
+.btn-mark-read {
+    background: none;
+    border: none;
+    color: #28a745;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.btn-mark-read:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para el estado vacío */
+.empty-notifications {
+    text-align: center;
+    padding: 40px;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-message {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* Estilos para el badge de notificaciones */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para el botón de marcar todas como leídas */
+.mark-all-read {
+    text-align: right;
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.btn-mark-all-read {
+    background: none;
+    border: none;
+    color: #28a745;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.btn-mark-all-read:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para la paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.page-item {
+    list-style: none;
+}
+
+.page-link {
+    display: block;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    background-color: #f8f9fa;
+}
+
+.page-link.active {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .notifications-container {
+        padding: 10px;
+    }
+
+    .notification-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .notification-icon {
+        align-self: center;
+    }
+} 

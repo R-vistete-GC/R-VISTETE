@@ -1,0 +1,279 @@
+/* Estilos para la página de inicio */
+.main-wrapper {
+    padding-top: 20px;
+}
+
+/* Estilos para las tarjetas de publicación */
+.publicacion-card {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: white;
+    transition: transform 0.2s;
+}
+
+.publicacion-card:hover {
+    transform: translateY(-5px);
+}
+
+.publicacion-imagen {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.publicacion-contenido {
+    padding: 15px;
+}
+
+.publicacion-titulo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.publicacion-precio {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.publicacion-descripcion {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.publicacion-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Estilos para los botones de interacción */
+.interaccion-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-like, .btn-comment, .btn-share {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.btn-like:hover, .btn-comment:hover, .btn-share:hover {
+    background-color: #f8f9fa;
+    color: #28a745;
+}
+
+.btn-like.active {
+    color: #dc3545;
+}
+
+/* Estilos para la sección de comentarios */
+.comentarios-section {
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+.comentario {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.comentario:last-child {
+    border-bottom: none;
+}
+
+.comentario-autor {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.comentario-texto {
+    color: #444;
+    line-height: 1.4;
+}
+
+.comentario-fecha {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.comentario-form {
+    margin-top: 15px;
+}
+
+.comentario-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.btn-comentar {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-comentar:hover {
+    background-color: #218838;
+}
+
+/* Estilos para el botón de publicar */
+.btn-publicar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-publicar:hover {
+    background-color: #218838;
+    transform: scale(1.1);
+}
+
+/* Estilos para la insignia de notificaciones */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para el estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-message {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* Estilos para la paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.page-item {
+    list-style: none;
+}
+
+.page-link {
+    display: block;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    background-color: #f8f9fa;
+}
+
+.page-link.active {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+/* Estilos para los filtros */
+.filters-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .publicacion-imagen {
+        height: 200px;
+    }
+
+    .interaccion-buttons {
+        flex-wrap: wrap;
+    }
+
+    .btn-publicar {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+} 

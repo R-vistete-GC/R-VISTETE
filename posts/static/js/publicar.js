@@ -88,6 +88,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Por favor selecciona una imagen para la publicación');
                 return;
             }
+
+            // Verificar que se haya seleccionado al menos un estilo
+            const estilosSeleccionados = document.querySelectorAll('input[name="estilo[]"]:checked');
+            if (estilosSeleccionados.length === 0) {
+                alert('Por favor selecciona al menos un estilo');
+                return;
+            }
+
+            // Verificar que se haya seleccionado al menos un color
+            const coloresSeleccionados = document.querySelectorAll('input[name="colores[]"]:checked');
+            if (coloresSeleccionados.length === 0) {
+                alert('Por favor selecciona al menos un color');
+                return;
+            }
             
             const formData = new FormData(this);
             

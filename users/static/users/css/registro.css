@@ -1,0 +1,187 @@
+/* Estilos para la página de registro */
+.register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.register-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.register-logo {
+    width: 80px;
+    margin-bottom: 15px;
+}
+
+.register-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.register-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Estilos para el formulario */
+.register-form {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Estilos para el botón de registro */
+.btn-register {
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.btn-register:hover {
+    background-color: #218838;
+}
+
+/* Estilos para los mensajes de error */
+.error-message {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Estilos para los términos y condiciones */
+.terms-section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.terms-text {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.terms-link {
+    color: #28a745;
+    text-decoration: none;
+}
+
+.terms-link:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para el enlace de inicio de sesión */
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link a {
+    color: #28a745;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para el spinner de carga */
+.spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
+}
+
+/* Estilos para la validación de contraseña */
+.password-strength {
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.strength-weak {
+    color: #dc3545;
+}
+
+.strength-medium {
+    color: #ffc107;
+}
+
+.strength-strong {
+    color: #28a745;
+}
+
+/* Estilos para los campos de fecha y género */
+.select-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: white;
+    cursor: pointer;
+}
+
+.select-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Estilos responsivos */
+@media (max-width: 576px) {
+    .register-card {
+        padding: 20px;
+    }
+
+    .register-title {
+        font-size: 1.5rem;
+    }
+
+    .form-control {
+        padding: 10px;
+    }
+} 

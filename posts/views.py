@@ -540,6 +540,12 @@ def publicar_prenda(request):
             estilos = request.POST.getlist('estilo[]')
             colores = request.POST.getlist('colores[]')
             
+            # Validar que se hayan seleccionado estilos y colores
+            if not estilos:
+                return JsonResponse({'success': False, 'error': 'Debes seleccionar al menos un estilo'}, status=400)
+            if not colores:
+                return JsonResponse({'success': False, 'error': 'Debes seleccionar al menos un color'}, status=400)
+            
             print("=== Datos validados ===")
             print(f"Título: {titulo}")
             print(f"Tipo: {tipo}")
@@ -583,9 +589,9 @@ def publicar_prenda(request):
                     deposito=deposito,
                     publico=publico,
                     talla=talla,
-                    estilo=estilos if estilos else [],
-                    colores=colores if colores else [],
-                    fecha_publicacion=timezone.now()  # Asegurar que se use la fecha actual
+                    estilo=estilos,
+                    colores=colores,
+                    fecha_publicacion=timezone.now()
                 )
                 print("Publicación creada exitosamente:", publicacion.id)
                 
@@ -596,6 +602,8 @@ def publicar_prenda(request):
                 print(f"Usuario: {publicacion_verificada.usuario_id}")
                 print(f"Título: {publicacion_verificada.titulo}")
                 print(f"Imagen: {publicacion_verificada.imagen}")
+                print(f"Estilos: {publicacion_verificada.estilo}")
+                print(f"Colores: {publicacion_verificada.colores}")
                 
                 return JsonResponse({
                     'success': True,
