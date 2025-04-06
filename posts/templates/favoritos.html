@@ -14,8 +14,8 @@
         {% for favorito in favoritos %}
         <div class="col-md-4 mb-4">
             <div class="card h-100 shadow-sm" data-publicacion-id="{{ favorito.publicacion.id }}">
-                {% if favorito.publicacion.imagen_url %}
-                <img src="{{ favorito.publicacion.imagen_url }}" class="card-img-top" alt="{{ favorito.publicacion.titulo }}" style="height: 300px; object-fit: cover;">
+                {% if favorito.publicacion.imagen %}
+                <img src="{{ favorito.publicacion.imagen.url }}" class="card-img-top" alt="{{ favorito.publicacion.titulo }}" style="height: 300px; object-fit: cover;">
                 {% endif %}
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">

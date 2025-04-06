@@ -17,7 +17,9 @@
         {% for like in likes %}
         <div class="col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
-                <img src="{{ like.publicacion.imagen_url }}" class="card-img-top" alt="{{ like.publicacion.titulo }}" style="height: 250px; object-fit: cover;">
+                {% if like.publicacion.imagen %}
+                <img src="{{ like.publicacion.imagen.url }}" class="card-img-top" alt="{{ like.publicacion.titulo }}" style="height: 250px; object-fit: cover;">
+                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title mb-2">{{ like.publicacion.titulo }}</h5>
                     <p class="card-text mb-2">{{ like.publicacion.descripcion|truncatechars:100 }}</p>
