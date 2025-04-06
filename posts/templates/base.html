@@ -41,13 +41,20 @@
                             <i class="fas fa-store"></i> Mis posts
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'compras:mis_compras' %}">                            
-                                <i class="fas fa-shopping-cart"></i> Mis Compras</a></li>
-                            <li><a class="dropdown-item" href="{% url 'alquileres:mis_alquileres' %}"><i class="fas fa-key"></i> Mis Alquileres</a></li>
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalPublicar">
+                                    <i class="fas fa-plus"></i> Publicar
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
-                            <li class="nav-item me-3">
-                                <a href="#" class="btn btn-publicar ms-1" title="Publicar Prenda" data-bs-toggle="modal" data-bs-target="#modalPublicar">
-                                   Publicar
+                            <li>
+                                <a class="dropdown-item" href="{% url 'compras:mis_compras' %}">
+                                    <i class="fas fa-shopping-cart"></i> Mis Compras
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'alquileres:mis_alquileres' %}">
+                                    <i class="fas fa-key"></i> Mis Alquileres
                                 </a>
                             </li>
                         </ul>
