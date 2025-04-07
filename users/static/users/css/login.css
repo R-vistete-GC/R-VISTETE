@@ -157,19 +157,3 @@
     width: 1rem;
     height: 1rem;
     border-width: 0.2em;
-}
-
-/* Estilos responsivos */
-@media (max-width: 576px) {
-    .login-card {
-        padding: 20px;
-    }
-
-    .login-title {
-        font-size: 1.5rem;
-    }
-
-    .form-control {
-        padding: 10px;
-    }
-} 

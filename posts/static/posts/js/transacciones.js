@@ -37,80 +37,140 @@ document.addEventListener('DOMContentLoaded', function() {
     const fechaFin = document.getElementById('fechaFin');
     
     if (fechaInicio && fechaFin) {
-        fechaInicio.addEventListener('change', actualizarResumenAlquiler);
-        fechaFin.addEventListener('change', actualizarResumenAlquiler);
+        fechaInicio.addEventListener('change', validarFechas);
+        fechaFin.addEventListener('change', validarFechas);
     }
 
-    // Modal de Compra
-    const modalCompra = document.getElementById('modalCompra');
-    if (modalCompra) {
-        modalCompra.addEventListener('show.bs.modal', function (event) {
+    // Modal de Alquiler
+    const modalAlquiler = document.getElementById('modalAlquilar');
+    if (modalAlquiler) {
+        modalAlquiler.addEventListener('show.bs.modal', function (event) {
             // Botón que activó el modal
             const button = event.relatedTarget;
             
-            // Obtener información de la publicación directamente del botón
+            // Obtener información de la publicación
             const publicacionId = button.getAttribute('data-publicacion-id');
-            const precio = button.getAttribute('data-precio');
+            const precio = parseFloat(button.getAttribute('data-precio'));
             const imagen = button.getAttribute('data-imagen');
             const titulo = button.getAttribute('data-titulo');
             
+            console.log('Datos de la publicación:', { publicacionId, precio, imagen, titulo });
+
             // Actualizar el modal con la información
-            document.getElementById('compraPublicacionId').value = publicacionId;
-            document.getElementById('compraImagenPreview').src = imagen;
-            document.getElementById('compraTitulo').textContent = titulo;
-            document.getElementById('compraPrecio').textContent = `$${precio}`;
+            const alquilerPublicacionId = document.getElementById('alquilerPublicacionId');
+            const alquilerImagenPreview = document.getElementById('alquilerImagenPreview');
+            const alquilerTitulo = document.getElementById('alquilerTitulo');
+            const alquilerPrecio = document.getElementById('alquilerPrecio');
+            const alquilerDeposito = document.getElementById('alquilerDeposito');
+            const alquilerTotal = document.getElementById('alquilerTotal');
+
+            if (alquilerPublicacionId) alquilerPublicacionId.value = publicacionId;
+            if (alquilerImagenPreview) alquilerImagenPreview.src = imagen;
+            if (alquilerTitulo) alquilerTitulo.textContent = titulo;
+            
+            // Actualizar precios
+            if (alquilerPrecio) alquilerPrecio.textContent = `$${precio.toFixed(2)}`;
+            if (alquilerDeposito) alquilerDeposito.textContent = `$${precio.toFixed(2)}`;
+            if (alquilerTotal) alquilerTotal.textContent = `$${(precio * 2).toFixed(2)}`;
+
+            // Resetear el formulario
+            document.getElementById('alquilerForm').reset();
+            document.getElementById('fechaInicio').min = new Date().toISOString().split('T')[0];
         });
 
-        // Manejar el envío del formulario de compra
-        const compraForm = document.getElementById('compraForm');
-        compraForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            fetch('/inicio/comprar/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        // Manejar el envío del formulario de alquiler
+        const alquilerForm = document.getElementById('alquilerForm');
+        if (alquilerForm) {
+            alquilerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validarFechas()) {
+                    return;
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Cerrar el modal
-                    const modal = bootstrap.Modal.getInstance(modalCompra);
-                    modal.hide();
-                    
-                    // Mostrar mensaje de éxito
-                    Swal.fire({
-                        title: '¡Compra exitosa!',
-                        text: data.message || 'Tu compra se ha realizado correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then(() => {
-                        // Recargar la página o actualizar la UI según sea necesario
-                        window.location.reload();
-                    });
-                } else {
-                    // Mostrar mensaje de error
+
+                const formData = new FormData(this);
+                
+                fetch('/inicio/alquilar/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Cerrar el modal
+                        const modal = bootstrap.Modal.getInstance(modalAlquiler);
+                        modal.hide();
+                        
+                        // Mostrar mensaje de éxito
+                        Swal.fire({
+                            title: '¡Alquiler confirmado!',
+                            text: data.message || 'Tu alquiler se ha procesado correctamente',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            // Recargar la página o actualizar la UI según sea necesario
+                            window.location.reload();
+                        });
+                    } else {
+                        // Mostrar mensaje de error
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message || 'Ha ocurrido un error al procesar tu alquiler',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
                         title: 'Error',
-                        text: data.message || 'Ha ocurrido un error al procesar tu compra',
+                        text: 'Ha ocurrido un error al procesar tu alquiler',
                         icon: 'error',
                         confirmButtonText: 'Aceptar'
                     });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Ha ocurrido un error al procesar tu compra',
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar'
                 });
             });
-        });
+        }
     }
-}); 
+});
+
+// Función para validar las fechas
+function validarFechas() {
+    const fechaInicio = document.getElementById('fechaInicio');
+    const fechaFin = document.getElementById('fechaFin');
+    
+    if (!fechaInicio || !fechaFin || !fechaInicio.value || !fechaFin.value) {
+        return false;
+    }
+
+    const inicio = new Date(fechaInicio.value);
+    const fin = new Date(fechaFin.value);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    if (inicio < hoy) {
+        Swal.fire({
+            title: 'Error',
+            text: 'La fecha de inicio no puede ser anterior a hoy',
+            icon: 'error'
+        });
+        fechaInicio.value = '';
+        return false;
+    }
+
+    if (fin <= inicio) {
+        Swal.fire({
+            title: 'Error',
+            text: 'La fecha de devolución debe ser posterior a la fecha de inicio',
+            icon: 'error'
+        });
+        fechaFin.value = '';
+        return false;
+    }
+
+    return true;
+} 

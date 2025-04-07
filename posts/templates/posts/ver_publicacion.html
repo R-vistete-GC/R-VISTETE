@@ -1,0 +1,11 @@
+<!-- Botón de compra -->
+<button type="button" 
+        class="btn btn-success" 
+        data-bs-toggle="modal" 
+        data-bs-target="#modalCompra"
+        data-publicacion-id="{{ publicacion.id }}"
+        data-precio="{{ publicacion.precio }}"
+        data-imagen="{{ publicacion.imagen.url }}"
+        data-titulo="{{ publicacion.titulo }}">
+    <i class="fas fa-shopping-cart"></i> Comprar
+</button> 

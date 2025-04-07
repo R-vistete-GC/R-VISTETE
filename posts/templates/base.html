@@ -335,12 +335,12 @@
     </div>
 
     <!-- Modal Compra -->
-    <div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true" role="dialog">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalCompraLabel">Comprar Prenda</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                     <form id="compraForm" method="POST">
@@ -355,18 +355,17 @@
                                 <img id="compraImagenPreview" src="" alt="Imagen de la prenda" 
                                      style="max-width: 200px; max-height: 200px; object-fit: cover;" class="rounded">
                             </div>
-                            <!-- Título de la publicación -->
-                            <h6 id="compraTitulo" class="text-center mb-3"></h6>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Precio:</span>
-                                <span class="fw-bold" id="compraPrecio"></span>
+                            <!-- Título y precio -->
+                            <div class="text-center">
+                                <h6 id="compraTitulo" class="mb-2"></h6>
+                                <p class="h5 text-success mb-3" id="compraPrecio"></p>
                             </div>
                         </div>
 
                         <!-- Método de pago -->
                         <div class="mb-3">
-                            <label class="form-label">Método de Pago*</label>
-                            <select class="form-select" name="metodo_pago" required>
+                            <label for="metodoPago" class="form-label">Método de Pago*</label>
+                            <select class="form-select" id="metodoPago" name="metodo_pago" required>
                                 <option value="">Selecciona un método de pago</option>
                                 <option value="tarjeta_credito">Tarjeta de Crédito</option>
                                 <option value="tarjeta_debito">Tarjeta de Débito</option>
@@ -376,45 +375,45 @@
 
                         <!-- Dirección de envío -->
                         <div class="mb-3">
-                            <label class="form-label">Dirección de Envío*</label>
-                            <textarea class="form-control" name="direccion_envio" rows="3" required 
+                            <label for="direccionEnvio" class="form-label">Dirección de Envío*</label>
+                            <textarea class="form-control" id="direccionEnvio" name="direccion_envio" rows="3" required 
                                     placeholder="Ingresa la dirección completa de envío"></textarea>
                         </div>
 
                         <!-- Notas adicionales -->
                         <div class="mb-3">
-                            <label class="form-label">Notas Adicionales</label>
-                            <textarea class="form-control" name="notas" rows="2" 
+                            <label for="notas" class="form-label">Notas Adicionales</label>
+                            <textarea class="form-control" id="notas" name="notas" rows="2" 
                                     placeholder="Instrucciones especiales de entrega, etc."></textarea>
                         </div>
+
+                        <div class="modal-footer px-0 pb-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-shopping-cart"></i> Confirmar Compra
+                            </button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="compraForm" class="btn btn-success">
-                        <i class="fas fa-shopping-cart"></i> Confirmar Compra
-                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal de Alquiler -->
-    <div class="modal fade" id="modalAlquilar" tabindex="-1" aria-labelledby="modalAlquilarLabel">
-        <div class="modal-dialog modal-lg">
+    <div class="modal fade" id="modalAlquilar" tabindex="-1" aria-labelledby="modalAlquilarLabel" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalAlquilarLabel">Alquilar Prenda</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <!-- Preview de la prenda -->
                         <div class="col-md-4">
                             <div class="prenda-preview text-center">
-                                <img id="prendaImagenAlquiler" src="" alt="Imagen de la prenda" class="img-fluid mb-3">
+                                <img id="prendaImagenAlquiler" src="" alt="Imagen de la prenda" class="img-fluid rounded mb-3">
                                 <h6 id="prendaTituloAlquiler" class="mb-2"></h6>
-                                <p id="prendaPrecioAlquiler" class="mb-2"></p>
                             </div>
                         </div>
                         <!-- Formulario de alquiler -->
@@ -423,6 +422,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" id="publicacionIdAlquiler" name="publicacion_id">
                                 
+                                <!-- Fechas -->
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label for="fechaInicio" class="form-label">Fecha de Inicio*</label>
@@ -434,6 +434,33 @@
                                     </div>
                                 </div>
 
+                                <!-- Resumen del Alquiler -->
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Resumen del Alquiler</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless mb-0">
+                                                <tr>
+                                                    <td>Precio del alquiler:</td>
+                                                    <td class="text-end" id="precioPorDia">$0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Depósito de seguridad:</td>
+                                                    <td class="text-end" id="depositoSeguridad">$0.00</td>
+                                                </tr>
+                                                <tr class="fw-bold">
+                                                    <td>Total a pagar:</td>
+                                                    <td class="text-end text-success" id="totalPagar">$0.00</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">
+                                            * El depósito se devolverá cuando la prenda sea regresada en buen estado
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Método de pago -->
                                 <div class="mb-3">
                                     <label for="metodoPagoAlquiler" class="form-label">Método de Pago*</label>
                                     <select class="form-select" id="metodoPagoAlquiler" name="metodo_pago" required>
@@ -444,21 +471,21 @@
                                     </select>
                                 </div>
 
+                                <!-- Dirección de envío -->
                                 <div class="mb-3">
                                     <label for="direccionEnvioAlquiler" class="form-label">Dirección de Envío*</label>
-                                    <textarea class="form-control" id="direccionEnvioAlquiler" name="direccion_envio" rows="2" required></textarea>
+                                    <textarea class="form-control" id="direccionEnvioAlquiler" name="direccion_envio" rows="2" required 
+                                            placeholder="Ingresa la dirección completa donde recibirás la prenda"></textarea>
                                 </div>
 
+                                <!-- Instrucciones de devolución -->
                                 <div class="mb-3">
                                     <label for="instruccionesDevolucion" class="form-label">Instrucciones de Devolución</label>
-                                    <textarea class="form-control" id="instruccionesDevolucion" name="instrucciones_devolucion" rows="2"></textarea>
+                                    <textarea class="form-control" id="instruccionesDevolucion" name="instrucciones_devolucion" rows="2"
+                                            placeholder="Instrucciones especiales para la devolución de la prenda"></textarea>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="notasAlquiler" class="form-label">Notas Adicionales</label>
-                                    <textarea class="form-control" id="notasAlquiler" name="notas" rows="2"></textarea>
-                                </div>
-
+                                <!-- Términos y condiciones -->
                                 <div class="mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="terminosAlquiler" name="terminos_aceptados" required>
@@ -468,25 +495,16 @@
                                     </div>
                                 </div>
 
-                                <div class="resumen-alquiler mb-3">
-                                    <h6>Resumen del Alquiler</h6>
-                                    <div id="resumenAlquiler">
-                                        <p>Precio por día: <span id="precioPorDia">$0</span></p>
-                                        <p>Días de alquiler: <span id="diasAlquiler">0</span></p>
-                                        <p>Depósito de seguridad: <span id="depositoSeguridad">$0</span></p>
-                                        <p class="fw-bold">Total a pagar: <span id="totalPagar">$0</span></p>
-                                    </div>
+                                <div class="modal-footer px-0 mb-0">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary" id="btnConfirmarAlquiler">
+                                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        Confirmar Alquiler
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btnConfirmarAlquiler">
-                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        Confirmar Alquiler
-                    </button>
                 </div>
             </div>
         </div>
