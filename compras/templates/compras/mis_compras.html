@@ -2,59 +2,64 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-5">
     <h2 class="mb-4">Mis Compras</h2>
-
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% else %}
-        {% if tiene_compras %}
-            <div class="row">
-                {% for compra in compras %}
-                    <div class="col-md-6 mb-4">
-                        <div class="card">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    {% if compra.publicacion.imagen_url %}
-                                        <img src="{{ compra.publicacion.imagen_url }}" class="img-fluid rounded-start" alt="{{ compra.publicacion.titulo }}" style="height: 200px; width: 100%; object-fit: cover;">
-                                    {% else %}
-                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ compra.publicacion.titulo }}</h5>
-                                        <div class="mb-2">
-                                            <span class="badge {% if compra.estado == 'pendiente' %}bg-warning
-                                                          {% elif compra.estado == 'completada' %}bg-success
-                                                          {% else %}bg-danger{% endif %}">
-                                                {{ compra.get_estado_display }}
-                                            </span>
-                                        </div>
+    
+    {% if compras %}
+        <div class="row">
+            {% for compra in compras %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="{{ compra.publicacion.imagen.url }}" 
+                                     class="img-fluid rounded-start" 
+                                     alt="{{ compra.publicacion.titulo }}"
+                                     style="object-fit: cover; height: 100%;">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ compra.publicacion.titulo }}</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">Vendedor: {{ compra.vendedor.username }}</small>
+                                    </p>
+                                    <p class="card-text">
+                                        <strong>Precio:</strong> ${{ compra.precio_final }}
+                                    </p>
+                                    <p class="card-text">
+                                        <strong>Estado:</strong> 
+                                        <span class="badge {% if compra.estado == 'pendiente' %}bg-warning
+                                                     {% elif compra.estado == 'enviado' %}bg-info
+                                                     {% elif compra.estado == 'entregado' %}bg-success
+                                                     {% else %}bg-secondary{% endif %}">
+                                            {{ compra.estado|title }}
+                                        </span>
+                                    </p>
+                                    <p class="card-text">
+                                        <strong>Método de pago:</strong> {{ compra.metodo_pago }}
+                                    </p>
+                                    <p class="card-text">
+                                        <strong>Dirección:</strong> {{ compra.direccion_envio }}
+                                    </p>
+                                    {% if compra.notas %}
                                         <p class="card-text">
-                                            <strong>Fecha:</strong> {{ compra.fecha_venta|date:"d/m/Y H:i" }}<br>
-                                            <strong>Precio:</strong> ${{ compra.precio_final }}<br>
-                                            <strong>Método de pago:</strong> {{ compra.metodo_pago }}<br>
-                                            <strong>Vendedor:</strong> {{ compra.vendedor.nombre }}<br>
-                                            <strong>Dirección de envío:</strong> {{ compra.direccion_envio }}<br>
-                                            {% if compra.notas %}
-                                                <strong>Notas:</strong> {{ compra.notas }}<br>
-                                            {% endif %}
+                                            <strong>Notas:</strong> {{ compra.notas }}
                                         </p>
-                                    </div>
+                                    {% endif %}
+                                    <p class="card-text">
+                                        <small class="text-muted">Fecha de compra: {{ compra.fecha_venta|date:"d/m/Y H:i" }}</small>
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                No tienes compras realizadas aún.
-            </div>
-        {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            No tienes compras realizadas aún.
+        </div>
     {% endif %}
 </div>
 {% endblock %} 

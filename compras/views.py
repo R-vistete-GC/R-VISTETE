@@ -6,25 +6,26 @@ from users.models import Usuario
 
 def mis_compras(request):
     # Verificar autenticación (maneja tanto session como user)
-    if not request.user.is_authenticated and not request.session.get('usuario_id'):
+    if not request.session.get('usuario_id'):
         return redirect(f'/users/login/?next={request.path}')  # Redirige manteniendo la URL destino
     
     try:
-        # Obtener usuario (adaptado para ambos sistemas de auth)
-        usuario_id = request.user.id if request.user.is_authenticated else request.session.get('usuario_id')
+        # Obtener usuario de la sesión
+        usuario_id = request.session.get('usuario_id')
         usuario = Usuario.objects.get(id=usuario_id)
         
-        # Obtener todas las compras donde el usuario es el comprador usando el related_name existente
-        compras = usuario.compras_realizadas.all().order_by('-fecha_venta')
-        
+        # Obtener todas las compras del usuario ordenadas por fecha
+        compras = Venta.objects.filter(
+            comprador=usuario
+        ).select_related(
+            'publicacion',
+            'vendedor'
+        ).order_by('-fecha_venta')
+
         return render(request, 'compras/mis_compras.html', {
             'compras': compras,
-            'tiene_compras': compras.exists(),
-            'user': request.user if request.user.is_authenticated else None
+            'usuario': usuario
         })
-        
     except Usuario.DoesNotExist:
-        return render(request, 'compras/mis_compras.html', {
-            'error': 'Usuario no encontrado.',
-            'tiene_compras': False
-        })
+        request.session.flush()
+        return redirect('/users/login/')

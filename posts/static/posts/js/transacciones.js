@@ -31,7 +31,7 @@ function actualizarResumenAlquiler() {
     }
 }
 
-// Event listeners para las fechas
+// Event listeners para las fechas y modales
 document.addEventListener('DOMContentLoaded', function() {
     const fechaInicio = document.getElementById('fechaInicio');
     const fechaFin = document.getElementById('fechaFin');
@@ -132,6 +132,122 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'error',
                         confirmButtonText: 'Aceptar'
                     });
+                });
+            });
+        }
+    }
+
+    // Modal de Compra
+    const modalCompra = document.getElementById('modalCompra');
+    if (modalCompra) {
+        modalCompra.addEventListener('show.bs.modal', function (event) {
+            // Botón que activó el modal
+            const button = event.relatedTarget;
+            
+            // Obtener información de la publicación
+            const publicacionId = button.getAttribute('data-publicacion-id');
+            const precio = button.getAttribute('data-precio');
+            const imagen = button.getAttribute('data-imagen');
+            const titulo = button.getAttribute('data-titulo');
+            
+            console.log('Datos de la publicación:', { publicacionId, precio, imagen, titulo });
+            
+            // Actualizar el modal con la información
+            document.getElementById('compraPublicacionId').value = publicacionId;
+            document.getElementById('compraImagenPreview').src = imagen;
+            document.getElementById('compraTitulo').textContent = titulo;
+            document.getElementById('compraPrecio').textContent = `$${precio}`;
+
+            // Resetear el formulario
+            document.getElementById('compraForm').reset();
+        });
+
+        // Manejar el envío del formulario de compra
+        const compraForm = document.getElementById('compraForm');
+        if (compraForm) {
+            compraForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Validar campos requeridos
+                const metodoPago = document.getElementById('metodoPago').value;
+                const direccionEnvio = document.getElementById('direccionEnvio').value;
+
+                if (!metodoPago || !direccionEnvio) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Por favor completa todos los campos requeridos',
+                        icon: 'error'
+                    });
+                    return;
+                }
+
+                // Deshabilitar el botón y mostrar indicador de carga
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+
+                // Enviar formulario
+                const formData = new FormData(this);
+                
+                fetch('/inicio/comprar/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json().then(data => ({ status: response.status, data })))
+                .then(({ status, data }) => {
+                    if (status === 401) {
+                        // Usuario no autenticado
+                        window.location.href = '/users/login/';
+                        return;
+                    }
+                    
+                    if (data.success) {
+                        // Cerrar el modal
+                        const modal = bootstrap.Modal.getInstance(modalCompra);
+                        modal.hide();
+                        
+                        // Mostrar mensaje de éxito
+                        Swal.fire({
+                            title: '¡Compra exitosa!',
+                            text: data.message,
+                            icon: 'success',
+                            confirmButtonText: 'Ver mis compras',
+                            showCancelButton: true,
+                            cancelButtonText: 'Cerrar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/compras/mis-compras/';
+                            } else {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        // Mostrar mensaje de error
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message || 'Ha ocurrido un error al procesar tu compra',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Ha ocurrido un error al procesar tu compra',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                })
+                .finally(() => {
+                    // Restaurar el botón
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
                 });
             });
         }
