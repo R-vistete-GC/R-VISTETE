@@ -143,10 +143,12 @@
     <div class="main-wrapper">
         <div class="container-fluid py-5">
             <div class="container">
-    {% block content %}{% endblock %}
+                {% block content %}{% endblock %}
             </div>
         </div>
     </div>
+
+    {% block modals %}{% endblock %}
 
     <!-- Modal Publicar -->
     <div class="modal fade" id="modalPublicar" tabindex="-1" role="dialog" aria-labelledby="modalPublicarLabel">

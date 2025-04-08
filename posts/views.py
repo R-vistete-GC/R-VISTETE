@@ -824,188 +824,171 @@ def procesar_operacion(request):
         print("Error procesando operación:", str(e))
         return JsonResponse({'success': False, 'error': 'Error interno del servidor'})
 
+@require_http_methods(["GET"])
+def get_publicacion(request, publicacion_id):
+    """
+    Vista para obtener los datos de una publicación específica
+    """
+    try:
+        # Obtener la publicación
+        publicacion = get_object_or_404(Publicacion, id=publicacion_id)
+        
+        # Construir la respuesta
+        data = {
+            'success': True,
+            'id': publicacion.id,
+            'titulo': publicacion.titulo,
+            'descripcion': publicacion.descripcion,
+            'precio': str(publicacion.precio),
+            'deposito': str(publicacion.deposito) if publicacion.deposito else '0',
+            'imagen': publicacion.imagen.url if publicacion.imagen else '',
+            'tipo': publicacion.tipo,
+            'talla': publicacion.talla,
+            'publico': publicacion.publico,
+            'estilo': publicacion.estilo if isinstance(publicacion.estilo, list) else [],
+            'colores': publicacion.colores if isinstance(publicacion.colores, list) else []
+        }
+        
+        print("Datos de publicación enviados:", data)  # Debug log
+        return JsonResponse(data)
+        
+    except Publicacion.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Publicación no encontrada'
+        }, status=404)
+    except Exception as e:
+        print("Error al obtener publicación:", str(e))  # Debug log
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500)
+
+@login_required
 @require_http_methods(["POST"])
 def procesar_compra(request):
     try:
-        # Verificar si el usuario está autenticado por sesión
-        usuario_id = request.session.get('usuario_id')
-        if not usuario_id:
-            return JsonResponse({
-                'success': False,
-                'message': 'Usuario no autenticado'
-            }, status=401)
-
         # Obtener datos del formulario
         publicacion_id = request.POST.get('publicacion_id')
+        direccion = request.POST.get('direccion')
         metodo_pago = request.POST.get('metodo_pago')
-        direccion_envio = request.POST.get('direccion_envio')
-        notas = request.POST.get('notas')
-
-        # Validar campos requeridos
-        if not all([publicacion_id, metodo_pago, direccion_envio]):
+        
+        if not all([publicacion_id, direccion, metodo_pago]):
             return JsonResponse({
                 'success': False,
-                'message': 'Faltan campos requeridos'
+                'message': 'Faltan datos requeridos'
             }, status=400)
-
-        try:
-            # Obtener la publicación y validar que existe
-            publicacion = Publicacion.objects.get(id=publicacion_id)
-            
-            # Validar que no esté comprando su propia publicación
-            if publicacion.usuario_id == usuario_id:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'No puedes comprar tu propia publicación'
-                }, status=400)
-
-            # Crear la venta
-            venta = Venta.objects.create(
-                publicacion=publicacion,
-                vendedor_id=publicacion.usuario_id,  # El usuario que creó la publicación
-                comprador_id=usuario_id,  # El usuario de la sesión que está comprando
-                precio_final=publicacion.precio,
-                estado='pendiente',
-                metodo_pago=metodo_pago,
-                direccion_envio=direccion_envio,
-                notas=notas
-            )
-
-            # Actualizar el estado de la publicación
-            publicacion.estado = 'vendida'
-            publicacion.save()
-
-            return JsonResponse({
-                'success': True,
-                'message': '¡Compra realizada con éxito!',
-                'venta_id': venta.id
-            })
-
-        except Publicacion.DoesNotExist:
+        
+        # Obtener la publicación y el usuario
+        publicacion = Publicacion.objects.get(id=publicacion_id)
+        usuario = request.user.usuario
+        
+        # Verificar que el usuario no sea el vendedor
+        if publicacion.usuario == usuario:
             return JsonResponse({
                 'success': False,
-                'message': 'La publicación no existe o no está disponible.'
-            }, status=404)
-
-    except Exception as e:
-        print("Error al procesar la compra:", str(e))
+                'message': 'No puedes comprar tus propias publicaciones'
+            }, status=400)
+        
+        # Crear la venta
+        venta = Venta.objects.create(
+            publicacion=publicacion,
+            vendedor=publicacion.usuario,
+            comprador=usuario,
+            precio_final=publicacion.precio,
+            estado='pendiente'
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Compra procesada exitosamente',
+            'venta_id': venta.id
+        })
+        
+    except Publicacion.DoesNotExist:
         return JsonResponse({
             'success': False,
-            'message': f'Error al procesar la compra: {str(e)}'
+            'message': 'Publicación no encontrada'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
         }, status=500)
 
+@login_required
 @require_http_methods(["POST"])
 def procesar_alquiler(request):
     try:
-        # Verificar si el usuario está autenticado
-        usuario_id = request.session.get('usuario_id')
-        if not usuario_id:
-            return JsonResponse({
-                'success': False,
-                'message': 'Usuario no autenticado'
-            }, status=401)
-
         # Obtener datos del formulario
         publicacion_id = request.POST.get('publicacion_id')
         fecha_inicio = request.POST.get('fecha_inicio')
         fecha_fin = request.POST.get('fecha_fin')
+        direccion = request.POST.get('direccion')
         metodo_pago = request.POST.get('metodo_pago')
-        direccion_envio = request.POST.get('direccion_envio')
-        instrucciones_devolucion = request.POST.get('instrucciones_devolucion', '')
-        notas = request.POST.get('notas', '')
-        terminos_aceptados = request.POST.get('terminos_aceptados') == 'on'
-
-        # Validar campos requeridos
-        if not all([publicacion_id, fecha_inicio, fecha_fin, metodo_pago, direccion_envio]):
+        
+        if not all([publicacion_id, fecha_inicio, fecha_fin, direccion, metodo_pago]):
             return JsonResponse({
                 'success': False,
-                'message': 'Faltan campos requeridos'
-            })
-
-        # Convertir fechas a timestamp
-        try:
-            fecha_inicio_dt = datetime.strptime(f"{fecha_inicio} 00:00:00", '%Y-%m-%d %H:%M:%S')
-            fecha_fin_dt = datetime.strptime(f"{fecha_fin} 23:59:59", '%Y-%m-%d %H:%M:%S')
-        except ValueError:
+                'message': 'Faltan datos requeridos'
+            }, status=400)
+        
+        # Convertir fechas
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+        
+        # Validar fechas
+        if fecha_inicio >= fecha_fin:
             return JsonResponse({
                 'success': False,
-                'message': 'Formato de fecha inválido'
-            })
-
-        if fecha_fin_dt <= fecha_inicio_dt:
+                'message': 'La fecha de fin debe ser posterior a la fecha de inicio'
+            }, status=400)
+        
+        # Obtener la publicación y el usuario
+        publicacion = Publicacion.objects.get(id=publicacion_id)
+        usuario = request.user.usuario
+        
+        # Verificar que el usuario no sea el propietario
+        if publicacion.usuario == usuario:
             return JsonResponse({
                 'success': False,
-                'message': 'La fecha de devolución debe ser posterior a la fecha de inicio'
-            })
-
-        # Obtener la publicación
-        try:
-            publicacion = Publicacion.objects.get(id=publicacion_id)
-        except Publicacion.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'message': 'La publicación no existe'
-            })
-
-        # Validar que la publicación no sea del mismo usuario
-        if publicacion.usuario_id == usuario_id:
-            return JsonResponse({
-                'success': False,
-                'message': 'No puedes alquilar tu propia publicación'
-            })
-
-        # Verificar disponibilidad para las fechas seleccionadas
-        alquileres_existentes = Alquiler.objects.filter(
+                'message': 'No puedes alquilar tus propias publicaciones'
+            }, status=400)
+        
+        # Calcular precio total
+        dias = (fecha_fin - fecha_inicio).days
+        precio_total = publicacion.precio * dias
+        
+        # Crear el alquiler
+        alquiler = Alquiler.objects.create(
             publicacion=publicacion,
-            estado__in=['reservado', 'activo'],
-            fecha_inicio__lte=fecha_fin_dt,
-            fecha_fin__gte=fecha_inicio_dt
-        )
-
-        if alquileres_existentes.exists():
-            return JsonResponse({
-                'success': False,
-                'message': 'La prenda no está disponible para las fechas seleccionadas'
-            })
-
-        # Calcular precios
-        dias = (fecha_fin_dt.date() - fecha_inicio_dt.date()).days
-        precio_por_dia = publicacion.precio
-        precio_total = precio_por_dia * dias
-        deposito = precio_por_dia * Decimal('0.5')  # 50% del precio por día como depósito
-
-        # Obtener el último ID de alquiler y sumar 1
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT setval('alquileres_id_seq', (SELECT MAX(id) FROM alquileres));")
-
-        # Crear el alquiler usando el usuario_id de la sesión
-        alquiler = Alquiler(
-            publicacion_id=publicacion_id,
-            fecha_inicio=fecha_inicio_dt,
-            fecha_fin=fecha_fin_dt,
-            propietario_id=publicacion.usuario_id,  # ID del dueño de la publicación
-            cliente_id=usuario_id,  # ID del usuario que alquila (de la sesión)
-            precio_por_dia=precio_por_dia,
-            deposito=deposito,
-            estado='reservado',
-            metodo_pago=metodo_pago,
-            direccion_envio=direccion_envio,
-            notas=notas,
+            arrendador=publicacion.usuario,
+            arrendatario=usuario,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
             precio_total=precio_total,
-            terminos_aceptados=terminos_aceptados,
-            instrucciones_devolucion=instrucciones_devolucion
+            deposito=publicacion.deposito,
+            estado='pendiente'
         )
-        alquiler.save()
-
+        
         return JsonResponse({
             'success': True,
-            'message': '¡Alquiler realizado con éxito!',
+            'message': 'Alquiler procesado exitosamente',
             'alquiler_id': alquiler.id
         })
-
-    except Exception as e:
-        print("Error al procesar el alquiler:", str(e))
+        
+    except Publicacion.DoesNotExist:
         return JsonResponse({
             'success': False,
-            'message': f'Error al procesar el alquiler: {str(e)}'
+            'message': 'Publicación no encontrada'
+        }, status=404)
+    except ValueError as e:
+        return JsonResponse({
+            'success': False,
+            'message': 'Formato de fecha inválido'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
         }, status=500)

@@ -19,19 +19,20 @@
                     </div>
 
                     <!-- Formulario de compra/alquiler -->
-                    <form id="formCompraAlquiler">
-                        <input type="hidden" id="modalPublicacionId">
-                        <input type="hidden" id="modalTipoOperacion">
+                    <form id="formCompraAlquiler" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" id="publicacionId" name="publicacion_id">
+                        <input type="hidden" id="tipoOperacion" name="tipo_operacion">
 
                         <!-- Campos para alquiler -->
                         <div id="camposAlquiler" style="display: none;">
                             <div class="mb-3">
                                 <label for="fechaInicio" class="form-label">Fecha de inicio</label>
-                                <input type="date" class="form-control" id="fechaInicio" required>
+                                <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio" required>
                             </div>
                             <div class="mb-3">
                                 <label for="fechaFin" class="form-label">Fecha de devolución</label>
-                                <input type="date" class="form-control" id="fechaFin" required>
+                                <input type="date" class="form-control" id="fechaFin" name="fecha_fin" required>
                             </div>
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle"></i>
@@ -42,7 +43,7 @@
                         <!-- Información de envío -->
                         <div class="mb-3">
                             <label for="direccion" class="form-label">Dirección de envío</label>
-                            <textarea class="form-control" id="direccion" rows="2" required></textarea>
+                            <textarea class="form-control" id="direccion" name="direccion" rows="2" required></textarea>
                         </div>
 
                         <!-- Método de pago -->
@@ -50,13 +51,13 @@
                             <label class="form-label">Método de pago</label>
                             <div class="d-flex gap-2">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodoPago" id="pagoTarjeta" value="tarjeta" checked>
+                                    <input class="form-check-input" type="radio" name="metodo_pago" id="pagoTarjeta" value="tarjeta" checked>
                                     <label class="form-check-label" for="pagoTarjeta">
                                         <i class="fas fa-credit-card"></i> Tarjeta
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodoPago" id="pagoPaypal" value="paypal">
+                                    <input class="form-check-input" type="radio" name="metodo_pago" id="pagoPaypal" value="paypal">
                                     <label class="form-check-label" for="pagoPaypal">
                                         <i class="fab fa-paypal"></i> PayPal
                                     </label>

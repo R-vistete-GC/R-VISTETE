@@ -23,4 +23,5 @@ urlpatterns = [
     path('procesar-operacion/', views.procesar_operacion, name='procesar_operacion'),
     path('comprar/', views.procesar_compra, name='procesar_compra'),  # Nueva URL para procesar compras
     path('procesar_alquiler/', views.procesar_alquiler, name='procesar_alquiler'),
+    path('get_publicacion/<int:publicacion_id>/', views.get_publicacion, name='get_publicacion'),
 ]

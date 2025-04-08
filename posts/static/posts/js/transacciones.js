@@ -289,4 +289,198 @@ function validarFechas() {
     }
 
     return true;
-} 
+}
+
+// Función para mostrar el modal de compra/alquiler
+function mostrarModalCompra(publicacionId, tipo) {
+    console.log('=== DEBUG: Inicio de mostrarModalCompra ===');
+    console.log('Parámetros recibidos:', { publicacionId, tipo });
+    
+    if (!publicacionId) {
+        console.error('Error: No se recibió publicacionId');
+        return;
+    }
+
+    const url = `/inicio/get_publicacion/${publicacionId}/`;
+    console.log('Realizando petición a:', url);
+    
+    fetch(url)
+        .then(response => {
+            console.log('Respuesta recibida del servidor:', response.status);
+            if (!response.ok) {
+                throw new Error(`Error en la respuesta del servidor: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos recibidos del servidor:', data);
+            
+            if (data.success) {
+                // Verificar elementos del DOM
+                const elementos = {
+                    publicacionId: document.getElementById('publicacionId'),
+                    tipoOperacion: document.getElementById('tipoOperacion'),
+                    imagenElement: document.getElementById('modalImagenPrenda'),
+                    tituloElement: document.getElementById('modalTituloPrenda'),
+                    precioElement: document.getElementById('modalPrecioPrenda'),
+                    subtotalElement: document.getElementById('subtotal'),
+                    totalElement: document.getElementById('total'),
+                    camposAlquiler: document.getElementById('camposAlquiler'),
+                    depositoRow: document.getElementById('depositoRow'),
+                    btnAccionTexto: document.getElementById('btnAccionTexto'),
+                    modalElement: document.getElementById('modalCompra'),
+                    formElement: document.getElementById('formCompraAlquiler')
+                };
+
+                console.log('Estado de los elementos del DOM:', 
+                    Object.entries(elementos)
+                        .map(([key, element]) => `${key}: ${element ? 'Encontrado' : 'No encontrado'}`)
+                        .join('\n')
+                );
+
+                if (!elementos.modalElement) {
+                    console.error('Error: No se encontró el modal');
+                    return;
+                }
+
+                // Actualizar valores
+                if (elementos.publicacionId) elementos.publicacionId.value = publicacionId;
+                if (elementos.tipoOperacion) elementos.tipoOperacion.value = tipo;
+                
+                if (elementos.imagenElement) {
+                    elementos.imagenElement.src = data.imagen;
+                    console.log('Imagen actualizada:', data.imagen);
+                }
+                
+                if (elementos.tituloElement) {
+                    elementos.tituloElement.textContent = data.titulo;
+                    console.log('Título actualizado:', data.titulo);
+                }
+                
+                if (elementos.precioElement) {
+                    elementos.precioElement.textContent = `$${data.precio}`;
+                    console.log('Precio actualizado:', data.precio);
+                }
+
+                // Actualizar subtotal y total
+                const precioBase = parseFloat(data.precio);
+                const costoEnvio = 5.00;
+                
+                if (elementos.subtotalElement) {
+                    elementos.subtotalElement.textContent = `$${precioBase.toFixed(2)}`;
+                    console.log('Subtotal actualizado:', precioBase.toFixed(2));
+                }
+
+                let total = precioBase + costoEnvio;
+                
+                // Manejar campos específicos según el tipo
+                if (tipo === 'alquiler') {
+                    if (elementos.camposAlquiler) elementos.camposAlquiler.style.display = 'block';
+                    if (elementos.depositoRow) {
+                        elementos.depositoRow.style.display = 'flex';
+                        const deposito = parseFloat(data.deposito);
+                        total += deposito;
+                        console.log('Total con depósito:', total.toFixed(2));
+                    }
+                    if (elementos.btnAccionTexto) elementos.btnAccionTexto.textContent = 'Alquilar ahora';
+                } else {
+                    if (elementos.camposAlquiler) elementos.camposAlquiler.style.display = 'none';
+                    if (elementos.depositoRow) elementos.depositoRow.style.display = 'none';
+                    if (elementos.btnAccionTexto) elementos.btnAccionTexto.textContent = 'Comprar ahora';
+                }
+
+                if (elementos.totalElement) {
+                    elementos.totalElement.textContent = `$${total.toFixed(2)}`;
+                    console.log('Total actualizado:', total.toFixed(2));
+                }
+
+                // Mostrar el modal
+                console.log('Mostrando modal...');
+                const modal = new bootstrap.Modal(elementos.modalElement);
+                modal.show();
+            } else {
+                console.error('Error en los datos recibidos:', data.message);
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message || 'No se pudieron cargar los datos de la publicación',
+                    icon: 'error'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error en la petición:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al cargar los datos de la publicación',
+                icon: 'error'
+            });
+        });
+}
+
+// Manejar el envío del formulario
+document.addEventListener('DOMContentLoaded', function() {
+    const formCompraAlquiler = document.getElementById('formCompraAlquiler');
+    
+    if (formCompraAlquiler) {
+        formCompraAlquiler.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const tipoOperacion = formData.get('tipo_operacion');
+            const url = tipoOperacion === 'alquiler' ? '/posts/procesar_alquiler/' : '/posts/procesar_compra/';
+            
+            // Mostrar indicador de carga
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+            
+            // Enviar la solicitud
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cerrar el modal
+                    const modalElement = document.getElementById('modalCompra');
+                    if (modalElement) {
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) modal.hide();
+                    }
+                    
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Error al procesar la transacción');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            })
+            .finally(() => {
+                // Restaurar el botón
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }
+            });
+        });
+    }
+}); 

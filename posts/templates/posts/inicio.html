@@ -2,25 +2,36 @@
 <div class="d-flex justify-content-between align-items-center mt-3">
     <div class="d-flex gap-2">
         {% if publicacion.tipo == 'venta' %}
-        <button class="btn btn-sm btn-primary" onclick="mostrarModalCompra({{ publicacion.id }}, 'compra')">
+        <button class="btn btn-sm btn-primary" 
+                onclick="mostrarModalCompra('{{ publicacion.id }}', 'compra')"
+                data-publicacion-id="{{ publicacion.id }}"
+                data-precio="{{ publicacion.precio }}"
+                data-imagen="{{ publicacion.imagen.url }}"
+                data-titulo="{{ publicacion.titulo }}">
             <i class="fas fa-shopping-cart"></i> Comprar
         </button>
         {% elif publicacion.tipo == 'alquiler' %}
-        <button class="btn btn-sm btn-success" onclick="mostrarModalCompra({{ publicacion.id }}, 'alquiler')">
+        <button class="btn btn-sm btn-success" 
+                onclick="mostrarModalCompra('{{ publicacion.id }}', 'alquiler')"
+                data-publicacion-id="{{ publicacion.id }}"
+                data-precio="{{ publicacion.precio }}"
+                data-imagen="{{ publicacion.imagen.url }}"
+                data-titulo="{{ publicacion.titulo }}">
             <i class="fas fa-key"></i> Alquilar
         </button>
         {% endif %}
         <button class="btn btn-sm btn-outline-danger {% if publicacion.id in publicaciones_likeadas %}active{% endif %}" 
-                onclick="toggleLike({{ publicacion.id }})">
+                onclick="toggleLike('{{ publicacion.id }}')">
             <i class="fas fa-heart"></i>
             <span class="like-count">{{ publicacion.likes_count }}</span>
         </button>
         <button class="btn btn-sm btn-outline-danger {% if publicacion.id in publicaciones_dislikeadas %}active{% endif %}" 
-                onclick="toggleDislike({{ publicacion.id }})">
+                onclick="toggleDislike('{{ publicacion.id }}')">
             <i class="fas fa-thumbs-down"></i>
             <span class="dislike-count">{{ publicacion.dislikes_count }}</span>
         </button>
-        <button class="btn btn-sm btn-outline-primary" onclick="mostrarComentarios({{ publicacion.id }})">
+        <button class="btn btn-sm btn-outline-primary" 
+                onclick="mostrarComentarios('{{ publicacion.id }}')">
             <i class="fas fa-comments"></i>
             <span class="comment-count">{{ publicacion.comentarios_count }}</span>
         </button>
