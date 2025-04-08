@@ -79,7 +79,8 @@
                         <div class="d-flex flex-column gap-2">
                             <div class="d-flex justify-content-between gap-1">
                                 <button class="btn btn-sm btn-success flex-grow-1" 
-                                        onclick="mostrarModalCompra('{{ publicacion.id }}', 'compra')"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalCompra"
                                         data-publicacion-id="{{ publicacion.id }}"
                                         data-precio="{{ publicacion.precio }}"
                                         data-imagen="{{ publicacion.imagen.url }}"
@@ -87,7 +88,8 @@
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
                                 <button class="btn btn-sm btn-warning flex-grow-1" 
-                                        onclick="mostrarModalCompra('{{ publicacion.id }}', 'alquiler')"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalAlquilar"
                                         data-publicacion-id="{{ publicacion.id }}"
                                         data-titulo="{{ publicacion.titulo }}"
                                         data-precio="{{ publicacion.precio }}"

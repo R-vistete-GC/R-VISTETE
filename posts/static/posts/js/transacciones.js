@@ -54,28 +54,30 @@ document.addEventListener('DOMContentLoaded', function() {
             const imagen = button.getAttribute('data-imagen');
             const titulo = button.getAttribute('data-titulo');
             
-            console.log('Datos de la publicación:', { publicacionId, precio, imagen, titulo });
+            console.log('Datos de la publicación para modal Alquiler:', { publicacionId, precio, imagen, titulo });
 
-            // Actualizar el modal con la información
-            const alquilerPublicacionId = document.getElementById('alquilerPublicacionId');
-            const alquilerImagenPreview = document.getElementById('alquilerImagenPreview');
-            const alquilerTitulo = document.getElementById('alquilerTitulo');
-            const alquilerPrecio = document.getElementById('alquilerPrecio');
-            const alquilerDeposito = document.getElementById('alquilerDeposito');
-            const alquilerTotal = document.getElementById('alquilerTotal');
+            // Actualizar el modal con la información usando los IDs correctos del HTML
+            const inputId = document.getElementById('publicacionIdAlquiler');
+            const imgPreview = document.getElementById('prendaImagenAlquiler');
+            const tituloModal = document.getElementById('prendaTituloAlquiler');
+            const precioDiaModal = document.getElementById('precioPorDia');
+            const depositoModal = document.getElementById('depositoSeguridad');
+            const totalModal = document.getElementById('totalPagar');
 
-            if (alquilerPublicacionId) alquilerPublicacionId.value = publicacionId;
-            if (alquilerImagenPreview) alquilerImagenPreview.src = imagen;
-            if (alquilerTitulo) alquilerTitulo.textContent = titulo;
+            if (inputId) inputId.value = publicacionId;
+            if (imgPreview) imgPreview.src = imagen;
+            if (tituloModal) tituloModal.textContent = titulo;
             
-            // Actualizar precios
-            if (alquilerPrecio) alquilerPrecio.textContent = `$${precio.toFixed(2)}`;
-            if (alquilerDeposito) alquilerDeposito.textContent = `$${precio.toFixed(2)}`;
-            if (alquilerTotal) alquilerTotal.textContent = `$${(precio * 2).toFixed(2)}`;
+            // Actualizar precios (Precio alquiler = Precio, Deposito = Precio, Total = Precio * 2)
+            if (precioDiaModal) precioDiaModal.textContent = `$${precio.toFixed(2)}`;
+            if (depositoModal) depositoModal.textContent = `$${precio.toFixed(2)}`;
+            if (totalModal) totalModal.textContent = `$${(precio * 2).toFixed(2)}`;
 
-            // Resetear el formulario
-            document.getElementById('alquilerForm').reset();
-            document.getElementById('fechaInicio').min = new Date().toISOString().split('T')[0];
+            // Resetear el formulario de alquiler y establecer fecha mínima
+            const alquilerForm = document.getElementById('alquilerForm');
+            if(alquilerForm) alquilerForm.reset();
+            const fechaInicioInput = document.getElementById('fechaInicio');
+            if(fechaInicioInput) fechaInicioInput.min = new Date().toISOString().split('T')[0];
         });
 
         // Manejar el envío del formulario de alquiler
@@ -150,20 +152,38 @@ document.addEventListener('DOMContentLoaded', function() {
             const imagen = button.getAttribute('data-imagen');
             const titulo = button.getAttribute('data-titulo');
             
-            console.log('Datos de la publicación:', { publicacionId, precio, imagen, titulo });
+            console.log('Datos de la publicación para modal Compra:', { publicacionId, precio, imagen, titulo });
             
-            // Actualizar el modal con la información
-            document.getElementById('compraPublicacionId').value = publicacionId;
-            document.getElementById('compraImagenPreview').src = imagen;
-            document.getElementById('compraTitulo').textContent = titulo;
-            document.getElementById('compraPrecio').textContent = `$${precio}`;
+            // Actualizar el modal con la información usando los IDs correctos del HTML
+            document.getElementById('publicacionId').value = publicacionId; // ID del input oculto
+            document.getElementById('modalImagenPrenda').src = imagen; // ID de la imagen
+            document.getElementById('modalTituloPrenda').textContent = titulo; // ID del título
+            document.getElementById('modalPrecioPrenda').textContent = `$${precio}`; // ID del precio
+
+            // Actualizar resumen de costos (si aplica)
+            const subtotalElement = document.getElementById('subtotal');
+            if (subtotalElement) subtotalElement.textContent = `$${precio}`;
+            const totalElement = document.getElementById('total');
+            const envio = 5.00; // Asumiendo un costo de envío fijo
+            if (totalElement) totalElement.textContent = `$${(parseFloat(precio) + envio).toFixed(2)}`;
 
             // Resetear el formulario
-            document.getElementById('compraForm').reset();
+            const compraForm = document.getElementById('formCompraAlquiler');
+            if(compraForm) compraForm.reset();
+            
+            // Asegurarse de que los campos de alquiler estén ocultos
+            const camposAlquiler = document.getElementById('camposAlquiler');
+            if (camposAlquiler) camposAlquiler.style.display = 'none';
+            const depositoRow = document.getElementById('depositoRow');
+            if (depositoRow) depositoRow.style.display = 'none';
+            
+            // Cambiar texto del botón de acción
+            const btnAccionTexto = document.getElementById('btnAccionTexto');
+            if (btnAccionTexto) btnAccionTexto.textContent = 'Comprar ahora';
         });
 
         // Manejar el envío del formulario de compra
-        const compraForm = document.getElementById('compraForm');
+        const compraForm = document.getElementById('formCompraAlquiler');
         if (compraForm) {
             compraForm.addEventListener('submit', function(e) {
                 e.preventDefault();
