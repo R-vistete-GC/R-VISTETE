@@ -316,49 +316,47 @@ function mostrarModalCompra(publicacionId, tipo) {
             console.log('Datos recibidos del servidor:', data);
             
             if (data.success) {
-                // Verificar elementos del DOM
-                const elementos = {
-                    publicacionId: document.getElementById('publicacionId'),
-                    tipoOperacion: document.getElementById('tipoOperacion'),
-                    imagenElement: document.getElementById('modalImagenPrenda'),
-                    tituloElement: document.getElementById('modalTituloPrenda'),
-                    precioElement: document.getElementById('modalPrecioPrenda'),
-                    subtotalElement: document.getElementById('subtotal'),
-                    totalElement: document.getElementById('total'),
-                    camposAlquiler: document.getElementById('camposAlquiler'),
-                    depositoRow: document.getElementById('depositoRow'),
-                    btnAccionTexto: document.getElementById('btnAccionTexto'),
-                    modalElement: document.getElementById('modalCompra'),
-                    formElement: document.getElementById('formCompraAlquiler')
-                };
-
-                console.log('Estado de los elementos del DOM:', 
-                    Object.entries(elementos)
-                        .map(([key, element]) => `${key}: ${element ? 'Encontrado' : 'No encontrado'}`)
-                        .join('\n')
-                );
-
-                if (!elementos.modalElement) {
+                // Obtener el modal y sus elementos
+                const modalElement = document.getElementById('modalCompra');
+                if (!modalElement) {
                     console.error('Error: No se encontró el modal');
                     return;
                 }
 
-                // Actualizar valores
-                if (elementos.publicacionId) elementos.publicacionId.value = publicacionId;
-                if (elementos.tipoOperacion) elementos.tipoOperacion.value = tipo;
-                
-                if (elementos.imagenElement) {
-                    elementos.imagenElement.src = data.imagen;
+                // Actualizar los campos del formulario
+                const formElement = modalElement.querySelector('#formCompraAlquiler');
+                if (formElement) {
+                    const publicacionIdInput = formElement.querySelector('#publicacionId');
+                    const tipoOperacionInput = formElement.querySelector('#tipoOperacion');
+                    const vendedorIdInput = formElement.querySelector('#vendedorId');
+                    
+                    if (publicacionIdInput) publicacionIdInput.value = publicacionId;
+                    if (tipoOperacionInput) tipoOperacionInput.value = tipo;
+                    if (vendedorIdInput) vendedorIdInput.value = data.vendedor_id;
+                }
+
+                // Actualizar la información visual
+                const imagenElement = modalElement.querySelector('#modalImagenPrenda');
+                const tituloElement = modalElement.querySelector('#modalTituloPrenda');
+                const precioElement = modalElement.querySelector('#modalPrecioPrenda');
+                const subtotalElement = modalElement.querySelector('#subtotal');
+                const totalElement = modalElement.querySelector('#total');
+                const depositoRow = modalElement.querySelector('#depositoRow');
+                const camposAlquiler = modalElement.querySelector('#camposAlquiler');
+                const btnAccionTexto = modalElement.querySelector('#btnAccionTexto');
+
+                if (imagenElement) {
+                    imagenElement.src = data.imagen;
                     console.log('Imagen actualizada:', data.imagen);
                 }
                 
-                if (elementos.tituloElement) {
-                    elementos.tituloElement.textContent = data.titulo;
+                if (tituloElement) {
+                    tituloElement.textContent = data.titulo;
                     console.log('Título actualizado:', data.titulo);
                 }
                 
-                if (elementos.precioElement) {
-                    elementos.precioElement.textContent = `$${data.precio}`;
+                if (precioElement) {
+                    precioElement.textContent = `$${data.precio}`;
                     console.log('Precio actualizado:', data.precio);
                 }
 
@@ -366,8 +364,8 @@ function mostrarModalCompra(publicacionId, tipo) {
                 const precioBase = parseFloat(data.precio);
                 const costoEnvio = 5.00;
                 
-                if (elementos.subtotalElement) {
-                    elementos.subtotalElement.textContent = `$${precioBase.toFixed(2)}`;
+                if (subtotalElement) {
+                    subtotalElement.textContent = `$${precioBase.toFixed(2)}`;
                     console.log('Subtotal actualizado:', precioBase.toFixed(2));
                 }
 
@@ -375,28 +373,39 @@ function mostrarModalCompra(publicacionId, tipo) {
                 
                 // Manejar campos específicos según el tipo
                 if (tipo === 'alquiler') {
-                    if (elementos.camposAlquiler) elementos.camposAlquiler.style.display = 'block';
-                    if (elementos.depositoRow) {
-                        elementos.depositoRow.style.display = 'flex';
-                        const deposito = parseFloat(data.deposito);
+                    if (camposAlquiler) {
+                        camposAlquiler.style.display = 'block';
+                        // Establecer la fecha mínima para el inicio del alquiler
+                        const fechaInicio = camposAlquiler.querySelector('#fechaInicio');
+                        if (fechaInicio) {
+                            fechaInicio.min = new Date().toISOString().split('T')[0];
+                        }
+                    }
+                    if (depositoRow) {
+                        depositoRow.style.display = 'flex';
+                        const deposito = precioBase; // El depósito es igual al precio base
+                        const depositoElement = modalElement.querySelector('#deposito');
+                        if (depositoElement) {
+                            depositoElement.textContent = `$${deposito.toFixed(2)}`;
+                        }
                         total += deposito;
                         console.log('Total con depósito:', total.toFixed(2));
                     }
-                    if (elementos.btnAccionTexto) elementos.btnAccionTexto.textContent = 'Alquilar ahora';
+                    if (btnAccionTexto) btnAccionTexto.textContent = 'Alquilar ahora';
                 } else {
-                    if (elementos.camposAlquiler) elementos.camposAlquiler.style.display = 'none';
-                    if (elementos.depositoRow) elementos.depositoRow.style.display = 'none';
-                    if (elementos.btnAccionTexto) elementos.btnAccionTexto.textContent = 'Comprar ahora';
+                    if (camposAlquiler) camposAlquiler.style.display = 'none';
+                    if (depositoRow) depositoRow.style.display = 'none';
+                    if (btnAccionTexto) btnAccionTexto.textContent = 'Comprar ahora';
                 }
 
-                if (elementos.totalElement) {
-                    elementos.totalElement.textContent = `$${total.toFixed(2)}`;
+                if (totalElement) {
+                    totalElement.textContent = `$${total.toFixed(2)}`;
                     console.log('Total actualizado:', total.toFixed(2));
                 }
 
                 // Mostrar el modal
                 console.log('Mostrando modal...');
-                const modal = new bootstrap.Modal(elementos.modalElement);
+                const modal = new bootstrap.Modal(modalElement);
                 modal.show();
             } else {
                 console.error('Error en los datos recibidos:', data.message);
@@ -427,6 +436,49 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const formData = new FormData(this);
             const tipoOperacion = formData.get('tipo_operacion');
+            
+            // Validar campos según el tipo de operación
+            if (tipoOperacion === 'compra') {
+                // Validar campos para compra
+                const metodoPago = formData.get('metodo_pago');
+                const direccionEnvio = formData.get('direccion_envio');
+                
+                if (!metodoPago || !direccionEnvio) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Por favor completa todos los campos requeridos',
+                        icon: 'error'
+                    });
+                    return;
+                }
+            } else if (tipoOperacion === 'alquiler') {
+                // Validar campos adicionales para alquiler
+                const fechaInicio = formData.get('fecha_inicio');
+                const fechaFin = formData.get('fecha_fin');
+                const metodoPago = formData.get('metodo_pago');
+                const direccionEnvio = formData.get('direccion_envio');
+                
+                if (!fechaInicio || !fechaFin || !metodoPago || !direccionEnvio) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Por favor completa todos los campos requeridos, incluyendo las fechas de alquiler',
+                        icon: 'error'
+                    });
+                    return;
+                }
+                
+                // Validar las fechas
+                if (!validarFechas()) {
+                    return;
+                }
+            }
+            
+            // Agregar campos adicionales necesarios
+            const precioElement = document.getElementById('modalPrecioPrenda');
+            const precio = precioElement ? parseFloat(precioElement.textContent.replace('$', '')) : 0;
+            formData.append('precio_final', precio);
+            
+            // URL según el tipo de operación
             const url = tipoOperacion === 'alquiler' ? '/posts/procesar_alquiler/' : '/posts/procesar_compra/';
             
             // Mostrar indicador de carga
@@ -443,7 +495,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/users/login/';
+                        throw new Error('Por favor inicia sesión para continuar');
+                    }
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Error en el servidor');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Cerrar el modal
@@ -458,9 +521,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         title: '¡Éxito!',
                         text: data.message,
                         icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then(() => {
-                        window.location.reload();
+                        confirmButtonText: tipoOperacion === 'compra' ? 'Ver mis compras' : 'Ver mis alquileres',
+                        showCancelButton: true,
+                        cancelButtonText: 'Cerrar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = tipoOperacion === 'compra' ? '/compras/mis-compras/' : '/alquileres/mis-alquileres/';
+                        } else {
+                            window.location.reload();
+                        }
                     });
                 } else {
                     throw new Error(data.message || 'Error al procesar la transacción');

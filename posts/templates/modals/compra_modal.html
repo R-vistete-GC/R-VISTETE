@@ -23,16 +23,17 @@
                         {% csrf_token %}
                         <input type="hidden" id="publicacionId" name="publicacion_id">
                         <input type="hidden" id="tipoOperacion" name="tipo_operacion">
+                        <input type="hidden" id="vendedorId" name="vendedor_id">
 
                         <!-- Campos para alquiler -->
                         <div id="camposAlquiler" style="display: none;">
                             <div class="mb-3">
                                 <label for="fechaInicio" class="form-label">Fecha de inicio</label>
-                                <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio" required>
+                                <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio">
                             </div>
                             <div class="mb-3">
                                 <label for="fechaFin" class="form-label">Fecha de devolución</label>
-                                <input type="date" class="form-control" id="fechaFin" name="fecha_fin" required>
+                                <input type="date" class="form-control" id="fechaFin" name="fecha_fin">
                             </div>
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle"></i>
@@ -43,7 +44,7 @@
                         <!-- Información de envío -->
                         <div class="mb-3">
                             <label for="direccion" class="form-label">Dirección de envío</label>
-                            <textarea class="form-control" id="direccion" name="direccion" rows="2" required></textarea>
+                            <textarea class="form-control" id="direccion" name="direccion_envio" rows="2" required></textarea>
                         </div>
 
                         <!-- Método de pago -->
@@ -63,6 +64,12 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Notas adicionales -->
+                        <div class="mb-3">
+                            <label for="notas" class="form-label">Notas adicionales</label>
+                            <textarea class="form-control" id="notas" name="notas" rows="2" placeholder="Instrucciones especiales de entrega, etc."></textarea>
                         </div>
 
                         <!-- Resumen de costos -->
