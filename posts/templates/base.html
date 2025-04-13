@@ -521,7 +521,46 @@
     <!-- Custom JS -->
     <script src="{% static 'posts/js/interacciones.js' %}"></script>
     <script src="{% static 'posts/js/comentarios.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imagePreview = document.getElementById('imagePreview');
+            const imageInput = document.getElementById('imageInput');
+            const previewImage = imagePreview?.querySelector('img');
+            const uploadPlaceholder = imagePreview?.querySelector('.upload-placeholder');
+
+            // Abrir el explorador de archivos al hacer clic en el área de subida
+            if (imagePreview && imageInput) {
+                imagePreview.addEventListener('click', () => {
+                    imageInput.click();
+                });
+            }
+
+            // Manejar la selección de la imagen
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    handleImageSelection(file);
+                });
+            }
+
+            // Función para manejar la selección de la imagen
+            function handleImageSelection(file) {
+                if (file && file.type.startsWith('image/') && previewImage && uploadPlaceholder) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        uploadPlaceholder.style.display = 'none';
+                        imagePreview.classList.remove('empty');
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Por favor selecciona un archivo de imagen válido.');
+                }
+            }
+        });
+    </script>
     {% block scripts %}{% endblock %}
     {% block extra_js %}{% endblock %}
 </body>
-</html> 
+</html>

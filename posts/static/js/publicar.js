@@ -6,7 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadPlaceholder = imagePreview?.querySelector('.upload-placeholder');
 
     if (imagePreview && imageInput) {
-        imagePreview.addEventListener('click', () => imageInput.click());
+        imagePreview.addEventListener('click', () => {
+            console.log('Clic en imagePreview');
+            imageInput.click(); // Esto abre el explorador de archivos
+        });
 
         imageInput.addEventListener('change', function(e) {
             handleImageSelection(e.target.files[0]);
