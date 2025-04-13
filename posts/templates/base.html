@@ -560,6 +560,53 @@
             }
         });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const publicarForm = document.getElementById('publicarForm');
+
+        if (publicarForm) {
+            publicarForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Evitar el envío tradicional del formulario
+
+                const formData = new FormData(this);
+
+                fetch('/inicio/publicar/', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Publicación creada exitosamente!',
+                                text: data.message,
+                                confirmButtonText: 'Aceptar',
+                            }).then(() => {
+                                const modal = document.getElementById('modalPublicar');
+                                if (modal) {
+                                    const modalInstance = bootstrap.Modal.getInstance(modal);
+                                    if (modalInstance) {
+                                        modalInstance.hide();
+                                    }
+                                }
+                                publicarForm.reset(); // Limpiar el formulario
+                            });
+                        } else {
+                            throw new Error(data.message || 'Error al publicar.');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message,
+                        });
+                    });
+            });
+        }
+    });
+</script>
     {% block scripts %}{% endblock %}
     {% block extra_js %}{% endblock %}
 </body>

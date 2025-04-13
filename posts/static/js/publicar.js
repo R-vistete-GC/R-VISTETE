@@ -83,69 +83,67 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (publicarForm) {
         publicarForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
+            e.preventDefault(); // Evitar el envío tradicional del formulario
+
             // Verificar que se haya seleccionado una imagen
             const imageFile = imageInput?.files[0];
             if (!imageFile) {
-                alert('Por favor selecciona una imagen para la publicación');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Por favor selecciona una imagen para la publicación.',
+                });
                 return;
             }
 
-            // Verificar que se haya seleccionado al menos un estilo
-            const estilosSeleccionados = document.querySelectorAll('input[name="estilo[]"]:checked');
-            if (estilosSeleccionados.length === 0) {
-                alert('Por favor selecciona al menos un estilo');
-                return;
-            }
-
-            // Verificar que se haya seleccionado al menos un color
-            const coloresSeleccionados = document.querySelectorAll('input[name="colores[]"]:checked');
-            if (coloresSeleccionados.length === 0) {
-                alert('Por favor selecciona al menos un color');
-                return;
-            }
-            
             const formData = new FormData(this);
-            
+
             // Deshabilitar el botón y mostrar estado de carga
             const submitButton = this.querySelector('button[type="submit"]');
-            if (submitButton) {
-                const originalText = submitButton.innerHTML;
-                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Publicando...';
-                submitButton.disabled = true;
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Publicando...';
+            submitButton.disabled = true;
 
-                fetch('/inicio/publicar/', {
-                    method: 'POST',
-                    body: formData
-                })
+            fetch('/inicio/publicar/', {
+                method: 'POST',
+                body: formData,
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Cerrar el modal si existe
-                        const modal = document.getElementById('modalPublicar');
-                        if (modal) {
-                            const modalInstance = bootstrap.Modal.getInstance(modal);
-                            if (modalInstance) {
-                                modalInstance.hide();
+                        // Mostrar modal de éxito
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Publicación creada exitosamente!',
+                            text: data.message,
+                            confirmButtonText: 'Aceptar',
+                        }).then(() => {
+                            // Cerrar el modal
+                            const modal = document.getElementById('modalPublicar');
+                            if (modal) {
+                                const modalInstance = bootstrap.Modal.getInstance(modal);
+                                if (modalInstance) {
+                                    modalInstance.hide();
+                                }
                             }
-                        }
-                        
-                        alert(data.message);
-                        window.location.href = data.redirect_url;
+                            publicarForm.reset(); // Limpiar el formulario
+                        });
                     } else {
-                        throw new Error(data.error || 'Error al publicar');
+                        throw new Error(data.message || 'Error al publicar.');
                     }
                 })
                 .catch(error => {
-                    alert('Error: ' + error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message,
+                    });
                 })
                 .finally(() => {
                     // Restaurar el botón
                     submitButton.innerHTML = originalText;
                     submitButton.disabled = false;
                 });
-            }
         });
     }
 });
