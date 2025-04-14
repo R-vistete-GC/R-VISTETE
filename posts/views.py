@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Sum, Count, Q
-from .models import Publicacion, Comentario, Venta, Alquiler, Favorito, Like, Dislike
+from .models import Publicacion, Comentario, Venta, Alquiler, Favorito, Like, Dislike, Compra
 from users.models import Usuario
 from django.utils import timezone
 import json
@@ -207,9 +207,9 @@ def mis_ventas_view(request):
         busqueda = request.GET.get('busqueda')
 
         if estado:
-            if estado == 'vendida':
+            if (estado == 'vendida'):
                 mis_publicaciones = mis_publicaciones.filter(id__in=ventas.filter(estado='completada').values('publicacion_id'))
-            elif estado == 'disponible':
+            elif (estado == 'disponible'):
                 mis_publicaciones = mis_publicaciones.exclude(id__in=ventas.filter(estado='completada').values('publicacion_id'))
 
         if busqueda:
@@ -275,11 +275,11 @@ def mis_alquileres_view(request):
         busqueda = request.GET.get('busqueda')
 
         if estado:
-            if estado == 'alquilada':
+            if (estado == 'alquilada'):
                 mis_publicaciones = mis_publicaciones.filter(
                     id__in=alquileres.filter(estado='activo').values('publicacion_id')
                 )
-            elif estado == 'disponible':
+            elif (estado == 'disponible'):
                 mis_publicaciones = mis_publicaciones.exclude(
                     id__in=alquileres.filter(estado='activo').values('publicacion_id')
                 )
@@ -748,57 +748,8 @@ def procesar_operacion(request):
         data = json.loads(request.body)
         publicacion = get_object_or_404(Publicacion, id=data['publicacion_id'])
         
-        if data['tipo'] == 'alquiler':
-            # Validar disponibilidad
-            fecha_inicio = datetime.strptime(data['fecha_inicio'], '%Y-%m-%d').date()
-            fecha_fin = datetime.strptime(data['fecha_fin'], '%Y-%m-%d').date()
-            
-            # Verificar si hay alquileres que se solapan
-            alquileres_existentes = Alquiler.objects.filter(
-                publicacion=publicacion,
-                estado__in=['reservado', 'activo'],
-                fecha_inicio__lte=fecha_fin,
-                fecha_fin__gte=fecha_inicio
-            )
-            
-            if alquileres_existentes.exists():
-                return JsonResponse({
-                    'success': False,
-                    'error': 'La prenda no está disponible para las fechas seleccionadas'
-                })
-
-            # Calcular precios
-            dias = (fecha_fin - fecha_inicio).days
-            precio_por_dia = publicacion.precio
-            precio_total = precio_por_dia * dias
-            deposito = publicacion.precio * Decimal('0.5')
-
-            # Crear alquiler
-            alquiler = Alquiler.objects.create(
-                publicacion=publicacion,
-                propietario=publicacion.usuario,
-                cliente=request.user.usuario,
-                fecha_inicio=fecha_inicio,
-                fecha_fin=fecha_fin,
-                precio_por_dia=precio_por_dia,
-                precio_total=precio_total,
-                deposito=deposito,
-                estado='reservado',
-                metodo_pago=data['metodo_pago'],
-                direccion_envio=data['direccion'],
-                instrucciones_devolucion=data.get('instrucciones_devolucion', ''),
-                notas=data.get('notas', ''),
-                terminos_aceptados=data['terminos_aceptados']
-            )
-
-            return JsonResponse({
-                'success': True,
-                'message': 'Alquiler registrado exitosamente',
-                'alquiler_id': alquiler.id
-            })
-
-        else:  # Compra
-            # Crear venta
+        if data['tipo'] == 'compra':
+            # Crear registro en la tabla "ventas"
             venta = Venta.objects.create(
                 publicacion=publicacion,
                 vendedor=publicacion.usuario,
@@ -810,11 +761,26 @@ def procesar_operacion(request):
                 notas=data.get('notas', '')
             )
 
+            # Crear registro en la tabla "compras"
+            compra = Compra.objects.create(
+                comprador=request.user.usuario,
+                publicacion=publicacion,
+                vendedor=publicacion.usuario,
+                precio_final=publicacion.precio,
+                metodo_pago=data['metodo_pago'],
+                direccion_envio=data['direccion'],
+                notas=data.get('notas', '')
+            )
+
             return JsonResponse({
                 'success': True,
                 'message': 'Compra registrada exitosamente',
-                'venta_id': venta.id
+                'venta_id': venta.id,
+                'compra_id': compra.id
             })
+
+        # Si el tipo no es "compra", manejar otros casos (como alquiler)
+        return JsonResponse({'success': False, 'error': 'Operación no válida'}, status=400)
 
     except Publicacion.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Publicación no encontrada'})
@@ -872,49 +838,56 @@ def procesar_compra(request):
         publicacion_id = request.POST.get('publicacion_id')
         direccion = request.POST.get('direccion')
         metodo_pago = request.POST.get('metodo_pago')
-        
-        if not all([publicacion_id, direccion, metodo_pago]):
-            return JsonResponse({
-                'success': False,
-                'message': 'Faltan datos requeridos'
-            }, status=400)
-        
-        # Obtener la publicación y el usuario
-        publicacion = Publicacion.objects.get(id=publicacion_id)
-        usuario = request.user.usuario
-        
-        # Verificar que el usuario no sea el vendedor
-        if publicacion.usuario == usuario:
-            return JsonResponse({
-                'success': False,
-                'message': 'No puedes comprar tus propias publicaciones'
-            }, status=400)
-        
-        # Crear la venta
+        notas = request.POST.get('notas')
+
+        # Validar datos
+        if not publicacion_id or not direccion or not metodo_pago:
+            return JsonResponse({'success': False, 'error': 'Faltan datos obligatorios'}, status=400)
+
+        # Obtener la publicación
+        publicacion = get_object_or_404(Publicacion, id=publicacion_id)
+
+        # Validar que la publicación esté disponible para la compra
+        if publicacion.tipo not in ['venta', 'venta y alquiler']:
+            return JsonResponse({'success': False, 'error': 'La publicación no está disponible para la compra'}, status=400)
+
+        # Obtener el vendedor
+        vendedor = publicacion.usuario
+
+        # Crear el registro en la tabla "ventas"
         venta = Venta.objects.create(
             publicacion=publicacion,
-            vendedor=publicacion.usuario,
-            comprador=usuario,
+            vendedor=vendedor,
+            comprador=request.user.usuario,  # Usuario autenticado como comprador
             precio_final=publicacion.precio,
-            estado='pendiente'
+            estado='pendiente',  # Estado inicial de la venta
+            metodo_pago=metodo_pago,
+            direccion_envio=direccion,
+            notas=notas
         )
-        
+
+        # Crear el registro en la tabla "compras"
+        compra = Compra.objects.create(
+            comprador=request.user.usuario,  # Usuario autenticado como comprador
+            publicacion=publicacion,
+            vendedor=vendedor,
+            precio_final=publicacion.precio,
+            metodo_pago=metodo_pago,
+            direccion_envio=direccion,
+            notas=notas
+        )
+
         return JsonResponse({
             'success': True,
             'message': 'Compra procesada exitosamente',
-            'venta_id': venta.id
+            'venta_id': venta.id,
+            'compra_id': compra.id
         })
-        
+
     except Publicacion.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'Publicación no encontrada'
-        }, status=404)
+        return JsonResponse({'success': False, 'error': 'La publicación no existe'}, status=404)
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'message': str(e)
-        }, status=500)
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 @login_required
 @require_http_methods(["POST"])

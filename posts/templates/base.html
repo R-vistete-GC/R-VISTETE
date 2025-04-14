@@ -336,71 +336,7 @@
         </div>
     </div>
 
-    <!-- Modal Compra -->
-    <div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalCompraLabel">Comprar Prenda</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="compraForm" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" id="compraPublicacionId" name="publicacion_id">
-                        
-                        <!-- Resumen de la compra -->
-                        <div class="mb-4">
-                            <h6 class="mb-3">Resumen de la compra</h6>
-                            <!-- Vista previa de la imagen -->
-                            <div class="text-center mb-3">
-                                <img id="compraImagenPreview" src="" alt="Imagen de la prenda" 
-                                     style="max-width: 200px; max-height: 200px; object-fit: cover;" class="rounded">
-                            </div>
-                            <!-- Título y precio -->
-                            <div class="text-center">
-                                <h6 id="compraTitulo" class="mb-2"></h6>
-                                <p class="h5 text-success mb-3" id="compraPrecio"></p>
-                            </div>
-                        </div>
-
-                        <!-- Método de pago -->
-                        <div class="mb-3">
-                            <label for="metodoPago" class="form-label">Método de Pago*</label>
-                            <select class="form-select" id="metodoPago" name="metodo_pago" required>
-                                <option value="">Selecciona un método de pago</option>
-                                <option value="tarjeta_credito">Tarjeta de Crédito</option>
-                                <option value="tarjeta_debito">Tarjeta de Débito</option>
-                                <option value="transferencia">Transferencia Bancaria</option>
-                            </select>
-                        </div>
-
-                        <!-- Dirección de envío -->
-                        <div class="mb-3">
-                            <label for="direccionEnvio" class="form-label">Dirección de Envío*</label>
-                            <textarea class="form-control" id="direccionEnvio" name="direccion_envio" rows="3" required 
-                                    placeholder="Ingresa la dirección completa de envío"></textarea>
-                        </div>
-
-                        <!-- Notas adicionales -->
-                        <div class="mb-3">
-                            <label for="notas" class="form-label">Notas Adicionales</label>
-                            <textarea class="form-control" id="notas" name="notas" rows="2" 
-                                    placeholder="Instrucciones especiales de entrega, etc."></textarea>
-                        </div>
-
-                        <div class="modal-footer px-0 pb-0">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-shopping-cart"></i> Confirmar Compra
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    
     <!-- Modal de Alquiler -->
     <div class="modal fade" id="modalAlquilar" tabindex="-1" aria-labelledby="modalAlquilarLabel" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
@@ -607,58 +543,7 @@
         }
     });
 </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const modalCompra = document.getElementById('modalCompra');
-        const modalAlquilar = document.getElementById('modalAlquilar');
-
-        if (modalCompra) {
-            modalCompra.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const publicacionId = button.getAttribute('data-publicacion-id');
-                const precio = button.getAttribute('data-precio');
-                const imagen = button.getAttribute('data-imagen');
-                const titulo = button.getAttribute('data-titulo');
-
-                const compraForm = modalCompra.querySelector('#compraForm');
-                const compraPublicacionId = compraForm.querySelector('#compraPublicacionId');
-                const compraImagenPreview = compraForm.querySelector('#compraImagenPreview');
-                const compraTitulo = compraForm.querySelector('#compraTitulo');
-                const compraPrecio = compraForm.querySelector('#compraPrecio');
-
-                compraPublicacionId.value = publicacionId;
-                compraImagenPreview.src = imagen;
-                compraTitulo.textContent = titulo;
-                compraPrecio.textContent = `$${precio}`;
-            });
-        }
-
-        if (modalAlquilar) {
-            modalAlquilar.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const publicacionId = button.getAttribute('data-publicacion-id');
-                const titulo = button.getAttribute('data-titulo');
-                const precio = button.getAttribute('data-precio');
-                const imagen = button.getAttribute('data-imagen');
-
-                const alquilerForm = modalAlquilar.querySelector('#alquilerForm');
-                const publicacionIdAlquiler = alquilerForm.querySelector('#publicacionIdAlquiler');
-                const prendaImagenAlquiler = alquilerForm.querySelector('#prendaImagenAlquiler');
-                const prendaTituloAlquiler = alquilerForm.querySelector('#prendaTituloAlquiler');
-                const precioPorDia = alquilerForm.querySelector('#precioPorDia');
-                const depositoSeguridad = alquilerForm.querySelector('#depositoSeguridad');
-                const totalPagar = alquilerForm.querySelector('#totalPagar');
-
-                publicacionIdAlquiler.value = publicacionId;
-                prendaImagenAlquiler.src = imagen;
-                prendaTituloAlquiler.textContent = titulo;
-                precioPorDia.textContent = `$${precio}`;
-                depositoSeguridad.textContent = `$${precio * 0.2}`; // Ejemplo de cálculo de depósito
-                totalPagar.textContent = `$${precio * 1.2}`; // Ejemplo de cálculo de total a pagar
-            });
-        }
-    });
-</script>
+   
     <div class="d-flex justify-content-between gap-1">
     {% if publicacion.tipo == "venta" %}
         <button class="btn btn-sm btn-success flex-grow-1" 

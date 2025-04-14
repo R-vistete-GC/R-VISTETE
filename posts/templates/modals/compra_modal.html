@@ -1,110 +1,59 @@
 <!-- Modal de Compra -->
-<div class="modal fade" id="modalCompra" tabindex="-1">
+<div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Comprar Prenda</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="modalCompraLabel">Comprar Prenda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="modalCompraDisponible">
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <img id="modalImagenPrenda" src="" alt="Prenda" class="me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                            <div>
-                                <h6 id="modalTituloPrenda" class="mb-1"></h6>
-                                <p id="modalPrecioPrenda" class="price-tag mb-0"></p>
-                            </div>
-                        </div>
+                <form id="formCompraAlquiler">
+                    <!-- Campo oculto para el ID de la publicación -->
+                    <input type="hidden" id="publicacionId" name="publicacion_id">
+
+                    <!-- Imagen de la prenda -->
+                    <div class="text-center mb-3">
+                        <img id="modalImagenPrenda" src="" alt="Imagen de la prenda" class="img-fluid" style="max-height: 200px;">
                     </div>
 
-                    <!-- Formulario de compra/alquiler -->
-                    <form id="formCompraAlquiler" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" id="publicacionId" name="publicacion_id">
-                        <input type="hidden" id="tipoOperacion" name="tipo_operacion">
-                        <input type="hidden" id="vendedorId" name="vendedor_id">
+                    <!-- Título de la prenda -->
+                    <h5 id="modalTituloPrenda" class="text-center"></h5>
 
-                        <!-- Campos para alquiler -->
-                        <div id="camposAlquiler" style="display: none;">
-                            <div class="mb-3">
-                                <label for="fechaInicio" class="form-label">Fecha de inicio</label>
-                                <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio">
-                            </div>
-                            <div class="mb-3">
-                                <label for="fechaFin" class="form-label">Fecha de devolución</label>
-                                <input type="date" class="form-control" id="fechaFin" name="fecha_fin">
-                            </div>
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                Se requiere un depósito de seguridad que será devuelto al regresar la prenda en buen estado.
-                            </div>
-                        </div>
+                    <!-- Resumen de precios -->
+                    <div class="mt-3">
+                        <p><strong>Precio:</strong> <span id="modalPrecioPrenda"></span></p>
+                        <p><strong>Subtotal:</strong> <span id="subtotal"></span></p>
+                        <p><strong>Total:</strong> <span id="total"></span></p>
+                    </div>
 
-                        <!-- Información de envío -->
-                        <div class="mb-3">
-                            <label for="direccion" class="form-label">Dirección de envío</label>
-                            <textarea class="form-control" id="direccion" name="direccion_envio" rows="2" required></textarea>
-                        </div>
+                    <!-- Dirección de envío -->
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección de Envío</label>
+                        <input type="text" class="form-control" id="direccion" name="direccion" required>
+                    </div>
 
-                        <!-- Método de pago -->
-                        <div class="mb-3">
-                            <label class="form-label">Método de pago</label>
-                            <div class="d-flex gap-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodo_pago" id="pagoTarjeta" value="tarjeta" checked>
-                                    <label class="form-check-label" for="pagoTarjeta">
-                                        <i class="fas fa-credit-card"></i> Tarjeta
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodo_pago" id="pagoPaypal" value="paypal">
-                                    <label class="form-check-label" for="pagoPaypal">
-                                        <i class="fab fa-paypal"></i> PayPal
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Método de pago -->
+                    <div class="mb-3">
+                        <label for="metodoPago" class="form-label">Método de Pago</label>
+                        <select class="form-select" id="metodoPago" name="metodo_pago" required>
+                            <option value="tarjeta">Tarjeta de Crédito</option>
+                            <option value="paypal">PayPal</option>
+                        </select>
+                    </div>
 
-                        <!-- Notas adicionales -->
-                        <div class="mb-3">
-                            <label for="notas" class="form-label">Notas adicionales</label>
-                            <textarea class="form-control" id="notas" name="notas" rows="2" placeholder="Instrucciones especiales de entrega, etc."></textarea>
-                        </div>
+                    <!-- Notas adicionales -->
+                    <div class="mb-3">
+                        <label for="notas" class="form-label">Notas</label>
+                        <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
+                    </div>
 
-                        <!-- Resumen de costos -->
-                        <div class="card bg-light mb-3">
-                            <div class="card-body">
-                                <h6 class="card-title">Resumen</h6>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Subtotal:</span>
-                                    <span id="subtotal"></span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Envío:</span>
-                                    <span>$5.00</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2" id="depositoRow" style="display: none;">
-                                    <span>Depósito:</span>
-                                    <span id="deposito"></span>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <strong>Total:</strong>
-                                    <strong id="total"></strong>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="formCompraAlquiler" class="btn btn-primary">
-                    <i class="fas fa-lock me-1"></i>
-                    <span id="btnAccionTexto">Pagar ahora</span>
-                </button>
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Confirmar Compra</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div> 
+</div>

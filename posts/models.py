@@ -92,14 +92,18 @@ class Venta(models.Model):
     id = models.AutoField(primary_key=True)
     publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE, db_column='publicacion_id')
     vendedor = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='vendedor_id', related_name='ventas_realizadas')
-    comprador = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='comprador_id', related_name='compras_realizadas')
+    comprador = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='comprador_id', related_name='ventas_compradas')
     precio_final = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_venta = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, choices=[
-        ('pendiente', 'Pendiente'),
-        ('completada', 'Completada'),
-        ('cancelada', 'Cancelada')
-    ], default='pendiente')
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('pendiente', 'Pendiente'),
+            ('completada', 'Completada'),
+            ('cancelada', 'Cancelada')
+        ],
+        default='pendiente'
+    )
     metodo_pago = models.CharField(max_length=50)
     direccion_envio = models.TextField()
     notas = models.TextField(null=True, blank=True)
