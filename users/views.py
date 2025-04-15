@@ -129,6 +129,9 @@ def logout_view(request):
     request.session.flush()
     return redirect('users:login')
 
+from posts.models import Like, Favorito, Venta, Alquiler, Compra, Publicacion
+from recommendations.views import recomendaciones_view
+
 def dashboard(request):
     # Verificar si el usuario está autenticado mediante la sesión
     usuario_id = request.session.get('usuario_id')
@@ -136,26 +139,20 @@ def dashboard(request):
         return redirect('/users/login/')
 
     try:
-        # Obtener publicaciones del usuario
-        publicaciones = Publicacion.objects.filter(usuario_id=usuario_id)
-        total_likes = sum([pub.likes.count() for pub in publicaciones])
+        # Contar estadísticas
+        total_likes = Like.objects.filter(usuario_id=usuario_id).count()
         total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
-
-        # Obtener recomendaciones y análisis de sentimientos
-        recomendaciones = recomendaciones_view(request)
-        analyzer = SentimentAnalyzer(usuario_id)
-        sentimientos = analyzer.obtener_metricas_generales()
+        total_publicaciones = Publicacion.objects.filter(usuario_id=usuario_id).count()
+        total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
+        total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
 
         # Preparar datos para el Dashboard
         context = {
             'total_likes': total_likes,
             'total_favoritos': total_favoritos,
-            'recomendaciones': recomendaciones,
-            'sentimientos': {
-                'positivos': sentimientos['positivos'],
-                'neutros': sentimientos['neutros'],
-                'negativos': sentimientos['negativos'],
-            },
+            'total_publicaciones': total_publicaciones,
+            'total_ventas': total_ventas,
+            'total_alquileres': total_alquileres,
         }
         return render(request, 'users/dashboard.html', context)
 
@@ -164,3 +161,23 @@ def dashboard(request):
         return render(request, 'users/dashboard.html', {
             'error': 'Ocurrió un error al cargar el Dashboard.'
         })
+
+def dashboard_data(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    total_likes = Like.objects.filter(usuario_id=usuario_id).count()
+    total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
+    total_compras = Venta.objects.filter(usuario_id=usuario_id).count()
+    total_alquileres = Alquiler.objects.filter(usuario_id=usuario_id).count()
+    recomendaciones = recomendaciones_view(request)
+    total_recomendaciones = len(recomendaciones)
+
+    return JsonResponse({
+        'total_likes': total_likes,
+        'total_favoritos': total_favoritos,
+        'total_compras': total_compras,
+        'total_alquileres': total_alquileres,
+        'total_recomendaciones': total_recomendaciones,
+    })

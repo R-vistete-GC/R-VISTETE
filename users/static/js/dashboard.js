@@ -29,24 +29,56 @@ const estilosChart = new Chart(estilosCtx, {
 });
 
 // Gráfica de recomendaciones
-const recomendacionesCtx = document.getElementById('recomendacionesChart').getContext('2d');
-const recomendacionesChart = new Chart(recomendacionesCtx, {
-    type: 'bar',
-    data: {
-        labels: recomendacionesData.map(rec => rec.publicacion.titulo),
-        datasets: [{
-            label: 'Puntuación',
-            data: recomendacionesData.map(rec => rec.puntuacion),
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
+if (recomendacionesData.length === 0) {
+    console.warn('No hay datos de recomendaciones para mostrar.');
+} else {
+    const recomendacionesCtx = document.getElementById('recomendacionesChart').getContext('2d');
+    const recomendacionesChart = new Chart(recomendacionesCtx, {
+        type: 'bar',
+        data: {
+            labels: recomendacionesData.map(rec => rec.publicacion.titulo),
+            datasets: [{
+                label: 'Puntuación',
+                data: recomendacionesData.map(rec => rec.puntuacion),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
-    }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Función para actualizar estadísticas en tiempo real
+    const actualizarEstadisticas = () => {
+        fetch('/users/dashboard/data/') // Ruta para obtener datos en tiempo real
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos de la API');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Actualizar los valores en el DOM
+                document.querySelector('#totalLikes').textContent = data.total_likes;
+                document.querySelector('#totalFavoritos').textContent = data.total_favoritos;
+                document.querySelector('#totalCompras').textContent = data.total_compras;
+                document.querySelector('#totalAlquileres').textContent = data.total_alquileres;
+                document.querySelector('#totalRecomendaciones').textContent = data.total_recomendaciones;
+            })
+            .catch(error => console.error('Error al actualizar estadísticas:', error));
+    };
+
+    // Llamar a la función cada 30 segundos
+    setInterval(actualizarEstadisticas, 30000);
+
+    // Llamar a la función inmediatamente al cargar la página
+    actualizarEstadisticas();
 });

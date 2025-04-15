@@ -4,47 +4,52 @@
 {% block title %}Mi Dashboard{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container py-5">
     <h1 class="text-center">Mi Dashboard</h1>
     <p class="text-muted text-center">Aquí puedes ver estadísticas sobre tu actividad en la aplicación.</p>
 
     <!-- Estadísticas generales -->
     <div class="row text-center my-4">
-        <div class="col-md-4">
-            <h3>{{ total_likes }}</h3>
-            <p>Me gusta</p>
+        <div class="col-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-1">{{ total_publicaciones }}</h4>
+                    <p class="text-muted mb-0">Publicaciones</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <h3>{{ total_favoritos }}</h3>
-            <p>Prendas Favoritas</p>
+        <div class="col-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-1">{{ total_ventas }}</h4>
+                    <p class="text-muted mb-0">Ventas</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <h3>{{ recomendaciones|length }}</h3>
-            <p>Recomendaciones Generadas</p>
+        <div class="col-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-1">{{ total_alquileres }}</h4>
+                    <p class="text-muted mb-0">Alquileres</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-1">{{ total_likes }}</h4>
+                    <p class="text-muted mb-0">Likes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-1">{{ total_favoritos }}</h4>
+                    <p class="text-muted mb-0">Favoritos</p>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- Gráficas -->
-    <div class="row">
-        <div class="col-md-6">
-            <canvas id="sentimientosChart"></canvas>
-        </div>
-        <div class="col-md-6">
-            <canvas id="recomendacionesChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Datos para las gráficas -->
-    <script id="sentimientosData" type="application/json">
-        {{ sentimientos|safe }}
-    </script>
-    <script id="recomendacionesData" type="application/json">
-        {{ recomendaciones|safe }}
-    </script>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{% static 'users/js/dashboard.js' %}"></script>
 {% endblock %}
