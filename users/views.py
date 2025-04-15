@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import Usuario, PerfilUsuario
-from posts.models import Publicacion, Venta, Alquiler
+from posts.models import Publicacion, Venta, Alquiler, Favorito, Like
 from django.contrib.auth.models import User
 import json
 from django.urls import reverse
@@ -11,6 +11,10 @@ from django.contrib import messages
 from .forms import PerfilUsuarioForm
 from django.shortcuts import render, redirect
 from django.urls import reverse  # Importa reverse para construir URLs
+from sentiment_analysis.analyzer import MetricasSentimiento
+from recommendations.utils import obtener_estadisticas_usuario
+from recommendations.views import recomendaciones_view
+from sentiment_analysis.utils import SentimentAnalyzer
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -125,7 +129,38 @@ def logout_view(request):
     request.session.flush()
     return redirect('users:login')
 
-#@login_required
 def dashboard(request):
-    # Aquí puedes agregar lógica para calcular estadísticas del usuario
-    return render(request, 'users/dashboard.html', {})
+    # Verificar si el usuario está autenticado mediante la sesión
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return redirect('/users/login/')
+
+    try:
+        # Obtener publicaciones del usuario
+        publicaciones = Publicacion.objects.filter(usuario_id=usuario_id)
+        total_likes = sum([pub.likes.count() for pub in publicaciones])
+        total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
+
+        # Obtener recomendaciones y análisis de sentimientos
+        recomendaciones = recomendaciones_view(request)
+        analyzer = SentimentAnalyzer(usuario_id)
+        sentimientos = analyzer.obtener_metricas_generales()
+
+        # Preparar datos para el Dashboard
+        context = {
+            'total_likes': total_likes,
+            'total_favoritos': total_favoritos,
+            'recomendaciones': recomendaciones,
+            'sentimientos': {
+                'positivos': sentimientos['positivos'],
+                'neutros': sentimientos['neutros'],
+                'negativos': sentimientos['negativos'],
+            },
+        }
+        return render(request, 'users/dashboard.html', context)
+
+    except Exception as e:
+        print(f"Error en el Dashboard: {str(e)}")
+        return render(request, 'users/dashboard.html', {
+            'error': 'Ocurrió un error al cargar el Dashboard.'
+        })
