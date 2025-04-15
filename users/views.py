@@ -146,6 +146,9 @@ def dashboard(request):
         total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
         total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
 
+        # Agregar lógica para contar compras
+        total_compras = Venta.objects.filter(comprador_id=usuario_id).count()  # Contar las compras realizadas
+
         # Agregar lógica para contar recomendaciones
         recomendaciones = recomendaciones_view(request, return_as_list=True)  # Obtener recomendaciones como lista
         total_recomendaciones = len(recomendaciones)  # Contar las recomendaciones
@@ -157,7 +160,8 @@ def dashboard(request):
             'total_publicaciones': total_publicaciones,
             'total_ventas': total_ventas,
             'total_alquileres': total_alquileres,
-            'total_recomendaciones': total_recomendaciones,  # Nuevo dato
+            'total_compras': total_compras,  # Nuevo dato
+            'total_recomendaciones': total_recomendaciones,
         }
         return render(request, 'users/dashboard.html', context)
 
