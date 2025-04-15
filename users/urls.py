@@ -4,8 +4,14 @@ from . import views
 app_name = 'users'
 
 urlpatterns = [
+    # Autenticación
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+
+    # Perfil de usuario
     path('perfil/', views.ver_perfil, name='ver_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+
+    # Dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
 ]

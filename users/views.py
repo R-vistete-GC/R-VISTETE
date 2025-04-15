@@ -124,3 +124,8 @@ def logout_view(request):
     # Limpiar la sesión
     request.session.flush()
     return redirect('users:login')
+
+#@login_required
+def dashboard(request):
+    # Aquí puedes agregar lógica para calcular estadísticas del usuario
+    return render(request, 'users/dashboard.html', {})
