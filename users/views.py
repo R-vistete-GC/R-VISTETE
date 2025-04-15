@@ -15,6 +15,11 @@ from sentiment_analysis.analyzer import MetricasSentimiento
 from recommendations.utils import obtener_estadisticas_usuario
 from recommendations.views import recomendaciones_view
 from sentiment_analysis.utils import SentimentAnalyzer
+import matplotlib
+matplotlib.use('Agg')  # Cambiar el backend a 'Agg' para evitar problemas con hilos
+import matplotlib.pyplot as plt
+import io
+import base64
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -132,6 +137,29 @@ def logout_view(request):
 from posts.models import Like, Favorito, Venta, Alquiler, Compra, Publicacion
 from recommendations.views import recomendaciones_view
 
+def generar_grafica(datos, titulo, tipo='bar'):
+    """
+    Genera una gráfica con matplotlib y la devuelve como una imagen en base64.
+    """
+    fig, ax = plt.subplots(figsize=(6, 4))
+    
+    if tipo == 'bar':
+        ax.bar(datos.keys(), datos.values(), color=['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'])
+    elif tipo == 'pie':
+        ax.pie(datos.values(), labels=datos.keys(), autopct='%1.1f%%', colors=['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'])
+    
+    ax.set_title(titulo)
+    plt.tight_layout()
+
+    # Guardar la gráfica en un buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    imagen_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    buffer.close()
+    plt.close(fig)
+    return imagen_base64
+
 def dashboard(request):
     # Verificar si el usuario está autenticado mediante la sesión
     usuario_id = request.session.get('usuario_id')
@@ -145,13 +173,30 @@ def dashboard(request):
         total_publicaciones = Publicacion.objects.filter(usuario_id=usuario_id).count()
         total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
         total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
+        total_compras = Venta.objects.filter(comprador_id=usuario_id).count()
 
-        # Agregar lógica para contar compras
-        total_compras = Venta.objects.filter(comprador_id=usuario_id).count()  # Contar las compras realizadas
+        # Obtener recomendaciones
+        recomendaciones = recomendaciones_view(request, return_as_list=True)
+        total_recomendaciones = len(recomendaciones)
 
-        # Agregar lógica para contar recomendaciones
-        recomendaciones = recomendaciones_view(request, return_as_list=True)  # Obtener recomendaciones como lista
-        total_recomendaciones = len(recomendaciones)  # Contar las recomendaciones
+        # Calcular datos para las gráficas
+        estilos_count = {}
+        colores_count = {}
+
+        for rec in recomendaciones:
+            publicacion = rec['publicacion']
+            # Contar estilos
+            if publicacion.estilo:
+                for estilo in publicacion.estilo:
+                    estilos_count[estilo] = estilos_count.get(estilo, 0) + 1
+            # Contar colores
+            if publicacion.colores:
+                for color in publicacion.colores:
+                    colores_count[color] = colores_count.get(color, 0) + 1
+
+        # Generar gráficas con matplotlib
+        grafica_estilos = generar_grafica(estilos_count, 'Distribución de Estilos', tipo='pie')
+        grafica_colores = generar_grafica(colores_count, 'Distribución de Colores', tipo='bar')
 
         # Pasar todos los datos al contexto
         context = {
@@ -160,8 +205,10 @@ def dashboard(request):
             'total_publicaciones': total_publicaciones,
             'total_ventas': total_ventas,
             'total_alquileres': total_alquileres,
-            'total_compras': total_compras,  # Nuevo dato
+            'total_compras': total_compras,
             'total_recomendaciones': total_recomendaciones,
+            'grafica_estilos': grafica_estilos,  # Imagen de la gráfica de estilos
+            'grafica_colores': grafica_colores,  # Imagen de la gráfica de colores
         }
         return render(request, 'users/dashboard.html', context)
 

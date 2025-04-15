@@ -28,6 +28,51 @@ const estilosChart = new Chart(estilosCtx, {
     }
 });
 
+// Gráfica de distribución de estilos
+const estilosDistribucionCtx = document.getElementById('estilosDistribucionChart').getContext('2d');
+new Chart(estilosDistribucionCtx, {
+    type: 'pie',
+    data: {
+        labels: Object.keys(estilosDistribucionData),
+        datasets: [{
+            data: Object.values(estilosDistribucionData),
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        },
+    }
+});
+
+// Gráfica de distribución de colores
+const coloresDistribucionCtx = document.getElementById('coloresDistribucionChart').getContext('2d');
+new Chart(coloresDistribucionCtx, {
+    type: 'bar',
+    data: {
+        labels: Object.keys(coloresDistribucionData),
+        datasets: [{
+            label: 'Colores',
+            data: Object.values(coloresDistribucionData),
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'],
+            borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
 // Gráfica de recomendaciones
 if (recomendacionesData.length === 0) {
     console.warn('No hay datos de recomendaciones para mostrar.');

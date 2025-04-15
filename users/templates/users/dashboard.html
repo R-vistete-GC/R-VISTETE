@@ -67,5 +67,22 @@
             </div>
         </div>
     </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h5 class="text-center">Distribución de Estilos</h5>
+            <img src="data:image/png;base64,{{ grafica_estilos }}" alt="Gráfica de Estilos" class="img-fluid">
+        </div>
+        <div class="col-md-6">
+            <h5 class="text-center">Distribución de Colores</h5>
+            <img src="data:image/png;base64,{{ grafica_colores }}" alt="Gráfica de Colores" class="img-fluid">
+        </div>
+    </div>
+
+    <!-- Pasar datos al JavaScript -->
+    <script>
+        const estilosDistribucionData = JSON.parse('{{ estilos_count|safe }}');
+        const coloresDistribucionData = JSON.parse('{{ colores_count|safe }}');
+    </script>
 </div>
 {% endblock %}
