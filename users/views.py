@@ -139,20 +139,25 @@ def dashboard(request):
         return redirect('/users/login/')
 
     try:
-        # Contar estadísticas
+        # Mantener las estadísticas existentes
         total_likes = Like.objects.filter(usuario_id=usuario_id).count()
         total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
         total_publicaciones = Publicacion.objects.filter(usuario_id=usuario_id).count()
         total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
         total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
 
-        # Preparar datos para el Dashboard
+        # Agregar lógica para contar recomendaciones
+        recomendaciones = recomendaciones_view(request, return_as_list=True)  # Obtener recomendaciones como lista
+        total_recomendaciones = len(recomendaciones)  # Contar las recomendaciones
+
+        # Pasar todos los datos al contexto
         context = {
             'total_likes': total_likes,
             'total_favoritos': total_favoritos,
             'total_publicaciones': total_publicaciones,
             'total_ventas': total_ventas,
             'total_alquileres': total_alquileres,
+            'total_recomendaciones': total_recomendaciones,  # Nuevo dato
         }
         return render(request, 'users/dashboard.html', context)
 
@@ -181,3 +186,37 @@ def dashboard_data(request):
         'total_alquileres': total_alquileres,
         'total_recomendaciones': total_recomendaciones,
     })
+
+def recomendaciones_view(request, return_as_list=False):
+    # Verificar autenticación
+    if not request.user.is_authenticated and not request.session.get('usuario_id'):
+        return redirect(f'/users/login/?next={request.path}')
+    
+    try:
+        # Obtener perfil
+        usuario_id = request.user.id if request.user.is_authenticated else request.session.get('usuario_id')
+        perfil = PerfilUsuario.objects.get(usuario_id=usuario_id)
+        
+        # Obtener publicaciones excluyendo las del usuario
+        publicaciones = Publicacion.objects.exclude(usuario_id=usuario_id).filter(
+            publico=perfil.genero
+        )
+        
+        # Generar recomendaciones (ejemplo simplificado)
+        recomendaciones = [
+            {'publicacion': pub, 'puntuacion': 80} for pub in publicaciones
+        ]
+        
+        if return_as_list:
+            return recomendaciones  # Devolver como lista si se solicita
+        
+        return render(request, 'recommendations/list.html', {
+            'recomendaciones': recomendaciones,
+        })
+    
+    except PerfilUsuario.DoesNotExist:
+        if return_as_list:
+            return []  # Devolver lista vacía si no hay perfil
+        return render(request, 'recommendations/list.html', {
+            'error': 'Completa tu perfil para obtener recomendaciones.'
+        })
