@@ -1,0 +1,28 @@
+/* Estilo para las tarjetas */
+.card {
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 128, 0, 0.2);
+}
+
+.card-body h4 {
+    font-weight: bold;
+}
+
+.card-body p {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Colores personalizados */
+.text-success {
+    color: #28a745 !important;
+}
+
+.border-success {
+    border-color: #28a745 !important;
+}

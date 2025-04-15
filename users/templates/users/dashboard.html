@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
 {% block title %}Mi Dashboard{% endblock %}
 
@@ -11,57 +12,57 @@
     <!-- Estadísticas generales -->
     <div class="row text-center my-4">
         <div class="col-md-2">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h4 class="mb-1">{{ total_publicaciones }}</h4>
+                    <h4 class="mb-1 text-success">{{ total_publicaciones }}</h4>
                     <p class="text-muted mb-0">Publicaciones</p>
                 </div>
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h4 class="mb-1">{{ total_ventas }}</h4>
+                    <h4 class="mb-1 text-success">{{ total_ventas }}</h4>
                     <p class="text-muted mb-0">Ventas</p>
                 </div>
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h4 class="mb-1">{{ total_alquileres }}</h4>
+                    <h4 class="mb-1 text-success">{{ total_alquileres }}</h4>
                     <p class="text-muted mb-0">Alquileres</p>
                 </div>
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h4 class="mb-1">{{ total_likes }}</h4>
+                    <h4 class="mb-1 text-success">{{ total_likes }}</h4>
                     <p class="text-muted mb-0">Likes</p>
                 </div>
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h4 class="mb-1">{{ total_favoritos }}</h4>
+                    <h4 class="mb-1 text-success">{{ total_favoritos }}</h4>
                     <p class="text-muted mb-0">Favoritos</p>
                 </div>
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h4 class="mb-1">{{ total_recomendaciones }}</h4>
+                    <h4 class="mb-1 text-success">{{ total_recomendaciones }}</h4>
                     <p class="text-muted mb-0">Recomendaciones</p>
                 </div>
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
-                    <h4 class="mb-1">{{ total_compras }}</h4>
+                    <h4 class="mb-1 text-success">{{ total_compras }}</h4>
                     <p class="text-muted mb-0">Compras</p>
                 </div>
             </div>
