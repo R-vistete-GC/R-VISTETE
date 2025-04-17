@@ -2,12 +2,15 @@ from textblob import TextBlob
 from googletrans import Translator
 from django.utils import timezone
 import logging
+from decouple import config  # Asegúrate de importar config
+import openai
 
 logger = logging.getLogger(__name__)
 
 class SentimentAnalyzer:
     def __init__(self):
         self.translator = Translator()
+        openai.api_key = config('OPENAI_API_KEY')  # Carga la llave desde el archivo .env
     
     def _clean_text(self, texto):
         """Limpia y prepara el texto para análisis"""
@@ -73,6 +76,20 @@ class SentimentAnalyzer:
             logger.error(f"Error en análisis de sentimiento: {e}")
             return None
 
+    def analyze_text_with_chatgpt(self, texto):
+        """Analiza el sentimiento usando ChatGPT."""
+        try:
+            response = openai.Completion.create(
+                engine="text-davinci-003",
+                prompt=f"Analiza el sentimiento del siguiente texto: {texto}",
+                max_tokens=50,
+                temperature=0.7
+            )
+            return response.choices[0].text.strip()
+        except openai.error.OpenAIError as e:
+            logger.error(f"Error al llamar a la API de OpenAI: {e}")
+            return None
+
     def analyze_batch(self, comentarios, limit=100):
         """Analiza un lote de comentarios"""
         from posts.models import Comentario, MetricasSentimiento
@@ -104,4 +121,4 @@ class SentimentAnalyzer:
                 )
                 metrica.actualizar_metricas()
         
-        return len(resultados) 
+        return len(resultados)

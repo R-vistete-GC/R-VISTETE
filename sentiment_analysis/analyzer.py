@@ -111,21 +111,16 @@ class SentimentAnalyzer:
     def _usar_chatgpt(self, texto):
         """Llama a la API de OpenAI para analizar el sentimiento."""
         try:
-            prompt = f"Clasifica el siguiente comentario como positivo, neutro o negativo:\n\n'{texto}'"
             response = openai.Completion.create(
                 engine="text-davinci-003",
-                prompt=prompt,
-                max_tokens=10,
+                prompt=f"Analiza el sentimiento del siguiente texto: {texto}",
+                max_tokens=50,
                 temperature=0.7
             )
-            clasificacion = response.choices[0].text.strip().lower()
-            if clasificacion in ['positivo', 'neutro', 'negativo']:
-                return clasificacion
-            else:
-                return 'neutro'  # Valor predeterminado si la respuesta no es clara
-        except Exception as e:
-            logger.error(f"Error al usar ChatGPT: {e}")
-            return 'neutro'
+            return response.choices[0].text.strip()
+        except openai.error.OpenAIError as e:
+            logger.error(f"Error al llamar a la API de OpenAI: {e}")
+            return None
 
     def analizar_comentario(self, texto):
         """Analiza el sentimiento de un comentario individual."""
