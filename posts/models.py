@@ -232,3 +232,18 @@ class Favorito(models.Model):
 
     def __str__(self):
         return f"Favorito de {self.usuario.nombre} - {self.publicacion.titulo}"
+
+
+# Obtén todos los comentarios
+comentarios = Comentario.objects.all()
+
+# Revisa los campos de cada comentario
+for comentario in comentarios:
+    print(f"ID: {comentario.id}")
+    print(f"Texto: {comentario.comentario}")
+    print(f"Polaridad: {comentario.polaridad}")
+    print(f"Subjetividad: {comentario.subjetividad}")
+    print(f"Clasificación ChatGPT: {comentario.clasificacion_chatgpt}")
+    print(f"Analizado por ChatGPT: {comentario.analizado_por_chatgpt}")
+    print(f"Fecha de Análisis: {comentario.fecha_analisis}")
+    print("-" * 50)

@@ -1,5 +1,5 @@
 from textblob import TextBlob
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from django.utils import timezone
 from django.db import transaction
 from posts.models import Comentario, MetricasSentimiento
@@ -7,6 +7,8 @@ import logging
 import numpy as np
 from collections import defaultdict
 import re
+import openai
+from decouple import config
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +16,8 @@ class SentimentAnalyzer:
     """Analizador de sentimiento para comentarios de R-Vístete."""
     
     def __init__(self):
-        self.translator = Translator()
+        self.translator = GoogleTranslator(source='auto', target='en')
+        openai.api_key = config('OPENAI_API_KEY')
         self.palabras_clave_moda = {
             'positivas': {
                 'calidad': 2.0,
@@ -102,48 +105,42 @@ class SentimentAnalyzer:
         polaridad_ajustada = max(min(polaridad_base + (ajuste * 0.2), 1), -1)
         return polaridad_ajustada
     
+    def traducir_texto(self, texto):
+        return self.translator.translate(texto)
+
+    def _usar_chatgpt(self, texto):
+        """Llama a la API de OpenAI para analizar el sentimiento."""
+        try:
+            prompt = f"Clasifica el siguiente comentario como positivo, neutro o negativo:\n\n'{texto}'"
+            response = openai.Completion.create(
+                engine="text-davinci-003",
+                prompt=prompt,
+                max_tokens=10,
+                temperature=0.7
+            )
+            clasificacion = response.choices[0].text.strip().lower()
+            if clasificacion in ['positivo', 'neutro', 'negativo']:
+                return clasificacion
+            else:
+                return 'neutro'  # Valor predeterminado si la respuesta no es clara
+        except Exception as e:
+            logger.error(f"Error al usar ChatGPT: {e}")
+            return 'neutro'
+
     def analizar_comentario(self, texto):
         """Analiza el sentimiento de un comentario individual."""
         try:
-            # Limpiar texto
-            texto_limpio = self._limpiar_texto(texto)
-            if not texto_limpio:
-                return None
-            
-            # Traducir al inglés
-            try:
-                texto_en = self.translator.translate(texto_limpio, dest='en').text
-            except Exception as e:
-                logger.warning(f"Error en traducción: {e}")
-                return None
-            
-            # Analizar sentimiento base
-            analysis = TextBlob(texto_en)
-            polaridad_base = float(analysis.sentiment.polarity)
-            
-            # Ajustar sentimiento con palabras clave
-            polaridad_ajustada = self._ajustar_sentimiento_palabras_clave(
-                texto_limpio, 
-                polaridad_base
-            )
-            
-            # Clasificar el comentario como positivo, neutro o negativo
-            if polaridad_ajustada > 0.1:
-                clasificacion = 'positivo'
-            elif polaridad_ajustada < -0.1:
-                clasificacion = 'negativo'
-            else:
-                clasificacion = 'neutro'
+            # Traducir texto
+            texto_en = self.translator.translate(texto)
+
+            # Clasificar el comentario con ChatGPT
+            clasificacion_chatgpt = self._usar_chatgpt(texto_en)
 
             return {
                 'texto_original': texto,
-                'texto_limpio': texto_limpio,
-                'polaridad': polaridad_ajustada,
-                'subjetividad': float(analysis.sentiment.subjectivity),
-                'clasificacion_chatgpt': clasificacion,
+                'clasificacion_chatgpt': clasificacion_chatgpt,
                 'fecha_analisis': timezone.now()
             }
-            
         except Exception as e:
             logger.error(f"Error en análisis de sentimiento: {e}")
             return None
