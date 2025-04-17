@@ -25,4 +25,5 @@ urlpatterns = [
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
     path('procesar_alquiler/', views.procesar_alquiler, name='procesar_alquiler'),
     path('get_publicacion/<int:publicacion_id>/', views.get_publicacion, name='get_publicacion'),
+    path('metricas/<int:publicacion_id>/', views.obtener_metricas_publicacion, name='obtener_metricas_publicacion'),
 ]

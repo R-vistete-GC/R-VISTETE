@@ -20,83 +20,20 @@ from sentiment_analysis.utils import SentimentAnalyzer  # Importar el analizador
 #inicio - publicaciones
 
 def inicio_view(request):
-    # Debug logging
-    print("Inicio view called")
-    print("Session:", request.session.items())
-    print("Path:", request.path)
-    
-    # Verificar si el usuario está autenticado
-    usuario_id = request.session.get('usuario_id')
-    print("Usuario ID from session:", usuario_id)
-    
-    try:
-        # Obtener las publicaciones con sus comentarios y métricas de sentimiento
-        publicaciones = Publicacion.objects.all().order_by('-fecha_publicacion')
-        print("Total publicaciones encontradas:", publicaciones.count())
-        for pub in publicaciones:
-            print(f"Publicación ID: {pub.id}, Título: {pub.titulo}, Usuario: {pub.usuario.nombre}")
-        
-        # Convertir arrays a strings para la plantilla
-        for publicacion in publicaciones:
-            publicacion.estilo = ", ".join(publicacion.estilo) if publicacion.estilo else "No especificado"
-            publicacion.colores = ", ".join(publicacion.colores) if publicacion.colores else "No especificado"
-        
-        # Obtener los comentarios para cada publicación
-        for publicacion in publicaciones:
-            publicacion.comentarios = Comentario.objects.filter(
-                publicacion=publicacion
-            ).select_related('usuario').order_by('fecha_comentario')
-        
-        context = {
-            'publicaciones': publicaciones,
-        }
+    publicaciones = Publicacion.objects.all()
 
-        # Si hay usuario en sesión, agregar información adicional al contexto
-        if usuario_id:
-            try:
-                usuario = Usuario.objects.get(id=usuario_id)
-                # Obtener los IDs de las publicaciones favoritas del usuario
-                favoritos = Favorito.objects.filter(usuario=usuario)
-                favoritos_ids = favoritos.values_list('publicacion_id', flat=True)
-                
-                # Obtener los IDs de las publicaciones con like del usuario
-                likes = Like.objects.filter(usuario=usuario)
-                likes_ids = likes.values_list('publicacion_id', flat=True)
-                
-                # Obtener el conteo de likes para cada publicación
-                for publicacion in publicaciones:
-                    publicacion.likes_count = Like.objects.filter(publicacion=publicacion).count()
-                
-                # Obtener los dislikes del usuario actual
-                dislikes_usuario = set(Dislike.objects.filter(usuario=usuario).values_list('publicacion_id', flat=True))
-                
-                # Agregar conteo de dislikes a cada publicación
-                for publicacion in publicaciones:
-                    publicacion.dislikes_count = Dislike.objects.filter(publicacion=publicacion).count()
-                
-                context.update({
-                    'usuario': usuario,
-                    'nombre_usuario': usuario.nombre,
-                    'favoritos': list(favoritos_ids),
-                    'favoritos_count': favoritos.count(),
-                    'likes': list(likes_ids),
-                    'likes_count': likes.count(),
-                    'dislikes_usuario': dislikes_usuario
-                })
-            except Usuario.DoesNotExist:
-                pass
-        
-        print("Rendering inicio.html with context")
-        return render(request, 'inicio.html', context)
-    
-    except Exception as e:
-        print("Error inesperado:", str(e))
-        context = {
-            'publicaciones': [],
-            'error': 'Ocurrió un error al cargar las publicaciones.'
-        }
-        return render(request, 'inicio.html', context)
+    # Calcular métricas de comentarios para cada publicación
+    for publicacion in publicaciones:
+        comentarios = Comentario.objects.filter(publicacion=publicacion)
+        publicacion.comentarios_positivos = comentarios.filter(clasificacion_chatgpt='positivo').count()
+        publicacion.comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
+        publicacion.comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
+        publicacion.total_comentarios = comentarios.count()
 
+    context = {
+        'publicaciones': publicaciones,
+    }
+    return render(request, 'inicio.html', context)
 
 #comentarios
 
@@ -978,3 +915,29 @@ def procesar_alquiler(request):
             'success': False,
             'message': str(e)
         }, status=500)
+
+@require_http_methods(["GET"])
+def obtener_metricas_publicacion(request, publicacion_id):
+    try:
+        # Obtener la publicación
+        publicacion = Publicacion.objects.get(id=publicacion_id)
+        comentarios = Comentario.objects.filter(publicacion=publicacion)
+
+        # Calcular métricas
+        comentarios_positivos = comentarios.filter(clasificacion_chatgpt='positivo').count()
+        comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
+        comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
+        total_comentarios = comentarios.count()
+
+        # Responder con las métricas
+        return JsonResponse({
+            'success': True,
+            'comentarios_positivos': comentarios_positivos,
+            'comentarios_neutros': comentarios_neutros,
+            'comentarios_negativos': comentarios_negativos,
+            'total_comentarios': total_comentarios
+        })
+    except Publicacion.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Publicación no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
