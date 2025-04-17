@@ -15,6 +15,7 @@ from django.contrib import messages
 from decimal import Decimal
 from datetime import datetime
 from django.db import connection
+from sentiment_analysis.utils import SentimentAnalyzer  # Importar el analizador de sentimientos
 
 #inicio - publicaciones
 
@@ -482,7 +483,7 @@ def agregar_comentario(request, publicacion_id):
                 'error': 'El comentario no puede estar vacío'
             }, status=400)
 
-        # Crear el comentario
+        # Crear el comentario en la base de datos
         comentario = Comentario.objects.create(
             usuario=usuario,
             publicacion=publicacion,
@@ -490,13 +491,25 @@ def agregar_comentario(request, publicacion_id):
             fecha_comentario=timezone.now()
         )
 
+        # Analizar el sentimiento del comentario
+        analyzer = SentimentAnalyzer()
+        resultado = analyzer.analyze_text_with_chatgpt(comentario_texto)
+
+        if resultado:
+            comentario.clasificacion_chatgpt = resultado['sentimiento']  # Guardar el sentimiento
+            comentario.fecha_analisis = resultado['fecha_analisis']  # Guardar la fecha del análisis
+            comentario.analizado_por_chatgpt = True
+            comentario.save()
+
+        # Responder con el comentario y su análisis
         return JsonResponse({
             'success': True,
             'comentario': {
                 'id': comentario.id,
                 'usuario': comentario.usuario.nombre,
                 'texto': comentario.comentario,
-                'fecha': comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M')
+                'fecha': comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M'),
+                'sentimiento': comentario.clasificacion_chatgpt
             }
         })
     except Usuario.DoesNotExist:
