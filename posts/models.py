@@ -34,18 +34,18 @@ class Publicacion(models.Model):
 class Comentario(models.Model):
     id = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario_id')
-    publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE, db_column='publicacion_id')
-    comentario = models.TextField()
-    fecha_comentario = models.DateTimeField(auto_now_add=True)
-    polaridad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
-    subjetividad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
-    fecha_analisis = models.DateTimeField(null=True)
-    clasificacion_chatgpt = models.CharField(max_length=10, null=True, blank=True)  # Agregado
-    analizado_por_chatgpt = models.BooleanField(default=False)  # Agregado
+    publicacion = models.ForeignKey('Publicacion', on_delete=models.CASCADE, db_column='publicacion_id')
+    comentario = models.TextField()  # Texto del comentario
+    fecha_comentario = models.DateTimeField(auto_now_add=True)  # Fecha en que se hizo el comentario
+    polaridad = models.DecimalField(max_digits=4, decimal_places=3, null=True, blank=True)  # Polaridad (análisis previo)
+    subjetividad = models.DecimalField(max_digits=4, decimal_places=3, null=True, blank=True)  # Subjetividad (análisis previo)
+    clasificacion_chatgpt = models.CharField(max_length=10, null=True, blank=True)  # Positivo, neutro o negativo
+    analizado_por_chatgpt = models.BooleanField(default=False)  # Indica si ya fue analizado por ChatGPT
+    fecha_analisis = models.DateTimeField(null=True, blank=True)  # Fecha del análisis
 
     class Meta:
-        db_table = 'comentarios'
-        ordering = ['-fecha_comentario']
+        db_table = 'comentarios'  # Vincula el modelo a la tabla existente
+        ordering = ['-fecha_comentario']  # Ordena por fecha de comentario (más reciente primero)
 
     def __str__(self):
         return f"Comentario de {self.usuario.nombre} en {self.publicacion.titulo}"

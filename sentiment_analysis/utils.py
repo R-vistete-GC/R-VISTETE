@@ -79,15 +79,27 @@ class SentimentAnalyzer:
     def analyze_text_with_chatgpt(self, texto):
         """Analiza el sentimiento usando ChatGPT."""
         try:
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=f"Analiza el sentimiento del siguiente texto: {texto}",
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "Eres un modelo que analiza sentimientos. Clasifica el siguiente texto como positivo, neutro o negativo."},
+                    {"role": "user", "content": f"Texto: {texto}"}
+                ],
                 max_tokens=50,
                 temperature=0.7
             )
-            return response.choices[0].text.strip()
-        except openai.error.OpenAIError as e:
-            logger.error(f"Error al llamar a la API de OpenAI: {e}")
+            # Extraer y limpiar la respuesta
+            sentimiento = response['choices'][0]['message']['content'].strip().lower()
+            if "positivo" in sentimiento:
+                return {'sentimiento': 'positivo', 'fecha_analisis': timezone.now()}
+            elif "neutro" in sentimiento:
+                return {'sentimiento': 'neutro', 'fecha_analisis': timezone.now()}
+            elif "negativo" in sentimiento:
+                return {'sentimiento': 'negativo', 'fecha_analisis': timezone.now()}
+            else:
+                return {'sentimiento': 'neutro', 'fecha_analisis': timezone.now()}  # Valor predeterminado
+        except Exception as e:
+            logger.error(f"Error al analizar el sentimiento con ChatGPT: {e}")
             return None
 
     def analyze_batch(self, comentarios, limit=100):
