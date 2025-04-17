@@ -127,11 +127,20 @@ class SentimentAnalyzer:
                 polaridad_base
             )
             
+            # Clasificar el comentario como positivo, neutro o negativo
+            if polaridad_ajustada > 0.1:
+                clasificacion = 'positivo'
+            elif polaridad_ajustada < -0.1:
+                clasificacion = 'negativo'
+            else:
+                clasificacion = 'neutro'
+
             return {
                 'texto_original': texto,
                 'texto_limpio': texto_limpio,
                 'polaridad': polaridad_ajustada,
                 'subjetividad': float(analysis.sentiment.subjectivity),
+                'clasificacion_chatgpt': clasificacion,
                 'fecha_analisis': timezone.now()
             }
             
@@ -164,6 +173,7 @@ class SentimentAnalyzer:
                 
                 comentario.polaridad = analisis['polaridad']
                 comentario.subjetividad = analisis['subjetividad']
+                comentario.clasificacion_chatgpt = analisis['clasificacion_chatgpt']
                 comentario.fecha_analisis = analisis['fecha_analisis']
                 comentario.save()
             
@@ -194,4 +204,4 @@ class SentimentAnalyzer:
         metricas.comentarios_neutros = sum(1 for p in polaridades if p == 0)
         metricas.ultima_actualizacion = timezone.now()
         
-        metricas.save() 
+        metricas.save()

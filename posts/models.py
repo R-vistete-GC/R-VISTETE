@@ -4,6 +4,7 @@ from users.models import Usuario
 from django.db.models import Avg
 from django.utils import timezone
 
+
 class Publicacion(models.Model):
     id = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario_id')
@@ -14,24 +15,85 @@ class Publicacion(models.Model):
     fecha_publicacion = models.DateTimeField(auto_now_add=True)
     tipo = models.CharField(max_length=10, default='venta', choices=[('venta', 'Venta'), ('alquiler', 'Alquiler')])
     deposito = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-
-    # 🔹 Campos faltantes
     publico = models.CharField(max_length=10, choices=[
         ('mujer', 'Mujer'), ('hombre', 'Hombre'), ('niño', 'Niño'),
         ('niña', 'Niña'), ('mascota', 'Mascota')
     ], default='mujer')
-
     talla = models.CharField(max_length=10, default='M')
-
     estilo = ArrayField(models.CharField(max_length=50), default=list)
     colores = ArrayField(models.CharField(max_length=50), default=list)
 
     class Meta:
-        db_table = 'publicaciones'  # 🔗 Conectar con la tabla en PostgreSQL
-        ordering = ['-fecha_publicacion']  # Ordenar por fecha más reciente
+        db_table = 'publicaciones'
+        ordering = ['-fecha_publicacion']
 
     def __str__(self):
         return f"{self.titulo} - {self.usuario.nombre}"
+
+
+class Comentario(models.Model):
+    id = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario_id')
+    publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE, db_column='publicacion_id')
+    comentario = models.TextField()
+    fecha_comentario = models.DateTimeField(auto_now_add=True)
+    polaridad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    subjetividad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    fecha_analisis = models.DateTimeField(null=True)
+    clasificacion_chatgpt = models.CharField(max_length=10, null=True, blank=True)  # Agregado
+    analizado_por_chatgpt = models.BooleanField(default=False)  # Agregado
+
+    class Meta:
+        db_table = 'comentarios'
+        ordering = ['-fecha_comentario']
+
+    def __str__(self):
+        return f"Comentario de {self.usuario.nombre} en {self.publicacion.titulo}"
+
+
+class MetricasSentimiento(models.Model):
+    publicacion = models.OneToOneField(
+        Publicacion,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        db_column='publicacion_id'
+    )
+    sentimiento_promedio = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    subjetividad_promedio = models.DecimalField(max_digits=4, decimal_places=3, null=True)
+    total_comentarios = models.IntegerField(default=0)
+    comentarios_positivos = models.IntegerField(default=0)
+    comentarios_negativos = models.IntegerField(default=0)
+    comentarios_neutros = models.IntegerField(default=0)
+    ultima_actualizacion = models.DateTimeField(null=True)
+
+    class Meta:
+        db_table = 'metricas_sentimiento'
+
+    def __str__(self):
+        return f"Métricas de sentimiento para {self.publicacion.titulo}"
+
+    def actualizar_metricas(self):
+        """Actualiza las métricas de sentimiento basadas en los comentarios"""
+        comentarios = Comentario.objects.filter(
+            publicacion=self.publicacion,
+            polaridad__isnull=False
+        )
+
+        self.total_comentarios = comentarios.count()
+        if self.total_comentarios > 0:
+            self.sentimiento_promedio = comentarios.aggregate(
+                Avg('polaridad')
+            )['polaridad__avg']
+            self.subjetividad_promedio = comentarios.aggregate(
+                Avg('subjetividad')
+            )['subjetividad__avg']
+
+            self.comentarios_positivos = comentarios.filter(polaridad__gt=0).count()
+            self.comentarios_negativos = comentarios.filter(polaridad__lt=0).count()
+            self.comentarios_neutros = comentarios.filter(polaridad=0).count()
+
+        self.ultima_actualizacion = timezone.now()
+        self.save()
 
 
 class Compra(models.Model):
@@ -46,6 +108,7 @@ class Compra(models.Model):
     def __str__(self):
         return f"Compra de {self.publicacion.titulo} por {self.usuario.nombre}"
 
+
 class Like(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE)
@@ -57,6 +120,7 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.usuario.nombre} liked {self.publicacion.titulo}"
+
 
 class Dislike(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -70,23 +134,6 @@ class Dislike(models.Model):
     def __str__(self):
         return f"{self.usuario.nombre} disliked {self.publicacion.titulo}"
 
-class Comentario(models.Model):
-    id = models.AutoField(primary_key=True)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario_id')
-    publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE, db_column='publicacion_id')
-    comentario = models.TextField()
-    fecha_comentario = models.DateTimeField(auto_now_add=True)
-    # Nuevos campos para análisis de sentimiento
-    polaridad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
-    subjetividad = models.DecimalField(max_digits=4, decimal_places=3, null=True)
-    fecha_analisis = models.DateTimeField(null=True)
-
-    class Meta:
-        db_table = 'comentarios'
-        ordering = ['-fecha_comentario']
-
-    def __str__(self):
-        return f"Comentario de {self.usuario.nombre} en {self.publicacion.titulo}"
 
 class Venta(models.Model):
     id = models.AutoField(primary_key=True)
@@ -115,6 +162,7 @@ class Venta(models.Model):
 
     def __str__(self):
         return f"Venta de {self.publicacion.titulo} a {self.comprador.nombre}"
+
 
 class Alquiler(models.Model):
     id = models.AutoField(primary_key=True)
@@ -152,7 +200,7 @@ class Alquiler(models.Model):
         # Validar fechas
         if self.fecha_fin <= self.fecha_inicio:
             raise ValueError("La fecha de fin debe ser posterior a la fecha de inicio")
-        
+
         # Validar montos
         if self.precio_por_dia <= 0:
             raise ValueError("El precio por día debe ser mayor a 0")
@@ -160,7 +208,7 @@ class Alquiler(models.Model):
             raise ValueError("El depósito no puede ser negativo")
         if self.precio_total <= 0:
             raise ValueError("El precio total debe ser mayor a 0")
-            
+
         super().save(*args, **kwargs)
 
     def calcular_precio_total(self):
@@ -169,6 +217,7 @@ class Alquiler(models.Model):
             dias = (self.fecha_fin - self.fecha_inicio).days
             return self.precio_por_dia * dias
         return 0
+
 
 class Favorito(models.Model):
     id = models.AutoField(primary_key=True)
@@ -183,47 +232,3 @@ class Favorito(models.Model):
 
     def __str__(self):
         return f"Favorito de {self.usuario.nombre} - {self.publicacion.titulo}"
-
-class MetricasSentimiento(models.Model):
-    publicacion = models.OneToOneField(
-        Publicacion, 
-        on_delete=models.CASCADE, 
-        primary_key=True, 
-        db_column='publicacion_id'
-    )
-    sentimiento_promedio = models.DecimalField(max_digits=4, decimal_places=3, null=True)
-    subjetividad_promedio = models.DecimalField(max_digits=4, decimal_places=3, null=True)
-    total_comentarios = models.IntegerField(default=0)
-    comentarios_positivos = models.IntegerField(default=0)
-    comentarios_negativos = models.IntegerField(default=0)
-    comentarios_neutros = models.IntegerField(default=0)
-    ultima_actualizacion = models.DateTimeField(null=True)
-
-    class Meta:
-        db_table = 'metricas_sentimiento'
-
-    def __str__(self):
-        return f"Métricas de sentimiento para {self.publicacion.titulo}"
-
-    def actualizar_metricas(self):
-        """Actualiza las métricas de sentimiento basadas en los comentarios"""
-        comentarios = Comentario.objects.filter(
-            publicacion=self.publicacion,
-            polaridad__isnull=False
-        )
-        
-        self.total_comentarios = comentarios.count()
-        if self.total_comentarios > 0:
-            self.sentimiento_promedio = comentarios.aggregate(
-                Avg('polaridad')
-            )['polaridad__avg']
-            self.subjetividad_promedio = comentarios.aggregate(
-                Avg('subjetividad')
-            )['subjetividad__avg']
-            
-            self.comentarios_positivos = comentarios.filter(polaridad__gt=0).count()
-            self.comentarios_negativos = comentarios.filter(polaridad__lt=0).count()
-            self.comentarios_neutros = comentarios.filter(polaridad=0).count()
-            
-        self.ultima_actualizacion = timezone.now()
-        self.save()

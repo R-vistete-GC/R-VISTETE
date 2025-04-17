@@ -9,49 +9,24 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write('Iniciando actualización de métricas de sentimiento...')
-        total_publicaciones = Publicacion.objects.count()
-        actualizadas = 0
 
-        for publicacion in Publicacion.objects.all():
-            with transaction.atomic():
-                # Obtener comentarios analizados para esta publicación
-                comentarios = Comentario.objects.filter(
-                    publicacion=publicacion,
-                    fecha_analisis__isnull=False
-                )
+        # Obtener todas las publicaciones con comentarios
+        publicaciones = MetricasSentimiento.objects.all()
 
-                # Calcular métricas
-                metricas = comentarios.aggregate(
-                    sentimiento_promedio=Avg('polaridad'),
-                    subjetividad_promedio=Avg('subjetividad'),
-                    total_comentarios=Count('id'),
-                    comentarios_positivos=Count(Case(
-                        When(polaridad__gt=0.0, then=Value(1))
-                    )),
-                    comentarios_negativos=Count(Case(
-                        When(polaridad__lt=0.0, then=Value(1))
-                    )),
-                    comentarios_neutros=Count(Case(
-                        When(polaridad=0.0, then=Value(1))
-                    ))
-                )
+        for publicacion in publicaciones:
+            comentarios = Comentario.objects.filter(publicacion_id=publicacion.publicacion_id)
 
-                # Actualizar o crear registro de métricas
-                MetricasSentimiento.objects.update_or_create(
-                    publicacion=publicacion,
-                    defaults={
-                        'sentimiento_promedio': metricas['sentimiento_promedio'] or 0,
-                        'subjetividad_promedio': metricas['subjetividad_promedio'] or 0,
-                        'total_comentarios': metricas['total_comentarios'],
-                        'comentarios_positivos': metricas['comentarios_positivos'],
-                        'comentarios_negativos': metricas['comentarios_negativos'],
-                        'comentarios_neutros': metricas['comentarios_neutros'],
-                        'ultima_actualizacion': timezone.now()
-                    }
-                )
-                actualizadas += 1
-                self.stdout.write(f'Progreso: {actualizadas}/{total_publicaciones} publicaciones procesadas')
+            # Calcular métricas de TextBlob
+            publicacion.sentimiento_promedio = comentarios.aggregate(Avg('polaridad'))['polaridad__avg'] or 0
+            publicacion.subjetividad_promedio = comentarios.aggregate(Avg('subjetividad'))['subjetividad__avg'] or 0
 
-        self.stdout.write(self.style.SUCCESS(
-            f'¡Métricas actualizadas exitosamente para {actualizadas} publicaciones!'
-        )) 
+            # Calcular métricas de ChatGPT
+            publicacion.comentarios_positivos_chatgpt = comentarios.filter(clasificacion_chatgpt='positivo').count()
+            publicacion.comentarios_neutros_chatgpt = comentarios.filter(clasificacion_chatgpt='neutro').count()
+            publicacion.comentarios_negativos_chatgpt = comentarios.filter(clasificacion_chatgpt='negativo').count()
+
+            # Actualizar la última fecha de actualización
+            publicacion.ultima_actualizacion = timezone.now()
+            publicacion.save()
+
+        self.stdout.write(self.style.SUCCESS('Métricas de sentimiento actualizadas.'))
