@@ -26,3 +26,10 @@
 .border-success {
     border-color: #28a745 !important;
 }
+
+/* Estilo para las gráficas */
+canvas {
+    max-width: 100%;
+    margin: 0 auto;
+    display: block;
+}

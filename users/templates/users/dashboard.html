@@ -80,6 +80,28 @@
         </div>
     </div>
 
+    <div class="row mt-5">
+        <!-- Gráfica de Distribución de Sentimientos -->
+        <div class="col-md-6">
+            <h5 class="text-center">Distribución de Sentimientos</h5>
+            <canvas id="graficaDistribucionSentimientos"></canvas>
+        </div>
+
+        <!-- Gráfica de Sentimientos en Publicaciones Interactuadas -->
+        <div class="col-md-6">
+            <h5 class="text-center">Sentimientos en Publicaciones Interactuadas</h5>
+            <canvas id="graficaSentimientosInteractuados"></canvas>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Gráfica de Evolución Temporal de Sentimientos -->
+        <div class="col-md-12">
+            <h5 class="text-center">Evolución Temporal de Sentimientos</h5>
+            <canvas id="graficaEvolucionSentimientos"></canvas>
+        </div>
+    </div>
+
     <!-- Pasar datos al JavaScript -->
     <script>
         const estilosDistribucionData = JSON.parse('{{ estilos_count|safe }}');

@@ -161,7 +161,6 @@ def generar_grafica(datos, titulo, tipo='bar'):
     return imagen_base64
 
 def dashboard(request):
-    # Verificar si el usuario está autenticado mediante la sesión
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
         return redirect('/users/login/')
@@ -179,7 +178,7 @@ def dashboard(request):
         recomendaciones = recomendaciones_view(request, return_as_list=True)
         total_recomendaciones = len(recomendaciones)
 
-        # Calcular datos para las gráficas
+        # Calcular datos para las gráficas existentes
         estilos_count = {}
         colores_count = {}
 
@@ -207,8 +206,8 @@ def dashboard(request):
             'total_alquileres': total_alquileres,
             'total_compras': total_compras,
             'total_recomendaciones': total_recomendaciones,
-            'grafica_estilos': grafica_estilos,  # Imagen de la gráfica de estilos
-            'grafica_colores': grafica_colores,  # Imagen de la gráfica de colores
+            'grafica_estilos': grafica_estilos,
+            'grafica_colores': grafica_colores,
         }
         return render(request, 'users/dashboard.html', context)
 
@@ -271,3 +270,46 @@ def recomendaciones_view(request, return_as_list=False):
         return render(request, 'recommendations/list.html', {
             'error': 'Completa tu perfil para obtener recomendaciones.'
         })
+
+from django.db.models import Count
+from posts.models import Comentario  # Importar desde la aplicación correcta
+
+def dashboard_data_sentimientos(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Calcular distribución de sentimientos en los comentarios del usuario
+        comentarios = Comentario.objects.filter(usuario_id=usuario_id)
+        comentarios_positivos = comentarios.filter(clasificacion_chatgpt='positivo').count()
+        comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
+        comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
+
+        # Calcular sentimientos en publicaciones interactuadas (likes y favoritos)
+        publicaciones_interactuadas = Publicacion.objects.filter(
+            id__in=Like.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)
+        ) | Publicacion.objects.filter(
+            id__in=Favorito.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)
+        )
+        sentimientos_interactuados = Comentario.objects.filter(publicacion__in=publicaciones_interactuadas).values(
+            'clasificacion_chatgpt'
+        ).annotate(total=Count('clasificacion_chatgpt'))
+
+        # Calcular evolución temporal de sentimientos
+        evolucion_sentimientos = Comentario.objects.filter(usuario_id=usuario_id).extra(
+            select={'fecha': "DATE(fecha_creacion)"}
+        ).values('fecha', 'clasificacion_chatgpt').annotate(total=Count('id'))
+
+        return JsonResponse({
+            'comentarios': {
+                'positivos': comentarios_positivos,
+                'neutros': comentarios_neutros,
+                'negativos': comentarios_negativos,
+            },
+            'interactuados': list(sentimientos_interactuados),
+            'evolucion': list(evolucion_sentimientos),
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
