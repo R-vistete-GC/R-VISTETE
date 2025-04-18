@@ -298,7 +298,7 @@ def dashboard_data_sentimientos(request):
 
         # Calcular evolución temporal de sentimientos
         evolucion_sentimientos = Comentario.objects.filter(usuario_id=usuario_id).extra(
-            select={'fecha': "DATE(fecha_creacion)"}
+            select={'fecha': "DATE(fecha_comentario)"}  # Cambiar a 'fecha_comentario'
         ).values('fecha', 'clasificacion_chatgpt').annotate(total=Count('id'))
 
         return JsonResponse({
