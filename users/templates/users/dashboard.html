@@ -102,10 +102,57 @@
         </div>
     </div>
 
+    <div class="row mt-5">
+        <!-- Gráfica de Sentimientos -->
+        <div class="col-md-12">
+            <h5 class="text-center">Sentimientos</h5>
+            <canvas id="sentimientosChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Gráfica de Estilos -->
+        <div class="col-md-12">
+            <h5 class="text-center">Estilos</h5>
+            <canvas id="estilosChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Gráfica de Distribución de Estilos -->
+        <div class="col-md-12">
+            <h5 class="text-center">Distribución de Estilos</h5>
+            <canvas id="estilosDistribucionChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Gráfica de Distribución de Colores -->
+        <div class="col-md-12">
+            <h5 class="text-center">Distribución de Colores</h5>
+            <canvas id="coloresDistribucionChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
     <!-- Pasar datos al JavaScript -->
     <script>
         const estilosDistribucionData = JSON.parse('{{ estilos_count|safe }}');
         const coloresDistribucionData = JSON.parse('{{ colores_count|safe }}');
     </script>
+    <script id="sentimientosData" type="application/json">
+        {
+            "positivos": 8,
+            "neutros": 6,
+            "negativos": 4
+        }
+    </script>
+    <script id="recomendacionesData" type="application/json">
+        {
+            "algunDato": "valor",
+            "otroDato": "valor"
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
 </div>
 {% endblock %}

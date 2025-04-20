@@ -1,135 +1,137 @@
-// Obtener datos de sentimientos
-const sentimientosData = JSON.parse(document.getElementById('sentimientosData').textContent);
-const recomendacionesData = JSON.parse(document.getElementById('recomendacionesData').textContent);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('El archivo dashboard.js se está ejecutando correctamente.');
 
-// Gráfica de sentimientos
-const sentimientosCtx = document.getElementById('sentimientosChart').getContext('2d');
-const sentimientosChart = new Chart(sentimientosCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Positivos', 'Neutros', 'Negativos'],
-        datasets: [{
-            data: [sentimientosData.positivos, sentimientosData.neutros, sentimientosData.negativos],
-            backgroundColor: ['#4caf50', '#ffc107', '#f44336']
-        }]
+    const sentimientosData = JSON.parse(document.getElementById('sentimientosData').textContent);
+    console.log('Datos de sentimientos:', sentimientosData);
+
+    const recomendacionesDataElement = document.getElementById('recomendacionesData');
+    if (recomendacionesDataElement) {
+        const recomendacionesData = JSON.parse(recomendacionesDataElement.textContent);
+        console.log('Datos de recomendaciones:', recomendacionesData);
+    } else {
+        console.error('El elemento recomendacionesData no existe en el DOM.');
     }
-});
 
-// Gráfica de estilos preferidos
-const estilosCtx = document.getElementById('estilosChart').getContext('2d');
-const estilosChart = new Chart(estilosCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Casual', 'Elegante', 'Deportivo'],
-        datasets: [{
-            data: JSON.parse(document.getElementById('estilosData').textContent),
-            backgroundColor: ['#2196f3', '#9c27b0', '#ff9800']
-        }]
-    }
-});
-
-// Gráfica de distribución de estilos
-const estilosDistribucionCtx = document.getElementById('estilosDistribucionChart').getContext('2d');
-new Chart(estilosDistribucionCtx, {
-    type: 'pie',
-    data: {
-        labels: Object.keys(estilosDistribucionData),
-        datasets: [{
-            data: Object.values(estilosDistribucionData),
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'],
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
+    // Gráfica de sentimientos
+    const sentimientosCtx = document.getElementById('sentimientosChart');
+    if (sentimientosCtx) {
+        const ctx = sentimientosCtx.getContext('2d');
+        const sentimientosChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Positivos', 'Neutros', 'Negativos'],
+                datasets: [{
+                    data: [5, 3, 2], // Reemplazar con datos dinámicos
+                    backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
+                }]
             },
-        },
-    }
-});
-
-// Gráfica de distribución de colores
-const coloresDistribucionCtx = document.getElementById('coloresDistribucionChart').getContext('2d');
-new Chart(coloresDistribucionCtx, {
-    type: 'bar',
-    data: {
-        labels: Object.keys(coloresDistribucionData),
-        datasets: [{
-            label: 'Colores',
-            data: Object.values(coloresDistribucionData),
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'],
-            borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800'],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
+            options: {
+                responsive: true,
             }
-        }
+        });
+    } else {
+        console.error('El elemento sentimientosChart no existe en el DOM.');
     }
-});
 
-// Gráfica de recomendaciones
-if (recomendacionesData.length === 0) {
-    console.warn('No hay datos de recomendaciones para mostrar.');
-} else {
-    const recomendacionesCtx = document.getElementById('recomendacionesChart').getContext('2d');
-    const recomendacionesChart = new Chart(recomendacionesCtx, {
-        type: 'bar',
-        data: {
-            labels: recomendacionesData.map(rec => rec.publicacion.titulo),
-            datasets: [{
-                label: 'Puntuación',
-                data: recomendacionesData.map(rec => rec.puntuacion),
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+    // Gráfica de estilos preferidos
+    const estilosCtx = document.getElementById('estilosChart');
+    if (estilosCtx) {
+        const ctx = estilosCtx.getContext('2d');
+        const estilosChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Casual', 'Elegante', 'Deportivo'],
+                datasets: [{
+                    data: [10, 20, 30], // Reemplazar con datos dinámicos
+                    backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+    } else {
+        console.error('El elemento estilosChart no existe en el DOM.');
+    }
+
+    // Gráfica de distribución de estilos
+    const estilosDistribucionCtx = document.getElementById('estilosDistribucionChart');
+    if (estilosDistribucionCtx) {
+        const ctx = estilosDistribucionCtx.getContext('2d');
+        const estilosDistribucionChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Casual', 'Elegante', 'Deportivo'],
+                datasets: [{
+                    data: [10, 20, 30], // Reemplazar con datos dinámicos
+                    backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+    } else {
+        console.error('El elemento estilosDistribucionChart no existe en el DOM.');
+    }
+
+    // Gráfica de distribución de colores
+    const coloresDistribucionCtx = document.getElementById('coloresDistribucionChart');
+    if (coloresDistribucionCtx) {
+        const ctx = coloresDistribucionCtx.getContext('2d');
+        const coloresDistribucionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Azul', 'Negro', 'Marrón', 'Rosa', 'Verde'],
+                datasets: [{
+                    data: [4, 1, 1, 1, 1], // Reemplazar con datos dinámicos
+                    backgroundColor: ['#2196f3', '#000000', '#795548', '#e91e63', '#4caf50'],
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    }
                 }
             }
-        }
-    });
-}
+        });
+    } else {
+        console.error('El elemento coloresDistribucionChart no existe en el DOM.');
+    }
 
-document.addEventListener('DOMContentLoaded', function () {
+    // Gráfica de recomendaciones
+    if (recomendacionesData.length === 0) {
+        console.warn('No hay datos de recomendaciones para mostrar.');
+    } else {
+        const recomendacionesCtx = document.getElementById('recomendacionesChart').getContext('2d');
+        const recomendacionesChart = new Chart(recomendacionesCtx, {
+            type: 'bar',
+            data: {
+                labels: recomendacionesData.map(rec => rec.publicacion.titulo),
+                datasets: [{
+                    label: 'Puntuación',
+                    data: recomendacionesData.map(rec => rec.puntuacion),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
     fetch('/users/dashboard/sentimientos/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error al obtener datos de sentimientos');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            // Actualizar Gráfica de Distribución de Sentimientos
-            const graficaDistribucionSentimientos = new Chart(document.getElementById('graficaDistribucionSentimientos'), {
-                type: 'pie',
-                data: {
-                    labels: ['Positivos', 'Neutros', 'Negativos'],
-                    datasets: [{
-                        data: [
-                            data.comentarios.positivos,
-                            data.comentarios.neutros,
-                            data.comentarios.negativos
-                        ],
-                        backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
-                    }]
-                },
-                options: {
-                    responsive: true,
-                }
-            });
-
-            // Actualizar otras gráficas (Sentimientos en Publicaciones Interactuadas, Evolución Temporal)
-            // ...
+            // Actualizar las gráficas aquí
         })
         .catch(error => console.error('Error al cargar datos de sentimientos:', error));
 
@@ -182,19 +184,19 @@ document.addEventListener('DOMContentLoaded', function () {
             datasets: [
                 {
                     label: 'Positivos',
-                    data: [],
+                    data: [], // Datos positivos
                     borderColor: '#4caf50',
                     fill: false,
                 },
                 {
                     label: 'Neutros',
-                    data: [],
+                    data: [], // Datos neutros
                     borderColor: '#ffeb3b',
                     fill: false,
                 },
                 {
                     label: 'Negativos',
-                    data: [],
+                    data: [], // Datos negativos
                     borderColor: '#f44336',
                     fill: false,
                 }
@@ -220,6 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch('/dashboard/sentimientos/')
         .then(response => response.json())
         .then(data => {
+            console.log('Datos recibidos del backend:', data);
             // Actualizar Gráfica de Distribución de Sentimientos
             graficaDistribucionSentimientos.data.datasets[0].data = [
                 data.comentarios.positivos,
