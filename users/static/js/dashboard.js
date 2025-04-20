@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: ['Positivos', 'Neutros', 'Negativos'],
             datasets: [{
-                data: [0, 0, 0], // Valores iniciales
+                data: [5, 3, 2], // Datos estáticos de prueba
                 backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
             }]
         },
@@ -228,6 +228,12 @@ document.addEventListener('DOMContentLoaded', function () {
             ];
             graficaDistribucionSentimientos.update();
 
+            console.log('Datos para Distribución de Sentimientos:', [
+                data.comentarios.positivos,
+                data.comentarios.neutros,
+                data.comentarios.negativos
+            ]);
+
             // Actualizar Gráfica de Sentimientos en Publicaciones Interactuadas
             const interactuados = data.interactuados.reduce((acc, item) => {
                 acc[item.clasificacion_chatgpt] = item.total;
@@ -239,6 +245,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 interactuados.negativo
             ];
             graficaSentimientosInteractuados.update();
+
+            console.log('Datos para Sentimientos Interactuados:', interactuados);
 
             // Actualizar Gráfica de Evolución Temporal de Sentimientos
             const fechas = [...new Set(data.evolucion.map(item => item.fecha))];
@@ -255,11 +263,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return item ? item.total : 0;
             });
 
-            graficaEvolucionSentimientos.data.labels = fechas;
-            graficaEvolucionSentimientos.data.datasets[0].data = positivos;
-            graficaEvolucionSentimientos.data.datasets[1].data = neutros;
-            graficaEvolucionSentimientos.data.datasets[2].data = negativos;
+            graficaEvolucionSentimientos.data.labels = fechas; // Fechas deben ser un array de strings
+            graficaEvolucionSentimientos.data.datasets[0].data = positivos; // Datos deben ser un array de números
             graficaEvolucionSentimientos.update();
+
+            console.log('Datos para Evolución Temporal:', { fechas, positivos, neutros, negativos });
         })
         .catch(error => console.error('Error al cargar datos de sentimientos:', error));
 
