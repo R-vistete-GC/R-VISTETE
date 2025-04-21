@@ -102,17 +102,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Gráfica de recomendaciones
-    if (recomendacionesData.length === 0) {
-        console.warn('No hay datos de recomendaciones para mostrar.');
-    } else {
-        const recomendacionesCtx = document.getElementById('recomendacionesChart').getContext('2d');
+const recomendacionesChartElement = document.getElementById('recomendacionesChart');
+if (recomendacionesDataElement && recomendacionesChartElement) {
+    const recomendacionesData = JSON.parse(recomendacionesDataElement.textContent);
+    
+    // Verificar si es un objeto o un array
+    if (!Array.isArray(recomendacionesData)) {
+        console.warn('recomendacionesData no es un array:', recomendacionesData);
+        
+        // Si es un objeto, puedes decidir:
+        // 1. No mostrar la gráfica:
+        // console.warn('No se puede mostrar la gráfica de recomendaciones porque los datos no son un array.');
+        
+        // 2. O convertir el objeto a un formato compatible para mostrar:
+        const labels = Object.keys(recomendacionesData);
+        const values = Object.values(recomendacionesData);
+        
+        const recomendacionesCtx = recomendacionesChartElement.getContext('2d');
         const recomendacionesChart = new Chart(recomendacionesCtx, {
             type: 'bar',
             data: {
-                labels: recomendacionesData.map(rec => rec.publicacion.titulo),
+                labels: labels,
                 datasets: [{
-                    label: 'Puntuación',
-                    data: recomendacionesData.map(rec => rec.puntuacion),
+                    label: 'Datos',
+                    data: values,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -126,15 +139,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+    } else {
+        // Si es un array, usa el código original
+        if (recomendacionesData.length === 0) {
+            console.warn('No hay datos de recomendaciones para mostrar.');
+        } else {
+            const recomendacionesCtx = recomendacionesChartElement.getContext('2d');
+            const recomendacionesChart = new Chart(recomendacionesCtx, {
+                type: 'bar',
+                data: {
+                    labels: recomendacionesData.map(rec => rec.publicacion.titulo),
+                    datasets: [{
+                        label: 'Puntuación',
+                        data: recomendacionesData.map(rec => rec.puntuacion),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
     }
-
-    fetch('/users/dashboard/sentimientos/')
-        .then(response => response.json())
-        .then(data => {
-            // Actualizar las gráficas aquí
-        })
-        .catch(error => console.error('Error al cargar datos de sentimientos:', error));
-
+} else {
+    console.warn('No se encontró el elemento recomendacionesChart o los datos de recomendaciones.');
+}
     // Configuración inicial de las gráficas
     const ctxDistribucionSentimientos = document.getElementById('graficaDistribucionSentimientos').getContext('2d');
     const ctxSentimientosInteractuados = document.getElementById('graficaSentimientosInteractuados').getContext('2d');
