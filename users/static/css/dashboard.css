@@ -2,11 +2,17 @@
 .card {
     border-radius: 10px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .card:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(0, 128, 0, 0.2);
+}
+
+.card-body {
+    padding: 1rem;
 }
 
 .card-body h4 {
@@ -30,6 +36,36 @@
 /* Estilo para las gráficas */
 canvas {
     max-width: 100%;
-    margin: 0 auto;
-    display: block;
+    height: 100% !important;
+    width: 100% !important;
+    max-height: 100% !important;
+}
+
+/* Añade estos estilos para las gráficas */
+.chart-container {
+    position: relative;
+    margin: 1rem auto;
+    height: 200px !important;
+    max-width: 500px;
+    padding: 10px;
+}
+
+/* Para gráficas que necesiten más espacio */
+.chart-container.large {
+    height: 400px;
+}
+
+/* Para gráficas que necesiten menos espacio */
+.chart-container.small {
+    height: 250px;
+}
+
+/* For pie and doughnut charts */
+.chart-container.circular {
+    height: 200px !important;
+}
+
+/* For bar charts */
+.chart-container.bar {
+    height: 180px !important;
 }

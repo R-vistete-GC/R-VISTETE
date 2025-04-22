@@ -80,65 +80,99 @@
         </div>
     </div>
 
-    <div class="row mt-5">
-        <!-- Gráfica de Distribución de Sentimientos -->
-        <div class="col-md-6">
-            <h5 class="text-center">Distribución de Sentimientos</h5>
-            <canvas id="graficaDistribucionSentimientos"></canvas>
-        </div>
+    <div class="container-fluid py-3">
+        <div class="row g-3">
+            <!-- Primera fila -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Distribución de Estilos</h6>
+                        <div class="chart-container circular">
+                            <canvas id="estilosDistribucionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Gráfica de Sentimientos en Publicaciones Interactuadas -->
-        <div class="col-md-6">
-            <h5 class="text-center">Sentimientos en Publicaciones Interactuadas</h5>
-            <canvas id="graficaSentimientosInteractuados"></canvas>
-        </div>
-    </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Distribución de Colores</h6>
+                        <div class="chart-container bar">
+                            <canvas id="coloresDistribucionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row mt-5">
-        <!-- Gráfica de Evolución Temporal de Sentimientos -->
-        <div class="col-md-12">
-            <h5 class="text-center">Evolución Temporal de Sentimientos</h5>
-            <canvas id="graficaEvolucionSentimientos"></canvas>
-        </div>
-    </div>
+            <!-- Segunda fila -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Distribución de Sentimientos</h6>
+                        <div class="chart-container circular">
+                            <canvas id="graficaDistribucionSentimientos"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row mt-5">
-        <!-- Gráfica de Sentimientos -->
-        <div class="col-md-12">
-            <h5 class="text-center">Sentimientos</h5>
-            <canvas id="sentimientosChart" width="400" height="400"></canvas>
-        </div>
-    </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Sentimientos en Publicaciones</h6>
+                        <div class="chart-container bar">
+                            <canvas id="graficaSentimientosInteractuados"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row mt-5">
-        <!-- Gráfica de Estilos -->
-        <div class="col-md-12">
-            <h5 class="text-center">Estilos</h5>
-            <canvas id="estilosChart" width="400" height="400"></canvas>
-        </div>
-    </div>
+            <!-- Tercera fila -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Evolución Temporal de Sentimientos</h6>
+                        <div class="chart-container bar">
+                            <canvas id="graficaEvolucionSentimientos"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row mt-5">
-        <!-- Gráfica de Distribución de Estilos -->
-        <div class="col-md-12">
-            <h5 class="text-center">Distribución de Estilos</h5>
-            <canvas id="estilosDistribucionChart" width="400" height="400"></canvas>
-        </div>
-    </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Sentimientos</h6>
+                        <div class="chart-container circular">
+                            <canvas id="sentimientosChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row mt-5">
-        <!-- Gráfica de Distribución de Colores -->
-        <div class="col-md-12">
-            <h5 class="text-center">Distribución de Colores</h5>
-            <canvas id="coloresDistribucionChart" width="400" height="400"></canvas>
-        </div>
-    </div>
+            <!-- Cuarta fila -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Estilos</h6>
+                        <div class="chart-container bar">
+                            <canvas id="estilosChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="row mt-5">
-        <!-- Gráfica de Recomendaciones -->
-        <div class="col-md-12">
-            <h5 class="text-center">Recomendaciones</h5>
-            <canvas id="recomendacionesChart" width="400" height="400"></canvas>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">Recomendaciones</h6>
+                        <div class="chart-container bar">
+                            <canvas id="recomendacionesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

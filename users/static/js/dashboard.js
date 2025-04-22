@@ -12,6 +12,62 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('El elemento recomendacionesData no existe en el DOM.');
     }
 
+    // Añade estas opciones comunes a todas las gráficas
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    boxWidth: 10,
+                    font: {
+                        size: 11
+                    },
+                    padding: 5
+                }
+            }
+        },
+        layout: {
+            padding: {
+                top: 5,
+                bottom: 5
+            }
+        }
+    };
+
+    // Ejemplo para una gráfica circular
+    const pieOptions = {
+        ...commonOptions,
+        aspectRatio: 1.2,
+        plugins: {
+            ...commonOptions.plugins
+        }
+    };
+
+    // Ejemplo para una gráfica de barras
+    const barOptions = {
+        ...commonOptions,
+        aspectRatio: 1.5,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    font: {
+                        size: 10
+                    }
+                }
+            },
+            x: {
+                ticks: {
+                    font: {
+                        size: 10
+                    }
+                }
+            }
+        }
+    };
+
     // Gráfica de sentimientos
     const sentimientosCtx = document.getElementById('sentimientosChart');
     if (sentimientosCtx) {
@@ -26,7 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }]
             },
             options: {
-                responsive: true,
+                ...pieOptions,
+                plugins: {
+                    ...pieOptions.plugins,
+                    title: {
+                        display: false
+                    }
+                }
             }
         });
     } else {
@@ -47,7 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }]
             },
             options: {
-                responsive: true,
+                ...barOptions,
+                plugins: {
+                    ...barOptions.plugins,
+                    title: {
+                        display: false
+                    }
+                }
             }
         });
     } else {
@@ -68,7 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }]
             },
             options: {
-                responsive: true,
+                ...pieOptions,
+                plugins: {
+                    ...pieOptions.plugins,
+                    title: {
+                        display: false
+                    }
+                }
             }
         });
     } else {
@@ -89,10 +163,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }]
             },
             options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
+                ...barOptions,
+                plugins: {
+                    ...barOptions.plugins,
+                    title: {
+                        display: false
                     }
                 }
             }
@@ -132,9 +207,11 @@ if (recomendacionesDataElement && recomendacionesChartElement) {
                 }]
             },
             options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+                ...barOptions,
+                plugins: {
+                    ...barOptions.plugins,
+                    title: {
+                        display: false
                     }
                 }
             }
@@ -158,9 +235,11 @@ if (recomendacionesDataElement && recomendacionesChartElement) {
                     }]
                 },
                 options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    ...barOptions,
+                    plugins: {
+                        ...barOptions.plugins,
+                        title: {
+                            display: false
                         }
                     }
                 }
@@ -186,7 +265,13 @@ if (recomendacionesDataElement && recomendacionesChartElement) {
             }]
         },
         options: {
-            responsive: true,
+            ...pieOptions,
+            plugins: {
+                ...pieOptions.plugins,
+                title: {
+                    display: false
+                }
+            }
         }
     });
 
@@ -202,10 +287,11 @@ if (recomendacionesDataElement && recomendacionesChartElement) {
             }]
         },
         options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
+            ...barOptions,
+            plugins: {
+                ...barOptions.plugins,
+                title: {
+                    display: false
                 }
             }
         }
@@ -238,7 +324,13 @@ if (recomendacionesDataElement && recomendacionesChartElement) {
             ]
         },
         options: {
-            responsive: true,
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                title: {
+                    display: false
+                }
+            },
             scales: {
                 x: {
                     type: 'time',
