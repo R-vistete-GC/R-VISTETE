@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Gráfica de sentimientos
+    // Gráfica de sentimientos (versión dona)
     const sentimientosCtx = document.getElementById('sentimientosChart');
     if (sentimientosCtx) {
         const ctx = sentimientosCtx.getContext('2d');
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data: {
                 labels: ['Positivos', 'Neutros', 'Negativos'],
                 datasets: [{
-                    data: [5, 3, 2], // Reemplazar con datos dinámicos
+                    data: [40, 35, 25],
                     backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
                 }]
             },
@@ -85,14 +85,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 ...pieOptions,
                 plugins: {
                     ...pieOptions.plugins,
-                    title: {
-                        display: false
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
                     }
                 }
             }
         });
-    } else {
-        console.error('El elemento sentimientosChart no existe en el DOM.');
     }
 
     // Gráfica de estilos preferidos
@@ -129,16 +131,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const estilosDistribucionChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ['Casual', 'Elegante', 'Deportivo'],
+                labels: ['Athleisure', 'Deportivo', 'Retro', 'Lujo', 'Vintage', 'Streetwear', 'Casual', 'Elegante'],
                 datasets: [{
-                    data: [10, 20, 30], // Reemplazar con datos dinámicos
-                    backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
+                    data: [8.3, 16.7, 8.3, 8.3, 16.7, 8.3, 16.7, 16.7],
+                    backgroundColor: [
+                        '#36A2EB', // Athleisure
+                        '#FF6384', // Deportivo
+                        '#FFCE56', // Retro
+                        '#4BC0C0', // Lujo
+                        '#FF9F40', // Vintage
+                        '#FF6384', // Streetwear
+                        '#4CAF50', // Casual
+                        '#FFC107'  // Elegante
+                    ]
                 }]
             },
             options: {
                 ...pieOptions,
                 plugins: {
                     ...pieOptions.plugins,
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    },
                     title: {
                         display: false
                     }

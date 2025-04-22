@@ -69,20 +69,9 @@
         </div>
     </div>
 
-    <div class="row mt-5">
-        <div class="col-md-6">
-            <h5 class="text-center">Distribución de Estilos</h5>
-            <img src="data:image/png;base64,{{ grafica_estilos }}" alt="Gráfica de Estilos" class="img-fluid">
-        </div>
-        <div class="col-md-6">
-            <h5 class="text-center">Distribución de Colores</h5>
-            <img src="data:image/png;base64,{{ grafica_colores }}" alt="Gráfica de Colores" class="img-fluid">
-        </div>
-    </div>
-
     <div class="container-fluid py-3">
         <div class="row g-3">
-            <!-- Primera fila -->
+            <!-- Gráficas de la primera fila -->
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
@@ -93,7 +82,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
@@ -105,41 +93,7 @@
                 </div>
             </div>
 
-            <!-- Segunda fila -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Distribución de Sentimientos</h6>
-                        <div class="chart-container circular">
-                            <canvas id="graficaDistribucionSentimientos"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Sentimientos en Publicaciones</h6>
-                        <div class="chart-container bar">
-                            <canvas id="graficaSentimientosInteractuados"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tercera fila -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Evolución Temporal de Sentimientos</h6>
-                        <div class="chart-container bar">
-                            <canvas id="graficaEvolucionSentimientos"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Gráficas de sentimientos (solo la versión dona) -->
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
@@ -151,24 +105,25 @@
                 </div>
             </div>
 
-            <!-- Cuarta fila -->
+            <!-- Gráfica de sentimientos interactuados -->
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Estilos</h6>
+                        <h6 class="card-title text-center mb-3">Sentimientos en Publicaciones</h6>
                         <div class="chart-container bar">
-                            <canvas id="estilosChart"></canvas>
+                            <canvas id="graficaSentimientosInteractuados"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <!-- Gráfica de evolución temporal -->
+            <div class="col-md-12">
                 <div class="card h-100">
                     <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Recomendaciones</h6>
+                        <h6 class="card-title text-center mb-3">Evolución Temporal de Sentimientos</h6>
                         <div class="chart-container bar">
-                            <canvas id="recomendacionesChart"></canvas>
+                            <canvas id="graficaEvolucionSentimientos"></canvas>
                         </div>
                     </div>
                 </div>
