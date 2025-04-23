@@ -160,3 +160,33 @@ def recomendaciones_view(request):
         return render(request, 'recommendations/list.html', {
             'error': 'Completa tu perfil para obtener recomendaciones.'
         })
+
+def inicio_view(request):
+    publicaciones = Publicacion.objects.all().prefetch_related('comentarios')
+    
+    for publicacion in publicaciones:
+        # Asegurarse que colores sea una lista
+        publicacion.colores = publicacion.colores or []
+        
+        # Resto del código existente...
+        if publicacion.tipo == 'venta':
+            publicacion.precio = publicacion.precio_venta
+        elif publicacion.tipo == 'alquiler':
+            publicacion.precio = publicacion.precio_alquiler
+        else:  # venta y alquiler
+            publicacion.precio_mostrar = {
+                'venta': publicacion.precio_venta,
+                'alquiler': publicacion.precio_alquiler
+            }
+
+        # Calcular métricas de comentarios
+        comentarios = publicacion.comentarios.all()
+        publicacion.comentarios_positivos = comentarios.filter(clasificacion_chatgpt='positivo').count()
+        publicacion.comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
+        publicacion.comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
+        publicacion.total_comentarios = comentarios.count()
+
+    context = {
+        'publicaciones': publicaciones,
+    }
+    return render(request, 'inicio.html', context)

@@ -54,7 +54,19 @@
                                         <small class="text-muted d-block">Colores:</small>
                                         <div class="d-flex flex-wrap gap-1">
                                             {% for color in publicacion.colores %}
-                                                <span class="badge" style="background-color: {{ color }};">{{ color }}</span>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="color-circle me-1" 
+                                                          style="width: 20px; 
+                                                                 height: 20px; 
+                                                                 border-radius: 50%; 
+                                                                 display: inline-block;
+                                                                 background-color: {{ color }};
+                                                                 border: 1px solid #ddd;">
+                                                    </span>
+                                                    <span class="color-name">{{ color }}</span>
+                                                </div>
+                                            {% empty %}
+                                                <span class="text-muted">No hay colores especificados</span>
                                             {% endfor %}
                                         </div>
                                     </div>
