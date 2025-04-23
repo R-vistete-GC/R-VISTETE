@@ -139,7 +139,7 @@
                         <div class="d-flex flex-column gap-2">
                             <div class="d-flex justify-content-between gap-1">
                                 {% if publicacion.tipo == "venta" %}
-                                    <button class="btn btn-sm btn-success flex-grow-1" 
+                                    <button class="btn btn-sm flex-grow-1" style="background-color: #52a976;; color: white; border: none;" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#modalCompra"
                                             data-publicacion-id="{{ publicacion.id }}"
@@ -149,7 +149,7 @@
                                         <i class="fas fa-shopping-cart"></i> Comprar
                                     </button>
                                 {% elif publicacion.tipo == "alquiler" %}
-                                    <button class="btn btn-sm btn-warning flex-grow-1" 
+                                    <button class="btn btn-sm flex-grow-1" style="background-color: #225a3a; color: white; border: none;" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#modalAlquilar"
                                             data-publicacion-id="{{ publicacion.id }}"
@@ -159,7 +159,7 @@
                                         <i class="fas fa-key"></i> Alquilar
                                     </button>
                                 {% elif publicacion.tipo == "venta y alquiler" %}
-                                    <button class="btn btn-sm btn-success flex-grow-1" 
+                                    <button class="btn btn-sm flex-grow-1" style="background-color: #52a976; color: white; border: none;" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#modalCompra"
                                             data-publicacion-id="{{ publicacion.id }}"
@@ -168,7 +168,7 @@
                                             data-titulo="{{ publicacion.titulo }}">
                                         <i class="fas fa-shopping-cart"></i> Comprar
                                     </button>
-                                    <button class="btn btn-sm btn-warning flex-grow-1" 
+                                    <button class="btn btn-sm flex-grow-1" style="background-color: #225a3a; color: white; border: none;" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#modalAlquilar"
                                             data-publicacion-id="{{ publicacion.id }}"
