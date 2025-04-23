@@ -1,5 +1,4 @@
-
-    .publish-container {
+.publish-container {
         margin-top: 2rem;
         padding-bottom: 3rem;
     }
@@ -145,3 +144,23 @@
         border-color: #ff4081;
         box-shadow: 0 0 0 0.2rem rgba(255, 64, 129, 0.25);
     }
+
+#modalPublicar .modal-body {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#modalPublicar .image-preview {
+    min-height: 200px;
+    max-height: 300px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+#modalPublicar .image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

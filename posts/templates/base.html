@@ -29,6 +29,142 @@
 
     {% block extra_css %}{% endblock %}
 
+<style>
+#modalPublicar .modal-body {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#modalPublicar .image-preview {
+    min-height: 200px;
+    max-height: 300px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+#modalPublicar .image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Estilos para el modal de publicación */
+#modalPublicar .modal-header {
+    background-color: #198754;  /* Verde de Bootstrap */
+    color: white;
+}
+
+#modalPublicar .modal-title {
+    font-weight: 500;
+}
+
+#modalPublicar .form-label {
+    color: #198754;
+    font-weight: 500;
+}
+
+#modalPublicar .image-preview {
+    border: 2px dashed #198754;
+    transition: all 0.3s ease;
+}
+
+#modalPublicar .image-preview:hover {
+    border-color: #2c8c5f;
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+#modalPublicar .upload-icon {
+    color: #198754;
+    font-size: 2rem;
+}
+
+#modalPublicar .form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+#modalPublicar .btn-primary {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+#modalPublicar .btn-primary:hover {
+    background-color: #146c43;
+    border-color: #146c43;
+}
+
+#modalPublicar .tipo-toggle .form-check-input:checked ~ .form-check-label {
+    color: #198754;
+}
+
+/* Agregar borde verde suave a los inputs cuando están en focus */
+#modalPublicar .form-control:focus,
+#modalPublicar .form-select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+/* Estilos para el modal con degradado y bordes redondeados */
+#modalPublicar .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+#modalPublicar .modal-header {
+    background: linear-gradient(145deg, #13472e 0%, #146c43 100%);
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+#modalPublicar .modal-body {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 2rem;
+}
+
+#modalPublicar .modal-footer {
+    background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
+    border-top: none;
+    padding: 1.5rem;
+}
+
+#modalPublicar .btn-primary {
+    background: linear-gradient(145deg, #198754 0%, #146c43 100%);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+#modalPublicar .btn-primary:hover {
+    background: linear-gradient(145deg, #146c43 0%, #0d462c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#modalPublicar .form-control,
+#modalPublicar .form-select {
+    border-radius: 10px;
+    border: 1px solid rgba(25, 135, 84, 0.2);
+    transition: all 0.3s ease;
+}
+
+#modalPublicar .form-control:focus,
+#modalPublicar .form-select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+}
+
+#modalPublicar .image-preview {
+    border-radius: 15px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+}
+</style>
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-white border-bottom fixed-top">
@@ -152,186 +288,194 @@
 
     <!-- Modal Publicar -->
     <div class="modal fade" id="modalPublicar" tabindex="-1" role="dialog" aria-labelledby="modalPublicarLabel">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <!-- Cambios aquí -->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalPublicarLabel">Nueva Publicación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Agregar grid system para mejor organización -->
                     <form id="publicarForm" method="POST" enctype="multipart/form-data" action="{% url 'posts:publicar_prenda' %}">
                         {% csrf_token %}
-                        
-                        <!-- Imagen -->
-                        <div class="form-section">
-                            <label class="form-label" for="imageInput">Imagen de la Prenda*</label>
-                            <div class="image-preview empty" id="imagePreview">
-                                <div class="upload-placeholder text-center">
-                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                                    <p class="mt-2">Haz clic para subir una imagen</p>
-                                    <small class="text-muted">o arrastra y suelta aquí</small>
+                        <div class="row">
+                            <!-- Columna izquierda para imagen -->
+                            <div class="col-md-6">
+                                <div class="form-section mb-3">
+                                    <label class="form-label" for="imageInput">Imagen de la Prenda*</label>
+                                    <div class="image-preview empty" id="imagePreview">
+                                        <div class="upload-placeholder text-center">
+                                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                            <p class="mt-2">Haz clic para subir una imagen</p>
+                                            <small class="text-muted">o arrastra y suelta aquí</small>
+                                        </div>
+                                        <img src="" alt="" style="display: none;">
+                                    </div>
+                                    <input type="file" class="form-control" name="imagen" id="imageInput" accept="image/*" required style="display: none;">
                                 </div>
-                                <img src="" alt="" style="display: none;">
-                            </div>
-                            <input type="file" class="form-control" name="imagen" id="imageInput" accept="image/*" required style="display: none;">
-                        </div>
-                        
-                        <!-- Título -->
-                        <div class="mb-3">
-                            <label for="titulo" class="form-label">Título*</label>
-                            <input type="text" class="form-control" id="titulo" name="titulo" required maxlength="255">
-                        </div>
-
-                        <!-- Descripción -->
-                        <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
-                        </div>
-
-                        <!-- Tipo de Publicación -->
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Publicación*</label>
-                            <div class="tipo-toggle">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="tipo" id="tipoVenta" value="venta" required>
-                                    <label class="form-check-label" for="tipoVenta">Venta</label>
+                                
+                                <!-- Título y Descripción -->
+                                <div class="mb-3">
+                                    <label for="titulo" class="form-label">Título*</label>
+                                    <input type="text" class="form-control" id="titulo" name="titulo" required maxlength="255">
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="tipo" id="tipoAlquiler" value="alquiler">
-                                    <label class="form-check-label" for="tipoAlquiler">Alquiler</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="tipo" id="tipoAmbos" value="venta y alquiler">
-                                    <label class="form-check-label" for="tipoAmbos">Venta y Alquiler</label>
+                                <div class="mb-3">
+                                    <label for="descripcion" class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Campos de precios dinámicos -->
-                        <div id="camposPrecio">
-                            <div class="mb-3" id="precioVentaSection" style="display: none;">
-                                <label for="precio_venta" class="form-label">Precio de Venta*</label>
-                                <input type="number" class="form-control" id="precio_venta" name="precio_venta" min="0" step="0.01">
-                            </div>
+                            <!-- Columna derecha para el resto de campos -->
+                            <div class="col-md-6">
+                                <!-- Tipo de Publicación y Precios -->
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo de Publicación*</label>
+                                    <div class="tipo-toggle">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="tipo" id="tipoVenta" value="venta" required>
+                                            <label class="form-check-label" for="tipoVenta">Venta</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="tipo" id="tipoAlquiler" value="alquiler">
+                                            <label class="form-check-label" for="tipoAlquiler">Alquiler</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="tipo" id="tipoAmbos" value="venta y alquiler">
+                                            <label class="form-check-label" for="tipoAmbos">Venta y Alquiler</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Campos de precios -->
+                                <div id="camposPrecio">
+                                    <div class="mb-3" id="precioVentaSection" style="display: none;">
+                                        <label for="precio_venta" class="form-label">Precio de Venta*</label>
+                                        <input type="number" class="form-control" id="precio_venta" name="precio_venta" min="0" step="0.01">
+                                    </div>
 
-                            <div class="mb-3" id="precioAlquilerSection" style="display: none;">
-                                <label for="precio_alquiler" class="form-label">Precio de Alquiler (por día)*</label>
-                                <input type="number" class="form-control" id="precio_alquiler" name="precio_alquiler" min="0" step="0.01">
-                            </div>
+                                    <div class="mb-3" id="precioAlquilerSection" style="display: none;">
+                                        <label for="precio_alquiler" class="form-label">Precio de Alquiler (por día)*</label>
+                                        <input type="number" class="form-control" id="precio_alquiler" name="precio_alquiler" min="0" step="0.01">
+                                    </div>
 
-                            <div class="mb-3" id="depositoSection" style="display: none;">
-                                <label for="deposito" class="form-label">Depósito de Seguridad*</label>
-                                <input type="number" class="form-control" id="deposito" name="deposito" min="0" step="0.01">
-                            </div>
-                        </div>
+                                    <div class="mb-3" id="depositoSection" style="display: none;">
+                                        <label for="deposito" class="form-label">Depósito de Seguridad*</label>
+                                        <input type="number" class="form-control" id="deposito" name="deposito" min="0" step="0.01">
+                                    </div>
+                                </div>
 
-                        <!-- Público -->
-                        <div class="mb-3">
-                            <label for="publico" class="form-label">Público*</label>
-                            <select class="form-select" id="publico" name="publico" required>
-                                <option value="mujer">Mujer</option>
-                                <option value="hombre">Hombre</option>
-                                <option value="unisex">Unisex</option>
-                                <option value="niño">Niño</option>
-                                <option value="niña">Niña</option>
-                                <option value="mascota">Mascota</option>
-                            </select>
-                        </div>
+                                <!-- Público y Talla en la misma fila -->
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label for="publico" class="form-label">Público*</label>
+                                            <select class="form-select" id="publico" name="publico" required>
+                                                <option value="mujer">Mujer</option>
+                                                <option value="hombre">Hombre</option>
+                                                <option value="unisex">Unisex</option>
+                                                <option value="niño">Niño</option>
+                                                <option value="niña">Niña</option>
+                                                <option value="mascota">Mascota</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label for="talla" class="form-label">Talla*</label>
+                                            <select class="form-select" id="talla" name="talla" required>
+                                                <option value="S">S</option>
+                                                <option value="M" selected>M</option>
+                                                <option value="L">L</option>
+                                                <option value="XL">XL</option>
+                                                <option value="Única">Única</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <!-- Talla -->
-                        <div class="mb-3">
-                            <label for="talla" class="form-label">Talla*</label>
-                            <select class="form-select" id="talla" name="talla" required>
-                                <option value="S">S</option>
-                                <option value="M" selected>M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
-                                <option value="Única">Única</option>
-                            </select>
-                        </div>
+                                <!-- Estilos y Colores -->
+                                <div class="mb-3">
+                                    <label class="form-label">Estilos*</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="casual" id="estiloCasual">
+                                            <label class="form-check-label" for="estiloCasual">Casual</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="formal" id="estiloFormal">
+                                            <label class="form-check-label" for="estiloFormal">Formal</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="deportivo" id="estiloDeportivo">
+                                            <label class="form-check-label" for="estiloDeportivo">Deportivo</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="elegante" id="estiloElegante">
+                                            <label class="form-check-label" for="estiloElegante">Elegante</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="bohemio" id="estiloBohemio">
+                                            <label class="form-check-label" for="estiloBohemio">Bohemio</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="vintage" id="estiloVintage">
+                                            <label class="form-check-label" for="estiloVintage">Vintage</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="minimalista" id="estiloMinimalista">
+                                            <label class="form-check-label" for="estiloMinimalista">Minimalista</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="estilo[]" value="streetwear" id="estiloStreetwear">
+                                            <label class="form-check-label" for="estiloStreetwear">Streetwear</label>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <!-- Estilos -->
-                        <div class="mb-3">
-                            <label class="form-label">Estilos*</label>
-                            <div class="d-flex flex-wrap gap-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="casual" id="estiloCasual">
-                                    <label class="form-check-label" for="estiloCasual">Casual</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="formal" id="estiloFormal">
-                                    <label class="form-check-label" for="estiloFormal">Formal</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="deportivo" id="estiloDeportivo">
-                                    <label class="form-check-label" for="estiloDeportivo">Deportivo</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="elegante" id="estiloElegante">
-                                    <label class="form-check-label" for="estiloElegante">Elegante</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="bohemio" id="estiloBohemio">
-                                    <label class="form-check-label" for="estiloBohemio">Bohemio</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="vintage" id="estiloVintage">
-                                    <label class="form-check-label" for="estiloVintage">Vintage</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="minimalista" id="estiloMinimalista">
-                                    <label class="form-check-label" for="estiloMinimalista">Minimalista</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="estilo[]" value="streetwear" id="estiloStreetwear">
-                                    <label class="form-check-label" for="estiloStreetwear">Streetwear</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Colores -->
-                        <div class="mb-3">
-                            <label class="form-label">Colores*</label>
-                            <div class="d-flex flex-wrap gap-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="negro" id="colorNegro">
-                                    <label class="form-check-label" for="colorNegro">Negro</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="blanco" id="colorBlanco">
-                                    <label class="form-check-label" for="colorBlanco">Blanco</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="rojo" id="colorRojo">
-                                    <label class="form-check-label" for="colorRojo">Rojo</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="azul" id="colorAzul">
-                                    <label class="form-check-label" for="colorAzul">Azul</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="verde" id="colorVerde">
-                                    <label class="form-check-label" for="colorVerde">Verde</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="amarillo" id="colorAmarillo">
-                                    <label class="form-check-label" for="colorAmarillo">Amarillo</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="rosa" id="colorRosa">
-                                    <label class="form-check-label" for="colorRosa">Rosa</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="morado" id="colorMorado">
-                                    <label class="form-check-label" for="colorMorado">Morado</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="marron" id="colorMarron">
-                                    <label class="form-check-label" for="colorMarron">Marrón</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="colores[]" value="gris" id="colorGris">
-                                    <label class="form-check-label" for="colorGris">Gris</label>
+                                <div class="mb-3">
+                                    <label class="form-label">Colores*</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="negro" id="colorNegro">
+                                            <label class="form-check-label" for="colorNegro">Negro</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="blanco" id="colorBlanco">
+                                            <label class="form-check-label" for="colorBlanco">Blanco</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="rojo" id="colorRojo">
+                                            <label class="form-check-label" for="colorRojo">Rojo</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="azul" id="colorAzul">
+                                            <label class="form-check-label" for="colorAzul">Azul</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="verde" id="colorVerde">
+                                            <label class="form-check-label" for="colorVerde">Verde</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="amarillo" id="colorAmarillo">
+                                            <label class="form-check-label" for="colorAmarillo">Amarillo</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="rosa" id="colorRosa">
+                                            <label class="form-check-label" for="colorRosa">Rosa</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="morado" id="colorMorado">
+                                            <label class="form-check-label" for="colorMorado">Morado</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="marron" id="colorMarron">
+                                            <label class="form-check-label" for="colorMarron">Marrón</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="colores[]" value="gris" id="colorGris">
+                                            <label class="form-check-label" for="colorGris">Gris</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
