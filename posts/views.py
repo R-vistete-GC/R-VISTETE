@@ -478,7 +478,7 @@ def agregar_comentario(request, publicacion_id):
         }, status=500)
 
 #publicar prendas
-@login_required
+
 @require_http_methods(["POST"])
 def publicar_prenda(request):
     try:

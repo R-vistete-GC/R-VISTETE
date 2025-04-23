@@ -23,9 +23,43 @@
                     <div class="card-body p-3">
                         <h5 class="card-title mb-2">{{ publicacion.titulo }}</h5>
                         <p class="card-text mb-2">{{ publicacion.descripcion|truncatechars:100 }}</p>
-                        <div class="text-muted mb-2">
-                            <div><strong>Público:</strong> {{ publicacion.publico }}</div>
-                            <div><strong>Talla:</strong> {{ publicacion.talla }}</div>
+                        
+                        <!-- Información adicional -->
+                        <div class="mb-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="bg-light rounded p-2">
+                                        <small class="text-muted d-block">Público:</small>
+                                        <strong>{{ publicacion.publico|title }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-light rounded p-2">
+                                        <small class="text-muted d-block">Talla:</small>
+                                        <strong>{{ publicacion.talla }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="bg-light rounded p-2">
+                                        <small class="text-muted d-block">Estilos:</small>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for estilo in publicacion.estilo %}
+                                                <span class="badge bg-secondary">{{ estilo }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="bg-light rounded p-2">
+                                        <small class="text-muted d-block">Colores:</small>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for color in publicacion.colores %}
+                                                <span class="badge" style="background-color: {{ color }};">{{ color }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Valoración de la comunidad -->
@@ -75,19 +109,27 @@
                         <!-- Modificar la sección de precios -->
                         <div class="d-flex justify-content-between align-items-center">
                             {% if publicacion.tipo == 'venta y alquiler' %}
-                                <h5 class="text-success mb-0">
-                                    Venta: ${{ publicacion.precio_venta }}<br>
-                                    Alquiler: ${{ publicacion.precio_alquiler }}/día
-                                </h5>
+                                <div class="text-success">
+                                    <div class="mb-1"><strong>Venta:</strong> ${{ publicacion.precio_venta }}</div>
+                                    <div><strong>Alquiler:</strong> ${{ publicacion.precio_alquiler }}/día</div>
+                                    {% if publicacion.deposito %}
+                                        <small class="text-muted">(Depósito: ${{ publicacion.deposito }})</small>
+                                    {% endif %}
+                                </div>
                             {% else %}
-                                <h5 class="text-success mb-0">
-                                    ${{ publicacion.precio }}
-                                    {% if publicacion.tipo == 'alquiler' %}/día{% endif %}
-                                </h5>
+                                <div class="text-success">
+                                    {% if publicacion.tipo == 'venta' %}
+                                        <strong>${{ publicacion.precio_venta }}</strong>
+                                    {% else %}
+                                        <div><strong>${{ publicacion.precio_alquiler }}/día</strong></div>
+                                        {% if publicacion.deposito %}
+                                            <small class="text-muted">(Depósito: ${{ publicacion.deposito }})</small>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
                             {% endif %}
                             <small class="text-muted">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
                         </div>
-
                     </div>
                     <div class="card-footer p-2 bg-white">
                         <div class="d-flex flex-column gap-2">
