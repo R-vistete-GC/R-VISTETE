@@ -357,7 +357,7 @@ def toggle_like(request, publicacion_id):
         # Verificar si ya existe el like
         like = Like.objects.filter(usuario=usuario, publicacion=publicacion).first()
         
-        if like:
+        if (like):
             # Si existe, lo eliminamos
             like.delete()
             likes_count = Like.objects.filter(publicacion=publicacion).count()
@@ -482,59 +482,77 @@ def agregar_comentario(request, publicacion_id):
 @require_http_methods(["POST"])
 def publicar_prenda(request):
     try:
-        # Verificar que el usuario tenga un perfil asociado
-        if not hasattr(request.user, 'usuario'):
-            return JsonResponse({
-                'success': False, 
-                'error': 'Usuario no tiene perfil asociado'
-            }, status=400)
-
-        # Obtener datos del formulario
-        titulo = request.POST.get('titulo')
-        descripcion = request.POST.get('descripcion')
-        tipo = request.POST.get('tipo')
-        precio_venta = request.POST.get('precio_venta')
-        precio_alquiler = request.POST.get('precio_alquiler')
-        deposito = request.POST.get('deposito')
-        publico = request.POST.get('publico')
-        talla = request.POST.get('talla')
-        imagen = request.FILES.get('imagen')
-
-        # Validar campos requeridos
-        if not all([titulo, tipo, publico, talla, imagen]):
+        # Verificar que los campos requeridos existan
+        if not request.POST.get('titulo') or not request.FILES.get('imagen'):
             return JsonResponse({
                 'success': False,
                 'error': 'Faltan campos requeridos'
             }, status=400)
 
-        # Validar precios según el tipo
-        if tipo == 'venta' and not precio_venta:
+        # Verificar si el usuario está autenticado por sesión
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({
+                'success': False, 
+                'error': 'Usuario no autenticado'
+            }, status=401)
+
+        # Obtener el usuario
+        try:
+            usuario = Usuario.objects.get(id=usuario_id)
+        except Usuario.DoesNotExist:
             return JsonResponse({
                 'success': False,
-                'error': 'El precio de venta es requerido'
-            }, status=400)
-        elif tipo == 'alquiler' and not all([precio_alquiler, deposito]):
+                'error': 'Usuario no encontrado'
+            }, status=404)
+
+        # Obtener datos del formulario
+        data = request.POST
+        imagen = request.FILES.get('imagen')
+        
+        # Obtener arrays
+        estilos = request.POST.getlist('estilo[]')
+        colores = request.POST.getlist('colores[]')
+
+        # Validar arrays requeridos
+        if not estilos or not colores:
             return JsonResponse({
                 'success': False,
-                'error': 'El precio de alquiler y depósito son requeridos'
-            }, status=400)
-        elif tipo == 'venta y alquiler' and not all([precio_venta, precio_alquiler, deposito]):
-            return JsonResponse({
-                'success': False,
-                'error': 'Todos los precios son requeridos'
+                'error': 'Debes seleccionar al menos un estilo y un color'
             }, status=400)
 
-        # Crear la publicación
+        # Validar precios según tipo
+        tipo = data.get('tipo')
+        precio_venta = data.get('precio_venta')
+        precio_alquiler = data.get('precio_alquiler')
+        deposito = data.get('deposito')
+
+        if tipo == 'venta':
+            if not precio_venta:
+                return JsonResponse({'success': False, 'error': 'El precio de venta es requerido'})
+            precio_alquiler = None
+            deposito = None
+        elif tipo == 'alquiler':
+            if not all([precio_alquiler, deposito]):
+                return JsonResponse({'success': False, 'error': 'Precio de alquiler y depósito son requeridos'})
+            precio_venta = None
+        elif tipo == 'venta y alquiler':
+            if not all([precio_venta, precio_alquiler, deposito]):
+                return JsonResponse({'success': False, 'error': 'Todos los precios son requeridos'})
+
+        # Crear la publicación usando el usuario de la sesión
         publicacion = Publicacion.objects.create(
-            usuario=request.user.usuario,
-            titulo=titulo,
-            descripcion=descripcion,
+            usuario=usuario,  # Usar el usuario obtenido de la sesión
+            titulo=data.get('titulo'),
+            descripcion=data.get('descripcion'),
             tipo=tipo,
-            precio_venta=precio_venta if precio_venta else None,
-            precio_alquiler=precio_alquiler if precio_alquiler else None,
-            deposito=deposito if deposito else None,
-            publico=publico,
-            talla=talla,
+            precio_venta=precio_venta,
+            precio_alquiler=precio_alquiler,
+            deposito=deposito,
+            publico=data.get('publico'),
+            talla=data.get('talla'),
+            estilo=estilos,
+            colores=colores,
             imagen=imagen
         )
 

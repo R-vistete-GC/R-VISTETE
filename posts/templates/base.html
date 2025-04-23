@@ -698,6 +698,62 @@
         }
     });
 </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const publicarForm = document.getElementById('publicarForm');
+
+    if (publicarForm) {
+        publicarForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Crear FormData
+            const formData = new FormData(this);
+
+            // Agregar arrays de estilos y colores
+            const estilosSeleccionados = Array.from(document.querySelectorAll('input[name="estilo[]"]:checked')).map(cb => cb.value);
+            const coloresSeleccionados = Array.from(document.querySelectorAll('input[name="colores[]"]:checked')).map(cb => cb.value);
+
+            // Eliminar arrays anteriores y agregar los nuevos
+            formData.delete('estilo[]');
+            formData.delete('colores[]');
+            
+            estilosSeleccionados.forEach(estilo => {
+                formData.append('estilo[]', estilo);
+            });
+            
+            coloresSeleccionados.forEach(color => {
+                formData.append('colores[]', color);
+            });
+
+            fetch('/inicio/publicar/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: data.message
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.error || 'Error al publicar');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                });
+            });
+        });
+    }
+});
+</script>
    
     <div class="d-flex justify-content-between gap-1">
     {% if publicacion.tipo == "venta" %}

@@ -14,7 +14,15 @@ class Publicacion(models.Model):
     precio_venta = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     precio_alquiler = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     fecha_publicacion = models.DateTimeField(auto_now_add=True)
-    tipo = models.CharField(max_length=10, default='venta', choices=[('venta', 'Venta'), ('alquiler', 'Alquiler')])
+    tipo = models.CharField(
+        max_length=20, 
+        choices=[
+            ('venta', 'Venta'),
+            ('alquiler', 'Alquiler'),
+            ('venta y alquiler', 'Venta y Alquiler')
+        ],
+        default='venta'
+    )
     deposito = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     publico = models.CharField(max_length=10, choices=[
         ('mujer', 'Mujer'), ('hombre', 'Hombre'), ('niño', 'Niño'),
