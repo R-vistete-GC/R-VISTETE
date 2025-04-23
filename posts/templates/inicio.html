@@ -72,10 +72,22 @@
                         </div>
                         <!-- Fin de valoración de la comunidad -->
 
+                        <!-- Modificar la sección de precios -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="text-success mb-0">${{ publicacion.precio }}</h5>
+                            {% if publicacion.tipo == 'venta y alquiler' %}
+                                <h5 class="text-success mb-0">
+                                    Venta: ${{ publicacion.precio_venta }}<br>
+                                    Alquiler: ${{ publicacion.precio_alquiler }}/día
+                                </h5>
+                            {% else %}
+                                <h5 class="text-success mb-0">
+                                    ${{ publicacion.precio }}
+                                    {% if publicacion.tipo == 'alquiler' %}/día{% endif %}
+                                </h5>
+                            {% endif %}
                             <small class="text-muted">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
                         </div>
+
                     </div>
                     <div class="card-footer p-2 bg-white">
                         <div class="d-flex flex-column gap-2">

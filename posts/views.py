@@ -21,9 +21,20 @@ from sentiment_analysis.utils import SentimentAnalyzer  # Importar el analizador
 
 def inicio_view(request):
     publicaciones = Publicacion.objects.all()
-
-    # Calcular métricas de comentarios para cada publicación
+    
     for publicacion in publicaciones:
+        # Determinar qué precio mostrar basado en el tipo
+        if publicacion.tipo == 'venta':
+            publicacion.precio = publicacion.precio_venta
+        elif publicacion.tipo == 'alquiler':
+            publicacion.precio = publicacion.precio_alquiler
+        else:  # venta y alquiler
+            publicacion.precio_mostrar = {
+                'venta': publicacion.precio_venta,
+                'alquiler': publicacion.precio_alquiler
+            }
+
+        # Calcular métricas de comentarios para cada publicación
         comentarios = Comentario.objects.filter(publicacion=publicacion)
         publicacion.comentarios_positivos = comentarios.filter(clasificacion_chatgpt='positivo').count()
         publicacion.comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
