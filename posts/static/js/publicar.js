@@ -47,24 +47,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // Manejo del tipo de publicación
     const tipoVenta = document.getElementById('tipoVenta');
     const tipoAlquiler = document.getElementById('tipoAlquiler');
+    const tipoAmbos = document.getElementById('tipoAmbos');
+    const precioVentaSection = document.getElementById('precioVentaSection');
+    const precioAlquilerSection = document.getElementById('precioAlquilerSection');
     const depositoSection = document.getElementById('depositoSection');
-    const depositoInput = document.getElementById('deposito');
 
-    if (tipoVenta && tipoAlquiler && depositoSection && depositoInput) {
-        function updateTipoUI() {
-            if (tipoAlquiler.checked) {
-                depositoSection.style.display = 'block';
-                depositoInput.required = true;
-            } else {
-                depositoSection.style.display = 'none';
-                depositoInput.required = false;
-                depositoInput.value = '';
-            }
-        }
+    function updateFormFields() {
+        const isVenta = tipoVenta.checked;
+        const isAlquiler = tipoAlquiler.checked;
+        const isAmbos = tipoAmbos.checked;
 
-        tipoVenta.addEventListener('change', updateTipoUI);
-        tipoAlquiler.addEventListener('change', updateTipoUI);
+        // Mostrar/ocultar campos según el tipo
+        precioVentaSection.style.display = (isVenta || isAmbos) ? 'block' : 'none';
+        precioAlquilerSection.style.display = (isAlquiler || isAmbos) ? 'block' : 'none';
+        depositoSection.style.display = (isAlquiler || isAmbos) ? 'block' : 'none';
+
+        // Actualizar required
+        precioVentaSection.querySelector('input').required = (isVenta || isAmbos);
+        precioAlquilerSection.querySelector('input').required = (isAlquiler || isAmbos);
+        depositoSection.querySelector('input').required = (isAlquiler || isAmbos);
     }
+
+    // Agregar event listeners
+    [tipoVenta, tipoAlquiler, tipoAmbos].forEach(radio => {
+        radio.addEventListener('change', updateFormFields);
+    });
 
     // Estilo activo para los radio buttons
     const tipoChecks = document.querySelectorAll('.tipo-toggle .form-check');
@@ -146,4 +153,93 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     }
+
+    // Manejo de campos de precio
+    const tipoVenta = document.getElementById('tipoVenta');
+    const tipoAlquiler = document.getElementById('tipoAlquiler');
+    const tipoAmbos = document.getElementById('tipoAmbos');
+    
+    const precioVentaSection = document.getElementById('precioVentaSection');
+    const precioAlquilerSection = document.getElementById('precioAlquilerSection');
+    const depositoSection = document.getElementById('depositoSection');
+
+    function actualizarCamposPrecio() {
+        // Obtener el tipo seleccionado
+        const isVenta = tipoVenta.checked;
+        const isAlquiler = tipoAlquiler.checked;
+        const isAmbos = tipoAmbos.checked;
+
+        // Mostrar/ocultar campos
+        precioVentaSection.style.display = (isVenta || isAmbos) ? 'block' : 'none';
+        precioAlquilerSection.style.display = (isAlquiler || isAmbos) ? 'block' : 'none';
+        depositoSection.style.display = (isAlquiler || isAmbos) ? 'block' : 'none';
+
+        // Actualizar required
+        precioVentaSection.querySelector('input').required = (isVenta || isAmbos);
+        precioAlquilerSection.querySelector('input').required = (isAlquiler || isAmbos);
+        depositoSection.querySelector('input').required = (isAlquiler || isAmbos);
+    }
+
+    // Event listeners para los radio buttons
+    [tipoVenta, tipoAlquiler, tipoAmbos].forEach(radio => {
+        radio.addEventListener('change', actualizarCamposPrecio);
+    });
+
+    // Ejecutar al cargar la página
+    actualizarCamposPrecio();
+
+    // Referencias a los elementos del formulario
+    const tipoVenta = document.getElementById('tipoVenta');
+    const tipoAlquiler = document.getElementById('tipoAlquiler');
+    const tipoVentaAlquiler = document.getElementById('tipoVentaAlquiler');
+    
+    const precioVentaContainer = document.getElementById('precioVentaContainer');
+    const precioAlquilerContainer = document.getElementById('precioAlquilerContainer');
+    const depositoContainer = document.getElementById('depositoContainer');
+
+    // Función para manejar la visibilidad de los campos
+    function actualizarCamposFormulario() {
+        // Ocultar todos los campos primero
+        precioVentaContainer.style.display = 'none';
+        precioAlquilerContainer.style.display = 'none';
+        depositoContainer.style.display = 'none';
+
+        // Obtener los inputs
+        const precioVentaInput = document.getElementById('precioVenta');
+        const precioAlquilerInput = document.getElementById('precioAlquiler');
+        const depositoInput = document.getElementById('deposito');
+
+        // Desactivar required en todos
+        precioVentaInput.required = false;
+        precioAlquilerInput.required = false;
+        depositoInput.required = false;
+
+        // Mostrar campos según el tipo seleccionado
+        if (tipoVenta.checked) {
+            precioVentaContainer.style.display = 'block';
+            precioVentaInput.required = true;
+        } 
+        else if (tipoAlquiler.checked) {
+            precioAlquilerContainer.style.display = 'block';
+            depositoContainer.style.display = 'block';
+            precioAlquilerInput.required = true;
+            depositoInput.required = true;
+        } 
+        else if (tipoVentaAlquiler.checked) {
+            precioVentaContainer.style.display = 'block';
+            precioAlquilerContainer.style.display = 'block';
+            depositoContainer.style.display = 'block';
+            precioVentaInput.required = true;
+            precioAlquilerInput.required = true;
+            depositoInput.required = true;
+        }
+    }
+
+    // Agregar event listeners a los radio buttons
+    [tipoVenta, tipoAlquiler, tipoVentaAlquiler].forEach(radio => {
+        radio.addEventListener('change', actualizarCamposFormulario);
+    });
+
+    // Ejecutar una vez al cargar la página
+    actualizarCamposFormulario();
 });

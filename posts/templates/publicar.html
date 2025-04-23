@@ -1,0 +1,32 @@
+<!-- Tipo de Publicación -->
+<div class="mb-3">
+    <label class="form-label">Tipo de Publicación*</label>
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="tipoVenta" name="tipo" value="venta" required>
+        <label class="form-check-label" for="tipoVenta">Venta</label>
+    </div>
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="tipoAlquiler" name="tipo" value="alquiler">
+        <label class="form-check-label" for="tipoAlquiler">Alquiler</label>
+    </div>
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="tipoVentaAlquiler" name="tipo" value="venta y alquiler">
+        <label class="form-check-label" for="tipoVentaAlquiler">Venta y Alquiler</label>
+    </div>
+</div>
+
+<!-- Campos de precios -->
+<div id="precioVentaContainer" class="mb-3" style="display: none;">
+    <label for="precioVenta" class="form-label">Precio de Venta*</label>
+    <input type="number" class="form-control" id="precioVenta" name="precio_venta" min="0" step="0.01">
+</div>
+
+<div id="precioAlquilerContainer" class="mb-3" style="display: none;">
+    <label for="precioAlquiler" class="form-label">Precio de Alquiler (por día)*</label>
+    <input type="number" class="form-control" id="precioAlquiler" name="precio_alquiler" min="0" step="0.01">
+</div>
+
+<div id="depositoContainer" class="mb-3" style="display: none;">
+    <label for="deposito" class="form-label">Depósito*</label>
+    <input type="number" class="form-control" id="deposito" name="deposito" min="0" step="0.01">
+</div>
