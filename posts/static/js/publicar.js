@@ -87,71 +87,69 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Manejo del formulario de publicación
     const publicarForm = document.getElementById('publicarForm');
-    
-    if (publicarForm) {
-        publicarForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Evitar el envío tradicional del formulario
+    let isSubmitting = false; // Flag para evitar envíos múltiples
 
-            // Verificar que se haya seleccionado una imagen
-            const imageFile = imageInput?.files[0];
-            if (!imageFile) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Por favor selecciona una imagen para la publicación.',
-                });
+    if (publicarForm) {
+        publicarForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Si ya se está enviando, ignorar
+            if (isSubmitting) {
                 return;
             }
 
-            const formData = new FormData(this);
+            // Marcar como enviando
+            isSubmitting = true;
 
-            // Deshabilitar el botón y mostrar estado de carga
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
-            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Publicando...';
-            submitButton.disabled = true;
+            try {
+                const formData = new FormData(this);
 
-            fetch('/inicio/publicar/', {
-                method: 'POST',
-                body: formData,
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Mostrar modal de éxito
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Publicación creada exitosamente!',
-                            text: data.message,
-                            confirmButtonText: 'Aceptar',
-                        }).then(() => {
-                            // Cerrar el modal
-                            const modal = document.getElementById('modalPublicar');
-                            if (modal) {
-                                const modalInstance = bootstrap.Modal.getInstance(modal);
-                                if (modalInstance) {
-                                    modalInstance.hide();
-                                }
-                            }
-                            publicarForm.reset(); // Limpiar el formulario
-                        });
-                    } else {
-                        throw new Error(data.message || 'Error al publicar.');
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.message,
-                    });
-                })
-                .finally(() => {
-                    // Restaurar el botón
-                    submitButton.innerHTML = originalText;
-                    submitButton.disabled = false;
+                // Deshabilitar el botón de submit
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Publicando...';
+
+                const response = await fetch('/inicio/publicar/', {
+                    method: 'POST',
+                    body: formData
                 });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: 'Publicación creada exitosamente'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(result.error || 'Error al crear la publicación');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                });
+            } finally {
+                // Restaurar el estado del botón y del formulario
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                isSubmitting = false;
+            }
         });
+
+        // Remover cualquier otro event listener que pueda estar causando el doble envío
+        const publicarButton = document.getElementById('btnPublicar');
+        if (publicarButton) {
+            publicarButton.onclick = null;
+        }
     }
 
     // Manejo de campos de precio

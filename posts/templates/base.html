@@ -652,104 +652,85 @@
         });
     </script>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const publicarForm = document.getElementById('publicarForm');
-
-        if (publicarForm) {
-            publicarForm.addEventListener('submit', function (e) {
-                e.preventDefault(); // Evitar el envío tradicional del formulario
-
-                const formData = new FormData(this);
-
-                fetch('/inicio/publicar/', {
-                    method: 'POST',
-                    body: formData,
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Publicación creada exitosamente!',
-                                text: data.message,
-                                confirmButtonText: 'Aceptar',
-                            }).then(() => {
-                                const modal = document.getElementById('modalPublicar');
-                                if (modal) {
-                                    const modalInstance = bootstrap.Modal.getInstance(modal);
-                                    if (modalInstance) {
-                                        modalInstance.hide();
-                                    }
-                                }
-                                publicarForm.reset(); // Limpiar el formulario
-                            });
-                        } else {
-                            throw new Error(data.message || 'Error al publicar.');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: error.message,
-                        });
-                    });
-            });
-        }
-    });
-</script>
-    <script>
 document.addEventListener('DOMContentLoaded', function() {
     const publicarForm = document.getElementById('publicarForm');
+    let isSubmitting = false; // Flag para prevenir envíos múltiples
 
     if (publicarForm) {
-        publicarForm.addEventListener('submit', function(e) {
+        publicarForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Crear FormData
-            const formData = new FormData(this);
+            // Prevenir envíos múltiples
+            if (isSubmitting) return;
+            isSubmitting = true;
 
-            // Agregar arrays de estilos y colores
-            const estilosSeleccionados = Array.from(document.querySelectorAll('input[name="estilo[]"]:checked')).map(cb => cb.value);
-            const coloresSeleccionados = Array.from(document.querySelectorAll('input[name="colores[]"]:checked')).map(cb => cb.value);
+            // Deshabilitar el botón de submit
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Publicando...';
 
-            // Eliminar arrays anteriores y agregar los nuevos
-            formData.delete('estilo[]');
-            formData.delete('colores[]');
-            
-            estilosSeleccionados.forEach(estilo => {
-                formData.append('estilo[]', estilo);
-            });
-            
-            coloresSeleccionados.forEach(color => {
-                formData.append('colores[]', color);
-            });
+            try {
+                // Crear FormData
+                const formData = new FormData(this);
 
-            fetch('/inicio/publicar/', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
+                // Obtener y agregar arrays de estilos y colores
+                const estilosSeleccionados = Array.from(document.querySelectorAll('input[name="estilo[]"]:checked')).map(cb => cb.value);
+                const coloresSeleccionados = Array.from(document.querySelectorAll('input[name="colores[]"]:checked')).map(cb => cb.value);
+
+                // Validar selecciones requeridas
+                if (estilosSeleccionados.length === 0) {
+                    throw new Error('Debes seleccionar al menos un estilo');
+                }
+                if (coloresSeleccionados.length === 0) {
+                    throw new Error('Debes seleccionar al menos un color');
+                }
+
+                // Actualizar arrays en formData
+                formData.delete('estilo[]');
+                formData.delete('colores[]');
+                estilosSeleccionados.forEach(estilo => formData.append('estilo[]', estilo));
+                coloresSeleccionados.forEach(color => formData.append('colores[]', color));
+
+                const response = await fetch('/inicio/publicar/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
                 if (data.success) {
-                    Swal.fire({
+                    // Cerrar el modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalPublicar'));
+                    modal.hide();
+
+                    // Mostrar mensaje de éxito
+                    await Swal.fire({
                         icon: 'success',
                         title: '¡Éxito!',
-                        text: data.message
-                    }).then(() => {
-                        window.location.reload();
+                        text: 'Publicación creada exitosamente',
+                        confirmButtonColor: '#198754'
                     });
+
+                    // Recargar la página
+                    window.location.reload();
                 } else {
-                    throw new Error(data.error || 'Error al publicar');
+                    throw new Error(data.error || 'Error al crear la publicación');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
+                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: error.message
+                    text: error.message,
+                    confirmButtonColor: '#198754'
                 });
-            });
+            } finally {
+                // Restaurar el estado del botón
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                isSubmitting = false;
+            }
         });
     }
 });
