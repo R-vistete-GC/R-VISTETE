@@ -570,5 +570,18 @@
 </div>
     {% block scripts %}{% endblock %}
     {% block extra_js %}{% endblock %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicialización global de tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'hover',  // Mostrar en hover
+                placement: 'top',  // Posición preferida
+                animation: true    // Animación suave
+            });
+        });
+    });
+</script>
 </body>
 </html>

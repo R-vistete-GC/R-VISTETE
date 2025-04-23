@@ -4,6 +4,14 @@ let comentariosModal;
 // Asegurar que el modal se inicialice después de que el DOM esté cargado
 document.addEventListener('DOMContentLoaded', function() {
     comentariosModal = new bootstrap.Modal(document.getElementById('comentariosModal'));
+    
+    // Inicialización de tooltips para las barras de sentimiento
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover'
+        });
+    });
 });
 
 function mostrarComentarios(publicacionId) {
