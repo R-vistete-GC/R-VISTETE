@@ -42,9 +42,10 @@
                                 <div class="col-12">
                                     <div class="bg-light rounded p-2">
                                         <small class="text-muted d-block">Estilos:</small>
-                                        <div class="d-flex flex-wrap gap-1">
+                                        <div>
                                             {% for estilo in publicacion.estilo %}
-                                                <span class="badge bg-secondary">{{ estilo }}</span>
+                                                {% if not forloop.first %}, {% endif %}
+                                                {{ estilo }}
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -52,19 +53,10 @@
                                 <div class="col-12">
                                     <div class="bg-light rounded p-2">
                                         <small class="text-muted d-block">Colores:</small>
-                                        <div class="d-flex flex-wrap gap-1">
+                                        <div>
                                             {% for color in publicacion.colores %}
-                                                <div class="d-flex align-items-center">
-                                                    <span class="color-circle me-1" 
-                                                          style="width: 20px; 
-                                                                 height: 20px; 
-                                                                 border-radius: 50%; 
-                                                                 display: inline-block;
-                                                                 background-color: {{ color }};
-                                                                 border: 1px solid #ddd;">
-                                                    </span>
-                                                    <span class="color-name">{{ color }}</span>
-                                                </div>
+                                                {% if not forloop.first %}, {% endif %}
+                                                {{ color }}
                                             {% empty %}
                                                 <span class="text-muted">No hay colores especificados</span>
                                             {% endfor %}
