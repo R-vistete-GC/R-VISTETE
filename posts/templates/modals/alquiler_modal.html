@@ -1,31 +1,46 @@
-Escritorio\USB\R-VISTETE\fashion_app\posts\templates\modals\compra_modal.html -->
-<!-- Modal de Compra -->
-<div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true">
+<!-- Modal de Alquiler -->
+<div class="modal fade" id="modalAlquiler" tabindex="-1" aria-labelledby="modalAlquilerLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalCompraLabel">Comprar Prenda</h5>
+                <h5 class="modal-title" id="modalAlquilerLabel">Alquilar Prenda</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="formCompraAlquiler" method="post" action="{% url 'posts:procesar_compra' %}">
+                <form id="alquilerForm" method="post" action="{% url 'posts:procesar_alquiler' %}">
                     {% csrf_token %}
                     <!-- Campo oculto para el ID de la publicación -->
-                    <input type="hidden" id="publicacionId" name="publicacion_id">
+                    <input type="hidden" id="alquilerPublicacionId" name="publicacion_id">
 
                     <!-- Imagen de la prenda -->
                     <div class="text-center mb-3">
-                        <img id="modalImagenPrenda" src="" alt="Imagen de la prenda" class="img-fluid" style="max-height: 200px;">
+                        <img id="modalImagenPrendaAlquiler" src="" alt="Imagen de la prenda" class="img-fluid" style="max-height: 200px;">
                     </div>
 
                     <!-- Título de la prenda -->
-                    <h5 id="modalTituloPrenda" class="text-center"></h5>
+                    <h5 id="modalTituloPrendaAlquiler" class="text-center"></h5>
 
                     <!-- Resumen de precios -->
                     <div class="mt-3">
-                        <p><strong>Precio:</strong> <span id="modalPrecioPrenda"></span></p>
-                        <p><strong>Subtotal:</strong> <span id="subtotal"></span></p>
-                        <p><strong>Total:</strong> <span id="total"></span></p>
+                        <p><strong>Precio por día:</strong> <span id="alquilerPrecioDia"></span></p>
+                        <p><strong>Depósito:</strong> <span id="alquilerDeposito"></span></p>
+                    </div>
+
+                    <!-- Fechas de alquiler -->
+                    <div class="mb-3">
+                        <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                        <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaFin" class="form-label">Fecha de Fin</label>
+                        <input type="date" class="form-control" id="fechaFin" name="fecha_fin" required>
+                    </div>
+
+                    <!-- Resumen de cálculo -->
+                    <div class="mt-3">
+                        <p><strong>Días totales:</strong> <span id="alquilerDiasTotales">-</span></p>
+                        <p><strong>Subtotal:</strong> <span id="alquilerSubtotal">-</span></p>
+                        <p><strong>Total:</strong> <span id="alquilerTotal">-</span></p>
                     </div>
 
                     <!-- Dirección de envío -->
@@ -52,7 +67,7 @@ Escritorio\USB\R-VISTETE\fashion_app\posts\templates\modals\compra_modal.html --
                     <!-- Botones -->
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Confirmar Compra</button>
+                        <button type="submit" class="btn btn-primary">Confirmar Alquiler</button>
                     </div>
                 </form>
             </div>
