@@ -40,6 +40,9 @@ def inicio_view(request):
         publicacion.comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
         publicacion.comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
         publicacion.total_comentarios = comentarios.count()
+        publicacion.likes_count = Like.objects.filter(publicacion=publicacion).count()
+        publicacion.favoritos_count = Favorito.objects.filter(publicacion=publicacion).count()
+        publicacion.comentarios_count = Comentario.objects.filter(publicacion=publicacion).count()
 
     context = {
         'publicaciones': publicaciones,

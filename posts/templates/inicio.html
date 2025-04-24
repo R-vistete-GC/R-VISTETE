@@ -205,16 +205,17 @@
                                         data-publicacion-id="{{ publicacion.id }}"
                                         {% if publicacion.id in likes %}aria-pressed="true"{% endif %}>
                                     <i class="fas fa-thumbs-up"></i>
-                                    <small>{{ publicacion.likes_count }}</small>
+                                    <small class="likes-count">{{ publicacion.likes_count }}</small>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger flex-grow-1" onclick="toggleFavorito({{ publicacion.id }})"
                                         data-publicacion-id="{{ publicacion.id }}"
                                         {% if publicacion.id in favoritos %}aria-pressed="true"{% endif %}>
                                     <i class="fas fa-heart"></i>
+                                    <small class="favoritos-count">{{ publicacion.favoritos_count }}</small>
                                 </button>
                                 <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="mostrarComentarios({{ publicacion.id }})">
                                     <i class="fas fa-comment"></i>
-                                    <small>{{ publicacion.comentarios.count }}</small>
+                                    <small class="comentarios-count">{{ publicacion.comentarios_count }}</small>
                                 </button>
                             </div>
                         </div>
