@@ -9,6 +9,7 @@ class Usuario(models.Model):
     correo = models.CharField(max_length=150, unique=True)
     contrasena = models.TextField()
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    foto_perfil = models.ImageField(upload_to='perfiles/', default='perfiles/default.png', null=True, blank=True)
 
     class Meta:
         db_table = 'usuarios'

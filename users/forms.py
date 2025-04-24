@@ -91,13 +91,14 @@ class PerfilUsuarioForm(forms.ModelForm):
         }),
         required=False
     )
+    foto_perfil = forms.ImageField(required=False)
 
     class Meta:
         model = PerfilUsuario
         fields = [
             'descripcion', 'estado', 'telefono', 'ubicacion', 
             'talla', 'estilos_preferidos', 'colores_preferidos',
-            'ocasiones_uso','genero','intereses', 'redes_sociales'
+            'ocasiones_uso','genero','intereses', 'redes_sociales', 'foto_perfil'
         ]
         widgets = {
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
@@ -149,4 +150,4 @@ class PerfilUsuarioForm(forms.ModelForm):
         
         if commit:
             instance.save()
-        return instance 
+        return instance
