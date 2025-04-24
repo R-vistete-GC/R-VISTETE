@@ -58,6 +58,9 @@ def inicio_view(request):
             publicacion.user_liked = publicacion.id in likes_usuario
             publicacion.user_favorited = publicacion.id in favoritos_usuario
             publicacion.user_commented = publicacion.id in comentarios_usuario
+            
+        # Agregar la URL de la imagen al contexto
+        publicacion.imagen_url = publicacion.imagen.url if publicacion.imagen else None
 
     context = {
         'publicaciones': publicaciones,

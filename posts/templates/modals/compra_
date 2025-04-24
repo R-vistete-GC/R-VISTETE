@@ -1,4 +1,4 @@
-
+modal.html -->
 <!-- Modal de Compra -->
 <div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true">
     <div class="modal-dialog">

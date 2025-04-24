@@ -161,30 +161,21 @@
                             <div class="d-flex justify-content-between gap-1">
                                 {% if publicacion.tipo == "venta" or publicacion.tipo == "venta y alquiler" %}
                                 <!-- Botón de compra -->
-                                <button class="btn btn-sm flex-grow-1" 
+                                <button class="btn btn-sm flex-grow-1 btn-comprar" 
                                         style="background-color: #52a976; color: white; border: none; font-size: 0.85rem;" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#modalCompra"
-                                        data-publicacion-id="{{ publicacion.id }}"
-                                        data-precio-venta="{{ publicacion.precio_venta|default:0 }}"
-                                        data-imagen="{{ publicacion.imagen.url }}"
-                                        data-titulo="{{ publicacion.titulo }}"
-                                        data-tipo="{{ publicacion.tipo }}">
+                                        data-publicacion-id="{{ publicacion.id }}">
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
                                 {% endif %}
                                 {% if publicacion.tipo == "alquiler" or publicacion.tipo == "venta y alquiler" %}
                                 <!-- Botón de alquiler -->
-                                <button class="btn btn-sm flex-grow-1" 
+                                <button class="btn btn-sm flex-grow-1 btn-alquilar" 
                                         style="background-color: #225a3a; color: white; border: none;" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#modalAlquiler"
-                                        data-publicacion-id="{{ publicacion.id }}"
-                                        data-titulo="{{ publicacion.titulo }}"
-                                        data-precio-dia="{{ publicacion.precio_alquiler|default:0 }}"
-                                        data-deposito="{{ publicacion.deposito|default:0 }}"
-                                        data-imagen="{{ publicacion.imagen.url }}"
-                                        data-tipo="{{ publicacion.tipo }}">
+                                        data-publicacion-id="{{ publicacion.id }}">
                                     <i class="fas fa-key"></i> Alquilar
                                 </button>
                                 {% endif %}
