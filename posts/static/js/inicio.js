@@ -328,7 +328,7 @@ function getCookie(name) {
 }
 
 function toggleLike(publicacionId) {
-    fetch(`/inicio/api/likes/${publicacionId}/`, {
+    fetch(`/posts/toggle_like/${publicacionId}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken'),
@@ -337,40 +337,24 @@ function toggleLike(publicacionId) {
     })
     .then(response => response.json())
     .then(data => {
-        const likeBtn = document.querySelector(`button[onclick="toggleLike(${publicacionId})"]`);
-        const likeIcon = likeBtn.querySelector('i');
-        const likesCount = likeBtn.querySelector('.likes-count');
+        const button = document.querySelector(`button[data-publicacion-id="${publicacionId}"]`);
         
-        if (data.status === 'added') {
-            likeBtn.classList.add('active');
-            likeIcon.classList.add('text-white');
-            if (likesCount) {
-                likesCount.textContent = parseInt(likesCount.textContent || '0') + 1;
-            }
+        if (data.liked) {
+            button.classList.remove('btn-outline-primary');
+            button.classList.add('btn-primary');
         } else {
-            likeBtn.classList.remove('active');
-            likeIcon.classList.remove('text-white');
-            if (likesCount) {
-                likesCount.textContent = parseInt(likesCount.textContent || '0') - 1;
-            }
+            button.classList.remove('btn-primary');
+            button.classList.add('btn-outline-primary');
         }
         
-        // Actualizar el contador en el navbar
-        const navLikeCount = document.querySelector('.nav-link .badge.bg-primary');
-        if (navLikeCount) {
-            const currentCount = parseInt(navLikeCount.textContent || '0');
-            navLikeCount.textContent = data.status === 'added' ? currentCount + 1 : currentCount - 1;
-            navLikeCount.style.display = navLikeCount.textContent === '0' ? 'none' : 'inline';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Hubo un error al procesar tu like. Por favor, intenta de nuevo.');
+        // Actualizar el contador
+        const text = button.textContent;
+        button.innerHTML = `<i class="fas fa-thumbs-up"></i> ${data.count}`;
     });
 }
 
 function toggleFavorito(publicacionId) {
-    fetch(`/inicio/api/favoritos/${publicacionId}/`, {
+    fetch(`/posts/toggle_favorito/${publicacionId}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken'),
@@ -379,28 +363,19 @@ function toggleFavorito(publicacionId) {
     })
     .then(response => response.json())
     .then(data => {
-        const favBtn = document.querySelector(`button[onclick="toggleFavorito(${publicacionId})"]`);
-        const favIcon = favBtn.querySelector('i');
+        const button = document.querySelector(`button[data-publicacion-id="${publicacionId}"]`);
         
-        if (data.status === 'added') {
-            favBtn.classList.add('active');
-            favIcon.classList.add('text-white');
+        if (data.favorited) {
+            button.classList.remove('btn-outline-danger');
+            button.classList.add('btn-danger');
         } else {
-            favBtn.classList.remove('active');
-            favIcon.classList.remove('text-white');
+            button.classList.remove('btn-danger');
+            button.classList.add('btn-outline-danger');
         }
         
-        // Actualizar el contador en el navbar
-        const navFavCount = document.querySelector('.nav-link .badge.bg-danger');
-        if (navFavCount) {
-            const currentCount = parseInt(navFavCount.textContent || '0');
-            navFavCount.textContent = data.status === 'added' ? currentCount + 1 : currentCount - 1;
-            navFavCount.style.display = navFavCount.textContent === '0' ? 'none' : 'inline';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Hubo un error al procesar tu favorito. Por favor, intenta de nuevo.');
+        // Actualizar el contador
+        const text = button.textContent;
+        button.innerHTML = `<i class="fas fa-heart"></i> ${data.count}`;
     });
 }
 

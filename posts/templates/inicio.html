@@ -200,22 +200,22 @@
                                     </button>
                                 {% endif %}
                             </div>
-                            <div class="d-flex justify-content-between gap-1">
-                                <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="toggleLike({{ publicacion.id }})"
-                                        data-publicacion-id="{{ publicacion.id }}"
-                                        {% if publicacion.id in likes %}aria-pressed="true"{% endif %}>
-                                    <i class="fas fa-thumbs-up"></i>
-                                    <small class="likes-count">{{ publicacion.likes_count }}</small>
+                            <div class="d-flex mt-2">
+                                <button class="btn btn-sm {% if publicacion.user_liked %}btn-primary{% else %}btn-outline-primary{% endif %} flex-grow-1" 
+                                        onclick="toggleLike({{ publicacion.id }})" 
+                                        data-publicacion-id="{{ publicacion.id }}">
+                                    <i class="fas fa-thumbs-up"></i> {{ publicacion.likes_count }}
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger flex-grow-1" onclick="toggleFavorito({{ publicacion.id }})"
-                                        data-publicacion-id="{{ publicacion.id }}"
-                                        {% if publicacion.id in favoritos %}aria-pressed="true"{% endif %}>
-                                    <i class="fas fa-heart"></i>
-                                    <small class="favoritos-count">{{ publicacion.favoritos_count }}</small>
+                                
+                                <button class="btn btn-sm {% if publicacion.user_favorited %}btn-danger{% else %}btn-outline-danger{% endif %} flex-grow-1 mx-2" 
+                                        onclick="toggleFavorito({{ publicacion.id }})" 
+                                        data-publicacion-id="{{ publicacion.id }}">
+                                    <i class="fas fa-heart"></i> {{ publicacion.favoritos_count }}
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="mostrarComentarios({{ publicacion.id }})">
-                                    <i class="fas fa-comment"></i>
-                                    <small class="comentarios-count">{{ publicacion.comentarios_count }}</small>
+                                
+                                <button class="btn btn-sm {% if publicacion.user_commented %}btn-secondary{% else %}btn-outline-secondary{% endif %} flex-grow-1" 
+                                        onclick="mostrarComentarios({{ publicacion.id }})">
+                                    <i class="fas fa-comment"></i> {{ publicacion.comentarios_count }}
                                 </button>
                             </div>
                         </div>

@@ -21,28 +21,43 @@ from sentiment_analysis.utils import SentimentAnalyzer  # Importar el analizador
 
 def inicio_view(request):
     publicaciones = Publicacion.objects.all()
+    usuario_id = request.session.get('usuario_id')
+    
+    # Obtener las interacciones del usuario si está autenticado
+    if usuario_id:
+        likes_usuario = Like.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)
+        favoritos_usuario = Favorito.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)
+        comentarios_usuario = Comentario.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)
     
     for publicacion in publicaciones:
-        # Determinar qué precio mostrar basado en el tipo
+        # Mantener el código existente...
         if publicacion.tipo == 'venta':
             publicacion.precio = publicacion.precio_venta
         elif publicacion.tipo == 'alquiler':
             publicacion.precio = publicacion.precio_alquiler
-        else:  # venta y alquiler
+        else:
             publicacion.precio_mostrar = {
                 'venta': publicacion.precio_venta,
                 'alquiler': publicacion.precio_alquiler
             }
 
-        # Calcular métricas de comentarios para cada publicación
+        # Mantener las métricas existentes de comentarios
         comentarios = Comentario.objects.filter(publicacion=publicacion)
         publicacion.comentarios_positivos = comentarios.filter(clasificacion_chatgpt='positivo').count()
         publicacion.comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
         publicacion.comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
         publicacion.total_comentarios = comentarios.count()
+        
+        # Agregar contadores existentes
         publicacion.likes_count = Like.objects.filter(publicacion=publicacion).count()
         publicacion.favoritos_count = Favorito.objects.filter(publicacion=publicacion).count()
         publicacion.comentarios_count = Comentario.objects.filter(publicacion=publicacion).count()
+
+        # Agregar estados de interacción del usuario si está autenticado
+        if usuario_id:
+            publicacion.user_liked = publicacion.id in likes_usuario
+            publicacion.user_favorited = publicacion.id in favoritos_usuario
+            publicacion.user_commented = publicacion.id in comentarios_usuario
 
     context = {
         'publicaciones': publicaciones,
