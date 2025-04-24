@@ -15,10 +15,10 @@
                     <div class="card-header d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center">
                             <img src="{{ publicacion.usuario.foto_perfil }}" 
-                                 alt="Foto de {{ publicacion.usuario.nombre }}" 
+                                 alt="Foto de {{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}" 
                                  class="rounded-circle me-2" 
                                  style="width: 35px; height: 35px; object-fit: cover;">
-                            <strong>{{ publicacion.usuario.nombre }}</strong>
+                            <strong>{{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}</strong>
                         </div>
                         <small class="text-muted">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
                     </div>
