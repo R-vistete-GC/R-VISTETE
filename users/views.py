@@ -93,8 +93,13 @@ def editar_perfil(request):
         perfil, created = PerfilUsuario.objects.get_or_create(usuario=usuario)
         
         if request.method == 'POST':
-            form = PerfilUsuarioForm(request.POST, instance=perfil)
+            form = PerfilUsuarioForm(request.POST, request.FILES, instance=perfil)
             if form.is_valid():
+                # Procesar la foto de perfil
+                if request.FILES.get('foto_perfil'):
+                    usuario.foto_perfil = request.FILES['foto_perfil']
+                    usuario.save()
+                
                 # Procesar las redes sociales
                 redes_sociales = {
                     'instagram': request.POST.get('instagram', ''),
@@ -128,12 +133,7 @@ def editar_perfil(request):
     except Usuario.DoesNotExist:
         request.session.flush()
         return redirect('users:login')
-
-def logout_view(request):
-    # Limpiar la sesión
-    request.session.flush()
-    return redirect('users:login')
-
+    
 from posts.models import Like, Favorito, Venta, Alquiler, Compra, Publicacion
 from recommendations.views import recomendaciones_view
 
@@ -315,3 +315,8 @@ def dashboard_data_sentimientos(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+def logout_view(request):
+    """Cerrar sesión del usuario."""
+    request.session.flush()
+    return redirect('users:login')
