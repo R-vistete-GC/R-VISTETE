@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{% if perfil.foto_perfil %}{{ perfil.foto_perfil.url }}{% else %}{% static 'users/img/default-profile.png' %}{% endif %}" class="card-img-top" alt="Foto de perfil">
+                <div class="card-body">
+                    <h5 class="card-title">{{ usuario.first_name }} {{ usuario.last_name }}</h5>
+                    {% if perfil %}
+                        <p class="card-text">{{ perfil.descripcion }}</p>
+                        <p class="card-text"><strong>Teléfono:</strong> {{ perfil.telefono }}</p>
+                        <p class="card-text"><strong>Ubicación:</strong> {{ perfil.ubicacion }}</p>
+                    {% else %}
+                        <p class="card-text">Este usuario no ha completado su perfil.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h2>Publicaciones de {{ usuario.first_name }}</h2>
+            <div class="row">
+                {% for publicacion in publicaciones %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <img src="{{ publicacion.imagen.url }}" class="card-img-top" alt="{{ publicacion.titulo }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ publicacion.titulo }}</h5>
+                                <p class="card-text">{{ publicacion.descripcion }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

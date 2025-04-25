@@ -20,6 +20,28 @@ matplotlib.use('Agg')  # Cambiar el backend a 'Agg' para evitar problemas con hi
 import matplotlib.pyplot as plt
 import io
 import base64
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, authenticate
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Usuario, PerfilUsuario
+from posts.models import Publicacion, Venta, Alquiler, Favorito, Like
+from django.contrib.auth.models import User
+import json
+from django.urls import reverse
+from django.contrib import messages
+from .forms import PerfilUsuarioForm
+from django.shortcuts import render, redirect
+from django.urls import reverse  # Importa reverse para construir URLs
+from sentiment_analysis.analyzer import MetricasSentimiento
+from recommendations.utils import obtener_estadisticas_usuario
+from recommendations.views import recomendaciones_view
+from sentiment_analysis.utils import SentimentAnalyzer
+import matplotlib
+matplotlib.use('Agg')  # Cambiar el backend a 'Agg' para evitar problemas con hilos
+import matplotlib.pyplot as plt
+import io
+import base64
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -56,31 +78,42 @@ def login_view(request):
     })
 
 def ver_perfil(request):
-    # Verificar si el usuario está autenticado
-    usuario_id = request.session.get('usuario_id')
-    if not usuario_id:
-        return redirect('users:login')
-    
+    """
+    Muestra el perfil del usuario. Si se proporciona un usuario_id, muestra el perfil de ese usuario.
+    Si no se proporciona, muestra el perfil del usuario autenticado.
+    """
+    usuario_id = request.GET.get('usuario_id')  # Obtener usuario_id de request.GET
+    if usuario_id:
+        # Mostrar el perfil del usuario específico
+        usuario = get_object_or_404(Usuario, id=usuario_id)
+    else:
+        # Mostrar el perfil del usuario autenticado
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return redirect('users:login')
+        usuario = get_object_or_404(Usuario, id=usuario_id)
+
     try:
-        # Buscar el usuario y su perfil
-        usuario = Usuario.objects.get(id=usuario_id)
-        perfil, created = PerfilUsuario.objects.get_or_create(usuario=usuario)
-        
-        # Obtener las publicaciones del usuario
-        publicaciones = Publicacion.objects.filter(usuario=usuario).order_by('-fecha_publicacion')
-        
-        context = {
-            'usuario': usuario,
-            'perfil': perfil,
-            'publicaciones': publicaciones,  # Para la lista de publicaciones
-            'publicaciones_count': publicaciones.count(),  # Para el contador en estadísticas
-            'ventas': Venta.objects.filter(vendedor=usuario).count(),
-            'alquileres': Alquiler.objects.filter(cliente=usuario).count()
-        }
-        return render(request, 'users/perfil.html', context)
-    except Usuario.DoesNotExist:
-        request.session.flush()
-        return redirect('users:login')
+        perfil = PerfilUsuario.objects.get(usuario=usuario)
+    except PerfilUsuario.DoesNotExist:
+        perfil = None  # Manejar el caso donde no existe un perfil
+
+    publicaciones = Publicacion.objects.filter(usuario=usuario).order_by('-fecha_publicacion')
+
+    # Calcular estadísticas
+    publicaciones_count = publicaciones.count()
+    ventas = Venta.objects.filter(vendedor=usuario).count()
+    alquileres = Alquiler.objects.filter(cliente=usuario).count()
+
+    context = {
+        'usuario': usuario,
+        'perfil': perfil,
+        'publicaciones': publicaciones,
+        'publicaciones_count': publicaciones_count,
+        'ventas': ventas,
+        'alquileres': alquileres,
+    }
+    return render(request, 'users/perfil.html', context)
 
 def editar_perfil(request):
     # Verificar si el usuario está autenticado

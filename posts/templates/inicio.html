@@ -25,7 +25,10 @@
                                      class="rounded-circle me-2" 
                                      style="width: 30px; height: 30px; object-fit: cover;">
                             {% endif %}
-                            <strong style="font-size: 0.9rem;">{{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}</strong>
+                            <!-- Enlace al perfil del usuario -->
+                            <a href="{% url 'users:ver_perfil' %}?usuario_id={{ publicacion.usuario.id }}" style="font-size: 0.9rem; color: inherit; text-decoration: none;">
+                                <strong>{{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}</strong>
+                            </a>
                         </div>
                         <small class="text-muted" style="font-size: 0.8rem;">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
                     </div>
