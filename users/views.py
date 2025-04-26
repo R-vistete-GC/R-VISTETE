@@ -125,6 +125,11 @@ def editar_perfil(request):
         usuario = Usuario.objects.get(id=usuario_id)
         perfil, created = PerfilUsuario.objects.get_or_create(usuario=usuario)
         
+        # Verificar que el usuario autenticado sea el propietario del perfil
+        if str(usuario.id) != str(request.session.get('usuario_id')):
+            messages.error(request, "No tienes permiso para editar este perfil.")
+            return redirect('users:ver_perfil')  # Redirigir al perfil del usuario autenticado
+        
         if request.method == 'POST':
             form = PerfilUsuarioForm(request.POST, request.FILES, instance=perfil)
             if form.is_valid():
