@@ -26,7 +26,7 @@
                                      style="width: 30px; height: 30px; object-fit: cover;">
                             {% endif %}
                             <!-- Enlace al perfil del usuario -->
-                            <a href="{% url 'users:ver_perfil' %}?usuario_id={{ publicacion.usuario.id }}" style="font-size: 0.9rem; color: inherit; text-decoration: none;">
+                            <a href="{% url 'users:ver_perfil_usuario' publicacion.usuario.id %}" style="font-size: 0.9rem; color: inherit; text-decoration: none;">
                                 <strong>{{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}</strong>
                             </a>
                         </div>

@@ -11,6 +11,7 @@ urlpatterns = [
     # Perfil de usuario
     path('perfil/', views.ver_perfil, name='ver_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+    path('perfiles/<int:usuario_id>/', views.ver_perfil_usuario, name='ver_perfil_usuario'),
 
     # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),

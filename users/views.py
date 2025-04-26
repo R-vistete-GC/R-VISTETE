@@ -358,3 +358,26 @@ def logout_view(request):
     """Cerrar sesión del usuario."""
     request.session.flush()
     return redirect('users:login')
+
+def ver_perfil_usuario(request, usuario_id):
+    """
+    Vista para ver el perfil de otros usuarios
+    """
+    try:
+        usuario = Usuario.objects.get(id=usuario_id)
+        try:
+            perfil = PerfilUsuario.objects.get(usuario=usuario)
+        except PerfilUsuario.DoesNotExist:
+            perfil = None
+
+        publicaciones = Publicacion.objects.filter(usuario=usuario).order_by('-fecha_publicacion')
+
+        context = {
+            'usuario': usuario,
+            'perfil': perfil,
+            'publicaciones': publicaciones,
+        }
+        return render(request, 'users/perfiles.html', context)
+    except Usuario.DoesNotExist:
+        messages.error(request, 'Usuario no encontrado')
+        return redirect('posts:inicio')
