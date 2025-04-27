@@ -42,6 +42,7 @@ matplotlib.use('Agg')  # Cambiar el backend a 'Agg' para evitar problemas con hi
 import matplotlib.pyplot as plt
 import io
 import base64
+from django.db.models import Count, Q, Exists, OuterRef
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -78,10 +79,6 @@ def login_view(request):
     })
 
 def ver_perfil(request):
-    """
-    Muestra el perfil del usuario. Si se proporciona un usuario_id, muestra el perfil de ese usuario.
-    Si no se proporciona, muestra el perfil del usuario autenticado.
-    """
     usuario_id = request.GET.get('usuario_id')
     
     if not usuario_id:
@@ -93,23 +90,47 @@ def ver_perfil(request):
         usuario = Usuario.objects.get(id=usuario_id)
         perfil = PerfilUsuario.objects.get(usuario=usuario)
         
-        # Obtener las publicaciones con anotaciones adicionales
+        # Mejorar las anotaciones para contar correctamente
         publicaciones = Publicacion.objects.filter(usuario=usuario).annotate(
-            likes_count=Count('like'),
-            favoritos_count=Count('favorito'),
-            comentarios_count=Count('comentario'),
-            comentarios_positivos=Count('comentario', filter=Q(comentario__clasificacion_chatgpt='positivo')),
-            comentarios_neutros=Count('comentario', filter=Q(comentario__clasificacion_chatgpt='neutro')),
-            comentarios_negativos=Count('comentario', filter=Q(comentario__clasificacion_chatgpt='negativo')),
-            total_comentarios=Count('comentario')
+            likes_count=Count('like', distinct=True),  # Añadido distinct=True
+            favoritos_count=Count('favorito', distinct=True),  # Añadido distinct=True
+            comentarios_count=Count('comentario', distinct=True),  # Añadido distinct=True
+            comentarios_positivos=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_chatgpt='positivo'),
+                distinct=True
+            ),
+            comentarios_neutros=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_chatgpt='neutro'),
+                distinct=True
+            ),
+            comentarios_negativos=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_chatgpt='negativo'),
+                distinct=True
+            ),
+            total_comentarios=Count('comentario', distinct=True),
+            # Añadir verificación si el usuario actual ha dado like/favorito
+            user_liked=Exists(
+                Like.objects.filter(
+                    publicacion=OuterRef('pk'),
+                    usuario_id=usuario_id
+                )
+            ),
+            user_favorited=Exists(
+                Favorito.objects.filter(
+                    publicacion=OuterRef('pk'),
+                    usuario_id=usuario_id
+                )
+            )
         ).order_by('-fecha_publicacion')
 
-        # Obtener conteos de ventas y alquileres
+        # Obtener conteos generales
         publicaciones_count = publicaciones.count()
-        ventas = Venta.objects.filter(publicacion__usuario=usuario).count()  # Cambiado a ventas
-        alquileres = Alquiler.objects.filter(publicacion__usuario=usuario).count()  # Cambiado a alquileres
+        ventas = Venta.objects.filter(publicacion__usuario=usuario).count()
+        alquileres = Alquiler.objects.filter(publicacion__usuario=usuario).count()
 
-        # Asegurarse que los valores no sean None
         if not ventas:
             ventas = 0
         if not alquileres:
@@ -120,8 +141,8 @@ def ver_perfil(request):
             'perfil': perfil,
             'publicaciones': publicaciones,
             'publicaciones_count': publicaciones_count,
-            'ventas': ventas,  # Cambiado de ventas_count a ventas
-            'alquileres': alquileres,  # Cambiado de alquileres_count a alquileres
+            'ventas': ventas,
+            'alquileres': alquileres,
         }
         
         return render(request, 'users/perfil.html', context)
