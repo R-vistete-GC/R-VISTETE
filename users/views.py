@@ -93,16 +93,30 @@ def ver_perfil(request):
         usuario = Usuario.objects.get(id=usuario_id)
         perfil = PerfilUsuario.objects.get(usuario=usuario)
         
-        # Obtener las publicaciones del usuario con conteos de likes y favoritos
+        # Obtener las publicaciones y conteos
         publicaciones = Publicacion.objects.filter(usuario=usuario).annotate(
             likes_count=Count('like'),
             favoritos_count=Count('favorito')
         ).order_by('-fecha_publicacion')
+
+        # Obtener conteos de ventas y alquileres
+        publicaciones_count = publicaciones.count()
+        ventas = Venta.objects.filter(publicacion__usuario=usuario).count()  # Cambiado a ventas
+        alquileres = Alquiler.objects.filter(publicacion__usuario=usuario).count()  # Cambiado a alquileres
+
+        # Asegurarse que los valores no sean None
+        if not ventas:
+            ventas = 0
+        if not alquileres:
+            alquileres = 0
         
         context = {
             'usuario': usuario,
             'perfil': perfil,
             'publicaciones': publicaciones,
+            'publicaciones_count': publicaciones_count,
+            'ventas': ventas,  # Cambiado de ventas_count a ventas
+            'alquileres': alquileres,  # Cambiado de alquileres_count a alquileres
         }
         
         return render(request, 'users/perfil.html', context)
