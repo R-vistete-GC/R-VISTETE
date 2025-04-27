@@ -176,7 +176,7 @@
                                         {% if publicacion.usuario.foto_perfil %}
                                             <img src="{{ publicacion.usuario.foto_perfil.url }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
                                         {% endif %}
-                                        <span>{{ publicacion.usuario.nombre }}</span>
+                                        <span>{{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}</span>
                                     </div>
                                     <small class="text-muted">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
                                 </div>
@@ -264,19 +264,54 @@
 
                                 </div>
 
+                                <div class="price-info p-3" style="color: #495057; font-size: 0.9rem;">
+                                    {% if publicacion.tipo == 'venta y alquiler' %}
+                                        <div class="price-item mb-1">
+                                            <span class="badge bg-success me-2">Venta</span>
+                                            <strong>${{ publicacion.precio_venta }}</strong>
+                                        </div>
+                                        <div class="price-item">
+                                            <span class="badge bg-primary me-2">Alquiler</span>
+                                            <strong>${{ publicacion.precio_alquiler }}/día</strong>
+                                            {% if publicacion.deposito %}
+                                                <div class="small text-muted">
+                                                    (Depósito: ${{ publicacion.deposito }})
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        {% if publicacion.tipo == 'venta' %}
+                                            <div class="price-item">
+                                                <span class="badge bg-success me-2">Venta</span>
+                                                <strong>${{ publicacion.precio_venta }}</strong>
+                                            </div>
+                                        {% else %}
+                                            <div class="price-item">
+                                                <span class="badge bg-primary me-2">Alquiler</span>
+                                                <strong>${{ publicacion.precio_alquiler }}/día</strong>
+                                                {% if publicacion.deposito %}
+                                                    <div class="small text-muted">
+                                                        (Depósito: ${{ publicacion.deposito }})
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
                                 <div class="card-footer bg-white">
                                     <div class="d-flex justify-content-between">
-                                        <button class="btn btn-sm {% if publicacion.user_liked %}btn-primary{% else %}btn-outline-primary{% endif %}" 
+                                        <button class="btn btn-sm {% if publicacion.user_liked %}btn-primary{% else %}btn-outline-primary{% endif %} flex-grow-1" 
                                                 onclick="toggleLike({{ publicacion.id }})">
                                             <i class="fas fa-thumbs-up"></i> {{ publicacion.likes_count }}
                                         </button>
                                         
-                                        <button class="btn btn-sm {% if publicacion.user_favorited %}btn-danger{% else %}btn-outline-danger{% endif %}" 
+                                        <button class="btn btn-sm {% if publicacion.user_favorited %}btn-danger{% else %}btn-outline-danger{% endif %} flex-grow-1 mx-2" 
                                                 onclick="toggleFavorito({{ publicacion.id }})">
                                             <i class="fas fa-heart"></i> {{ publicacion.favoritos_count }}
                                         </button>
                                         
-                                        <button class="btn btn-sm {% if publicacion.user_commented %}btn-secondary{% else %}btn-outline-secondary{% endif %}" 
+                                        <button class="btn btn-sm {% if publicacion.user_commented %}btn-secondary{% else %}btn-outline-secondary{% endif %} flex-grow-1" 
                                                 onclick="mostrarComentarios({{ publicacion.id }})">
                                             <i class="fas fa-comment"></i> {{ publicacion.comentarios_count }}
                                         </button>
@@ -303,5 +338,6 @@
 <script src="{% static 'posts/js/inicio.js' %}"></script>
 <script src="{% static 'posts/js/comentarios.js' %}"></script>
 <script src="{% static 'posts/js/interacciones.js' %}"></script>
+<script src="{% static 'posts/js/transacciones.js' %}"></script>
 {% endblock %}
 
