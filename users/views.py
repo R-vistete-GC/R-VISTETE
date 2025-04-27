@@ -92,26 +92,10 @@ def ver_perfil(request):
         
         # Mejorar las anotaciones para contar correctamente
         publicaciones = Publicacion.objects.filter(usuario=usuario).annotate(
-            likes_count=Count('like', distinct=True),  # Añadido distinct=True
-            favoritos_count=Count('favorito', distinct=True),  # Añadido distinct=True
-            comentarios_count=Count('comentario', distinct=True),  # Añadido distinct=True
-            comentarios_positivos=Count(
-                'comentario',
-                filter=Q(comentario__clasificacion_chatgpt='positivo'),
-                distinct=True
-            ),
-            comentarios_neutros=Count(
-                'comentario',
-                filter=Q(comentario__clasificacion_chatgpt='neutro'),
-                distinct=True
-            ),
-            comentarios_negativos=Count(
-                'comentario',
-                filter=Q(comentario__clasificacion_chatgpt='negativo'),
-                distinct=True
-            ),
-            total_comentarios=Count('comentario', distinct=True),
-            # Añadir verificación si el usuario actual ha dado like/favorito
+            likes_count=Count('like', distinct=True),
+            favoritos_count=Count('favorito', distinct=True),
+            comentarios_count=Count('comentario', distinct=True),
+            # Añadir estas anotaciones para verificar las interacciones del usuario
             user_liked=Exists(
                 Like.objects.filter(
                     publicacion=OuterRef('pk'),
@@ -123,9 +107,15 @@ def ver_perfil(request):
                     publicacion=OuterRef('pk'),
                     usuario_id=usuario_id
                 )
+            ),
+            user_commented=Exists(
+                Comentario.objects.filter(
+                    publicacion=OuterRef('pk'),
+                    usuario_id=usuario_id
+                )
             )
         ).order_by('-fecha_publicacion')
-
+        
         # Obtener conteos generales
         publicaciones_count = publicaciones.count()
         ventas = Venta.objects.filter(publicacion__usuario=usuario).count()

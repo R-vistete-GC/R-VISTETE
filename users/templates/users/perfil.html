@@ -268,13 +268,18 @@
 
                                 <div class="card-footer bg-white">
                                     <div class="d-flex justify-content-between">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="toggleLike({{ publicacion.id }})">
+                                        <button class="btn btn-sm {% if publicacion.user_liked %}btn-primary{% else %}btn-outline-primary{% endif %}" 
+                                                onclick="toggleLike({{ publicacion.id }})">
                                             <i class="fas fa-thumbs-up"></i> {{ publicacion.likes_count }}
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="toggleFavorito({{ publicacion.id }})">
+                                        
+                                        <button class="btn btn-sm {% if publicacion.user_favorited %}btn-danger{% else %}btn-outline-danger{% endif %}" 
+                                                onclick="toggleFavorito({{ publicacion.id }})">
                                             <i class="fas fa-heart"></i> {{ publicacion.favoritos_count }}
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="mostrarComentarios({{ publicacion.id }})">
+                                        
+                                        <button class="btn btn-sm {% if publicacion.user_commented %}btn-secondary{% else %}btn-outline-secondary{% endif %}" 
+                                                onclick="mostrarComentarios({{ publicacion.id }})">
                                             <i class="fas fa-comment"></i> {{ publicacion.comentarios_count }}
                                         </button>
                                     </div>
