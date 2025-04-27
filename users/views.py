@@ -82,38 +82,34 @@ def ver_perfil(request):
     Muestra el perfil del usuario. Si se proporciona un usuario_id, muestra el perfil de ese usuario.
     Si no se proporciona, muestra el perfil del usuario autenticado.
     """
-    usuario_id = request.GET.get('usuario_id')  # Obtener usuario_id de request.GET
-    if usuario_id:
-        # Mostrar el perfil del usuario específico
-        usuario = get_object_or_404(Usuario, id=usuario_id)
-    else:
-        # Mostrar el perfil del usuario autenticado
+    usuario_id = request.GET.get('usuario_id')
+    
+    if not usuario_id:
         usuario_id = request.session.get('usuario_id')
         if not usuario_id:
             return redirect('users:login')
-        usuario = get_object_or_404(Usuario, id=usuario_id)
-
+    
     try:
+        usuario = Usuario.objects.get(id=usuario_id)
         perfil = PerfilUsuario.objects.get(usuario=usuario)
-    except PerfilUsuario.DoesNotExist:
-        perfil = None  # Manejar el caso donde no existe un perfil
-
-    publicaciones = Publicacion.objects.filter(usuario=usuario).order_by('-fecha_publicacion')
-
-    # Calcular estadísticas
-    publicaciones_count = publicaciones.count()
-    ventas = Venta.objects.filter(vendedor=usuario).count()
-    alquileres = Alquiler.objects.filter(cliente=usuario).count()
-
-    context = {
-        'usuario': usuario,
-        'perfil': perfil,
-        'publicaciones': publicaciones,
-        'publicaciones_count': publicaciones_count,
-        'ventas': ventas,
-        'alquileres': alquileres,
-    }
-    return render(request, 'users/perfil.html', context)
+        
+        # Obtener las publicaciones del usuario con conteos de likes y favoritos
+        publicaciones = Publicacion.objects.filter(usuario=usuario).annotate(
+            likes_count=Count('like'),
+            favoritos_count=Count('favorito')
+        ).order_by('-fecha_publicacion')
+        
+        context = {
+            'usuario': usuario,
+            'perfil': perfil,
+            'publicaciones': publicaciones,
+        }
+        
+        return render(request, 'users/perfil.html', context)
+        
+    except (Usuario.DoesNotExist, PerfilUsuario.DoesNotExist):
+        messages.error(request, 'Usuario no encontrado')
+        return redirect('posts:inicio')
 
 def editar_perfil(request):
     # Verificar si el usuario está autenticado
