@@ -360,24 +360,39 @@ def logout_view(request):
     return redirect('users:login')
 
 def ver_perfil_usuario(request, usuario_id):
-    """
-    Vista para ver el perfil de otros usuarios
-    """
+    # Obtener el ID del usuario logueado
+    usuario_logueado_id = request.session.get('usuario_id')
+    
+    # Si el usuario está viendo su propio perfil, redirigir a ver_perfil
+    if str(usuario_id) == str(usuario_logueado_id):
+        return redirect('users:ver_perfil')
+    
+    # Si no es su propio perfil, mostrar el perfil público
+    usuario = get_object_or_404(Usuario, id=usuario_id)
     try:
-        usuario = Usuario.objects.get(id=usuario_id)
-        try:
-            perfil = PerfilUsuario.objects.get(usuario=usuario)
-        except PerfilUsuario.DoesNotExist:
-            perfil = None
+        perfil = PerfilUsuario.objects.get(usuario=usuario)
+    except PerfilUsuario.DoesNotExist:
+        perfil = None
+    
+    # Obtener conteos
+    publicaciones = Publicacion.objects.filter(usuario=usuario).order_by('-fecha_publicacion')
+    publicaciones_count = publicaciones.count()
+    ventas_count = Venta.objects.filter(publicacion__usuario=usuario).count()
+    alquileres_count = Alquiler.objects.filter(publicacion__usuario=usuario).count()
 
-        publicaciones = Publicacion.objects.filter(usuario=usuario).order_by('-fecha_publicacion')
+    # Asegurarse que los valores no sean None
+    if not ventas_count:
+        ventas_count = 0
+    if not alquileres_count:
+        alquileres_count = 0
 
-        context = {
-            'usuario': usuario,
-            'perfil': perfil,
-            'publicaciones': publicaciones,
-        }
-        return render(request, 'users/perfiles.html', context)
-    except Usuario.DoesNotExist:
-        messages.error(request, 'Usuario no encontrado')
-        return redirect('posts:inicio')
+    context = {
+        'usuario': usuario,
+        'perfil': perfil,
+        'publicaciones': publicaciones,
+        'publicaciones_count': publicaciones_count,
+        'ventas_count': ventas_count,
+        'alquileres_count': alquileres_count,
+    }
+    
+    return render(request, 'users/perfiles.html', context)
