@@ -1,45 +1,119 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Perfil de {{ usuario.nombre }} {{ usuario.apellido }}{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <img src="{% if perfil.foto_perfil %}{{ perfil.foto_perfil.url }}{% else %}{% static 'users/img/default-profile.png' %}{% endif %}" class="card-img-top" alt="Foto de perfil">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Cabecera del Perfil -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center p-4">
+                    <div class="position-relative mb-4">
+                        <img src="{% if usuario.foto_perfil %}{{ usuario.foto_perfil.url }}{% else %}{% static 'users/img/default-profile.png' %}{% endif %}"
+                             class="rounded-circle mx-auto d-block mb-3"
+                             style="width: 150px; height: 150px; object-fit: cover;"
+                             alt="Foto de perfil">
+                    </div>
+                    <h2 class="mb-2">{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+                    <p class="text-muted mb-4">{{ usuario.correo }}</p>
+                    
+                    <!-- Estadísticas -->
+                    <div class="row justify-content-center">
+                        <div class="col-4 text-center">
+                            <h3 class="mb-0">{{ publicaciones_count|default:"0" }}</h3>
+                            <p class="text-muted mb-0">Publicaciones</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <h3 class="mb-0">{{ ventas_count|default:"0" }}</h3>
+                            <p class="text-muted mb-0">Ventas</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <h3 class="mb-0">{{ alquileres_count|default:"0" }}</h3>
+                            <p class="text-muted mb-0">Alquileres</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Personal -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0"><i class="fas fa-user me-2"></i>Información Personal</h4>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ usuario.first_name }} {{ usuario.last_name }}</h5>
-                    {% if perfil %}
-                        <p class="card-text">{{ perfil.descripcion }}</p>
-                        <p class="card-text"><strong>Teléfono:</strong> {{ perfil.telefono }}</p>
-                        <p class="card-text"><strong>Ubicación:</strong> {{ perfil.ubicacion }}</p>
-                    {% else %}
-                        <p class="card-text">Este usuario no ha completado su perfil.</p>
+                    {% if perfil.descripcion %}
+                    <div class="mb-3">
+                        <i class="fas fa-comment-alt me-2 text-muted"></i>
+                        <strong>Descripción:</strong>
+                        <p class="ms-4 mb-0">{{ perfil.descripcion }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if perfil.telefono %}
+                    <div class="mb-3">
+                        <i class="fas fa-phone me-2 text-muted"></i>
+                        <strong>Teléfono:</strong>
+                        <p class="ms-4 mb-0">{{ perfil.telefono }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if perfil.ubicacion %}
+                    <div class="mb-3">
+                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                        <strong>Ubicación:</strong>
+                        <p class="ms-4 mb-0">{{ perfil.ubicacion }}</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
-        </div>
-        <div class="col-md-8">
-            <h2>Publicaciones de {{ usuario.first_name }}</h2>
-            <div class="row">
-                {% for publicacion in publicaciones %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <img src="{{ publicacion.imagen.url }}" class="card-img-top" alt="{{ publicacion.titulo }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ publicacion.titulo }}</h5>
-                                <p class="card-text">{{ publicacion.descripcion }}</p>
+
+            <!-- Preferencias de Moda -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0"><i class="fas fa-tshirt me-2"></i>Preferencias de Moda</h4>
+                </div>
+                <div class="card-body">
+                    {% if perfil.talla %}
+                    <div class="mb-3">
+                        <i class="fas fa-ruler me-2 text-muted"></i>
+                        <strong>Talla:</strong>
+                        <p class="ms-4 mb-0">{{ perfil.talla }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Publicaciones -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0"><i class="fas fa-images me-2"></i>Publicaciones</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for publicacion in publicaciones %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <img src="{{ publicacion.imagen.url }}" 
+                                     class="card-img-top" 
+                                     alt="{{ publicacion.titulo }}"
+                                     style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ publicacion.titulo }}</h5>
+                                    <p class="card-text">{{ publicacion.descripcion|truncatechars:100 }}</p>
+                                </div>
                             </div>
                         </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <p class="text-muted text-center">No hay publicaciones disponibles.</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </div>
-{% if usuario.id|stringformat:"s" == request.session.usuario_id|stringformat:"s" %}
-    <a href="{% url 'users:editar_perfil' %}" class="btn btn-primary">
-        <i class="fas fa-edit"></i> Editar Perfil
-    </a>
-{% endif %}
 {% endblock %}
