@@ -93,10 +93,15 @@ def ver_perfil(request):
         usuario = Usuario.objects.get(id=usuario_id)
         perfil = PerfilUsuario.objects.get(usuario=usuario)
         
-        # Obtener las publicaciones y conteos
+        # Obtener las publicaciones con anotaciones adicionales
         publicaciones = Publicacion.objects.filter(usuario=usuario).annotate(
             likes_count=Count('like'),
-            favoritos_count=Count('favorito')
+            favoritos_count=Count('favorito'),
+            comentarios_count=Count('comentario'),
+            comentarios_positivos=Count('comentario', filter=Q(comentario__clasificacion_chatgpt='positivo')),
+            comentarios_neutros=Count('comentario', filter=Q(comentario__clasificacion_chatgpt='neutro')),
+            comentarios_negativos=Count('comentario', filter=Q(comentario__clasificacion_chatgpt='negativo')),
+            total_comentarios=Count('comentario')
         ).order_by('-fecha_publicacion')
 
         # Obtener conteos de ventas y alquileres
@@ -321,8 +326,8 @@ def recomendaciones_view(request, return_as_list=False):
             'error': 'Completa tu perfil para obtener recomendaciones.'
         })
 
-from django.db.models import Count
-from posts.models import Comentario  # Importar desde la aplicación correcta
+from django.db.models import Count, Q
+from posts.models import Comentario  # Si no está ya importado
 
 def dashboard_data_sentimientos(request):
     usuario_id = request.session.get('usuario_id')
