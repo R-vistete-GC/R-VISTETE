@@ -235,32 +235,30 @@
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <small class="text-muted">Valoración de la comunidad:</small>
                                             <div class="sentiment-indicator">
-                                                {% if publicacion.comentarios_positivos > publicacion.comentarios_negativos %}
+                                                {% if publicacion.sentimiento == 'positivo' %}
                                                     <i class="fas fa-smile text-success"></i>
-                                                {% elif publicacion.comentarios_negativos > publicacion.comentarios_positivos %}
+                                                {% elif publicacion.sentimiento == 'negativo' %}
                                                     <i class="fas fa-frown text-danger"></i>
                                                 {% else %}
                                                     <i class="fas fa-meh text-warning"></i>
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <div class="sentiment-details">
-                                            <div class="progress" style="height: 5px;">
-                                                <div class="progress-bar bg-success" role="progressbar" 
-                                                     style="width: {% widthratio publicacion.comentarios_positivos|default:0 publicacion.total_comentarios|default:1 100 %}%">
-                                                </div>
-                                                <div class="progress-bar bg-warning" role="progressbar" 
-                                                     style="width: {% widthratio publicacion.comentarios_neutros|default:0 publicacion.total_comentarios|default:1 100 %}%">
-                                                </div>
-                                                <div class="progress-bar bg-danger" role="progressbar" 
-                                                     style="width: {% widthratio publicacion.comentarios_negativos|default:0 publicacion.total_comentarios|default:1 100 %}%">
-                                                </div>
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {% widthratio publicacion.comentarios_positivos publicacion.comentarios_count|default:1 100 %}%">
                                             </div>
-                                            <div class="d-flex justify-content-between mt-1">
-                                                <small class="text-muted">{{ publicacion.comentarios_positivos|default:0 }} <i class="far fa-thumbs-up"></i></small>
-                                                <small class="text-muted">{{ publicacion.comentarios_neutros|default:0 }} <i class="far fa-meh"></i></small>
-                                                <small class="text-muted">{{ publicacion.comentarios_negativos|default:0 }} <i class="far fa-thumbs-down"></i></small>
+                                            <div class="progress-bar bg-warning" role="progressbar" 
+                                                 style="width: {% widthratio publicacion.comentarios_neutros publicacion.comentarios_count|default:1 100 %}%">
                                             </div>
+                                            <div class="progress-bar bg-danger" role="progressbar" 
+                                                 style="width: {% widthratio publicacion.comentarios_negativos publicacion.comentarios_count|default:1 100 %}%">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-1">
+                                            <small class="text-muted">{{ publicacion.comentarios_positivos }} <i class="far fa-thumbs-up"></i></small>
+                                            <small class="text-muted">{{ publicacion.comentarios_neutros }} <i class="far fa-meh"></i></small>
+                                            <small class="text-muted">{{ publicacion.comentarios_negativos }} <i class="far fa-thumbs-down"></i></small>
                                         </div>
                                     </div>
 

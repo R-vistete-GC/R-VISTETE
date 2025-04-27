@@ -95,6 +95,22 @@ def ver_perfil(request):
             likes_count=Count('like', distinct=True),
             favoritos_count=Count('favorito', distinct=True),
             comentarios_count=Count('comentario', distinct=True),
+            # Añadir conteo de sentimientos
+            comentarios_positivos=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_chatgpt='positivo'),
+                distinct=True
+            ),
+            comentarios_neutros=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_chatgpt='neutro'),
+                distinct=True
+            ),
+            comentarios_negativos=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_chatgpt='negativo'),
+                distinct=True
+            ),
             # Añadir estas anotaciones para verificar las interacciones del usuario
             user_liked=Exists(
                 Like.objects.filter(
@@ -125,6 +141,22 @@ def ver_perfil(request):
             ventas = 0
         if not alquileres:
             alquileres = 0
+        
+        # Para cada publicación, calcular el sentimiento predominante
+        for publicacion in publicaciones:
+            total_comentarios = (publicacion.comentarios_positivos + 
+                               publicacion.comentarios_neutros + 
+                               publicacion.comentarios_negativos)
+            
+            if total_comentarios > 0:
+                if publicacion.comentarios_positivos > publicacion.comentarios_negativos:
+                    publicacion.sentimiento = 'positivo'
+                elif publicacion.comentarios_negativos > publicacion.comentarios_positivos:
+                    publicacion.sentimiento = 'negativo'
+                else:
+                    publicacion.sentimiento = 'neutro'
+            else:
+                publicacion.sentimiento = 'neutro'
         
         context = {
             'usuario': usuario,
