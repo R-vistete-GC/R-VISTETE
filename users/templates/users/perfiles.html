@@ -245,17 +245,45 @@
                                             {% endif %}
                                         {% endif %}
                                     </div>
+                                </div>
 
-                                    <!-- Botones de interacción -->
-                                    <div class="card-footer bg-white">
-                                        <div class="d-flex justify-content-between">
+                                <!-- Dentro del div card-footer, después de los precios -->
+                                <div class="card-footer p-2 bg-white">
+                                    <div class="d-flex flex-column gap-2">
+                                        <!-- Botones de Compra/Alquiler -->
+                                        <div class="d-flex justify-content-between gap-1">
+                                            {% if publicacion.tipo == "venta" or publicacion.tipo == "venta y alquiler" %}
+                                            <!-- Botón de compra -->
+                                            <button class="btn btn-sm flex-grow-1 btn-comprar" 
+                                                    style="background-color: #52a976; color: white; border: none; font-size: 0.85rem;" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalCompra"
+                                                    data-publicacion-id="{{ publicacion.id }}">
+                                                <i class="fas fa-shopping-cart"></i> Comprar
+                                            </button>
+                                            {% endif %}
+                                            {% if publicacion.tipo == "alquiler" or publicacion.tipo == "venta y alquiler" %}
+                                            <!-- Botón de alquiler -->
+                                            <button class="btn btn-sm flex-grow-1 btn-alquilar" 
+                                                    style="background-color: #225a3a; color: white; border: none;" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalAlquiler"
+                                                    data-publicacion-id="{{ publicacion.id }}">
+                                                <i class="fas fa-key"></i> Alquilar
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                        <!-- Botones de interacción (likes, favoritos, comentarios) -->
+                                        <div class="d-flex mt-2">
                                             <button class="btn btn-sm {% if publicacion.user_liked %}btn-primary{% else %}btn-outline-primary{% endif %} flex-grow-1" 
-                                                    onclick="toggleLike({{ publicacion.id }})">
+                                                    onclick="toggleLike({{ publicacion.id }})" 
+                                                    data-publicacion-id="{{ publicacion.id }}">
                                                 <i class="fas fa-thumbs-up"></i> {{ publicacion.likes_count }}
                                             </button>
                                             
                                             <button class="btn btn-sm {% if publicacion.user_favorited %}btn-danger{% else %}btn-outline-danger{% endif %} flex-grow-1 mx-2" 
-                                                    onclick="toggleFavorito({{ publicacion.id }})">
+                                                    onclick="toggleFavorito({{ publicacion.id }})" 
+                                                    data-publicacion-id="{{ publicacion.id }}">
                                                 <i class="fas fa-heart"></i> {{ publicacion.favoritos_count }}
                                             </button>
                                             
@@ -281,4 +309,13 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'posts/js/transacciones.js' %}"></script>
+{% endblock %}
+
+{% block modals %}
+    {% include 'modals/compra_modal.html' %}
+    {% include 'modals/alquiler_modal.html' %}
 {% endblock %}
