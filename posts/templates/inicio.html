@@ -176,12 +176,16 @@
                                 </button>
                                 {% endif %}
                                 {% if publicacion.tipo == "alquiler" or publicacion.tipo == "venta y alquiler" %}
-                                <!-- Botón de alquiler -->
+                                <!-- Cambiar el botón de alquiler -->
                                 <button class="btn btn-sm flex-grow-1 btn-alquilar" 
-                                        style="background-color: #225a3a; color: white; border: none;" 
-                                        data-bs-toggle="modal" 
+                                        style="background-color: #225a3a; color: white; border: none;"
+                                        data-bs-toggle="modal"
                                         data-bs-target="#modalAlquiler"
-                                        data-publicacion-id="{{ publicacion.id }}">
+                                        data-publicacion-id="{{ publicacion.id }}"
+                                        data-precio="{{ publicacion.precio_alquiler }}"
+                                        data-deposito="{{ publicacion.deposito }}"
+                                        data-titulo="{{ publicacion.titulo }}"
+                                        data-imagen="{{ publicacion.imagen.url }}">
                                     <i class="fas fa-key"></i> Alquilar
                                 </button>
                                 {% endif %}
@@ -256,6 +260,31 @@
 
                 modalCompra.querySelector('#subtotal').textContent = `$${subtotal.toFixed(2)}`;
                 modalCompra.querySelector('#total').textContent = `$${total.toFixed(2)}`;
+            });
+        }
+
+        // Agregar el event listener para el modal de alquiler
+        const modalAlquiler = document.getElementById('modalAlquiler');
+        if (modalAlquiler) {
+            modalAlquiler.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const publicacionId = button.getAttribute('data-publicacion-id');
+                const precio = button.getAttribute('data-precio');
+                const deposito = button.getAttribute('data-deposito');
+                const titulo = button.getAttribute('data-titulo');
+                const imagen = button.getAttribute('data-imagen');
+
+                // Actualizar campos del modal
+                modalAlquiler.querySelector('#alquilerPublicacionId').value = publicacionId;
+                modalAlquiler.querySelector('#modalImagenPrendaAlquiler').src = imagen;
+                modalAlquiler.querySelector('#modalTituloPrendaAlquiler').textContent = titulo;
+                modalAlquiler.querySelector('#alquilerPrecioDia').textContent = `$${precio}`;
+                modalAlquiler.querySelector('#alquilerDeposito').textContent = `$${deposito}`;
+
+                // Establecer fecha mínima
+                const today = new Date().toISOString().split('T')[0];
+                modalAlquiler.querySelector('#fechaInicio').min = today;
+                modalAlquiler.querySelector('#fechaFin').min = today;
             });
         }
     });

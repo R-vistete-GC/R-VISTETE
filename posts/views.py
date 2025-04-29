@@ -793,42 +793,30 @@ def procesar_operacion(request):
 
 @require_http_methods(["GET"])
 def get_publicacion(request, publicacion_id):
-    """
-    Vista para obtener los datos de una publicación específica
-    """
     try:
-        # Obtener la publicación
         publicacion = get_object_or_404(Publicacion, id=publicacion_id)
         
-        # Construir la respuesta
         data = {
             'success': True,
             'id': publicacion.id,
             'titulo': publicacion.titulo,
             'descripcion': publicacion.descripcion,
-            'precio': str(publicacion.precio),
-            'deposito': str(publicacion.deposito) if publicacion.deposito else '0',
+            'precio_venta': str(publicacion.precio_venta) if publicacion.precio_venta else '0.00',
+            'precio_alquiler': str(publicacion.precio_alquiler) if publicacion.precio_alquiler else '0.00',
+            'deposito': str(publicacion.deposito) if publicacion.deposito else '0.00',
             'imagen': publicacion.imagen.url if publicacion.imagen else '',
+            'usuario_id': publicacion.usuario.id,
             'tipo': publicacion.tipo,
             'talla': publicacion.talla,
-            'publico': publicacion.publico,
-            'estilo': publicacion.estilo if isinstance(publicacion.estilo, list) else [],
-            'colores': publicacion.colores if isinstance(publicacion.colores, list) else []
+            'publico': publicacion.publico
         }
         
-        print("Datos de publicación enviados:", data)  # Debug log
         return JsonResponse(data)
         
-    except Publicacion.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'Publicación no encontrada'
-        }, status=404)
     except Exception as e:
-        print("Error al obtener publicación:", str(e))  # Debug log
         return JsonResponse({
             'success': False,
-            'message': str(e)
+            'error': str(e)
         }, status=500)
 
 @login_required

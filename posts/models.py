@@ -205,32 +205,44 @@ class Venta(models.Model):
 
 class Alquiler(models.Model):
     id = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario_id')
     publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE, db_column='publicacion_id')
-    propietario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='propietario_id', related_name='alquileres_realizados')
-    cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='cliente_id', related_name='prendas_alquiladas')
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+    propietario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='propietario_id', related_name='alquileres_propietario', null=True)
+    cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='cliente_id', related_name='alquileres_cliente', null=True)
     precio_por_dia = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_total = models.DecimalField(max_digits=10, decimal_places=2)
     deposito = models.DecimalField(max_digits=10, decimal_places=2)
-    estado = models.CharField(max_length=20, choices=[
-        ('reservado', 'Reservado'),
-        ('activo', 'Activo'),
-        ('completado', 'Completado'),
-        ('cancelado', 'Cancelado')
-    ], default='reservado')
-    metodo_pago = models.CharField(max_length=50)
-    direccion_envio = models.TextField()
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('reservado', 'Reservado'),
+            ('activo', 'Activo'),
+            ('completado', 'Completado'),
+            ('cancelado', 'Cancelado')
+        ],
+        default='reservado'
+    )
+    metodo_pago = models.CharField(max_length=50, null=True)
+    direccion_envio = models.TextField(null=True)
+    notas = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2)
     tracking_envio = models.CharField(max_length=100, null=True, blank=True)
     tracking_devolucion = models.CharField(max_length=100, null=True, blank=True)
     terminos_aceptados = models.BooleanField(default=False)
     instrucciones_devolucion = models.TextField(null=True, blank=True)
-    notas = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'alquileres'
-        ordering = ['-fecha_inicio']
+        constraints = [
+            models.CheckConstraint(check=models.Q(fecha_fin__gt=models.F('fecha_inicio')),
+                                 name='fecha_valida'),
+            models.CheckConstraint(
+                check=models.Q(estado__in=['reservado', 'activo', 'completado', 'cancelado']),
+                name='estado_valido'
+            )
+        ]
 
     def __str__(self):
         return f"Alquiler de {self.publicacion.titulo} a {self.cliente.nombre}"

@@ -11,8 +11,11 @@ async function getPublicacionData(publicacionId) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Datos obtenidos:", data); // Para debugging
-        return data;
+        return {
+            ...data,
+            precio_alquiler: data.precio_alquiler || '0.00',
+            deposito: data.deposito || '0.00'
+        };
     } catch (error) {
         console.error("Error al obtener los datos de la publicación:", error);
         return null;
@@ -99,14 +102,130 @@ async function procesarCompra(event) {
     }
 }
 
-// Event listener para el formulario
+// Función para mostrar el modal de alquiler
+async function mostrarModalAlquiler(publicacionId) {
+    try {
+        const response = await fetch(`/posts/get_publicacion/${publicacionId}/`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Datos para alquiler:", data); // Para debugging
+
+        // Actualizar campos del modal
+        document.getElementById('alquilerPublicacionId').value = publicacionId;
+        document.getElementById('modalImagenPrendaAlquiler').src = data.imagen;
+        document.getElementById('modalTituloPrendaAlquiler').textContent = data.titulo;
+        document.getElementById('alquilerPrecioDia').textContent = data.precio_alquiler;
+        document.getElementById('alquilerDeposito').textContent = data.deposito;
+
+        // Establecer fecha mínima de inicio como hoy
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fechaInicio').min = today;
+        document.getElementById('fechaFin').min = today;
+
+        // Mostrar el modal
+        const modalAlquiler = new bootstrap.Modal(document.getElementById('modalAlquiler'));
+        modalAlquiler.show();
+
+        // Agregar event listeners para las fechas
+        setupFechasListeners();
+    } catch (error) {
+        console.error('Error al mostrar el modal de alquiler:', error);
+    }
+}
+
+// Función para calcular el total del alquiler
+function calcularTotalAlquiler() {
+    const fechaInicio = new Date(document.getElementById('fechaInicio').value);
+    const fechaFin = new Date(document.getElementById('fechaFin').value);
+    const precioDia = parseFloat(document.getElementById('alquilerPrecioDia').textContent.replace('$', ''));
+    const deposito = parseFloat(document.getElementById('alquilerDeposito').textContent.replace('$', ''));
+
+    if (fechaInicio && fechaFin && !isNaN(precioDia)) {
+        const diferenciaDias = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24));
+        if (diferenciaDias > 0) {
+            const subtotal = precioDia * diferenciaDias;
+            const total = subtotal + deposito;
+
+            document.getElementById('alquilerDiasTotales').textContent = diferenciaDias;
+            document.getElementById('alquilerSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('alquilerTotal').textContent = `$${total.toFixed(2)}`;
+        }
+    }
+}
+
+// Función para configurar los listeners de las fechas
+function setupFechasListeners() {
+    const fechaInicio = document.getElementById('fechaInicio');
+    const fechaFin = document.getElementById('fechaFin');
+
+    fechaInicio.addEventListener('change', function() {
+        fechaFin.min = this.value;
+        calcularTotalAlquiler();
+    });
+
+    fechaFin.addEventListener('change', calcularTotalAlquiler);
+}
+
+// Event listener para el formulario de alquiler
 document.addEventListener('DOMContentLoaded', function() {
-    const formCompra = document.getElementById('formCompraAlquiler');
-    if (formCompra) {
-        formCompra.addEventListener('submit', procesarCompra);
-        console.log('Event listener agregado al formulario de compra');
-    } else {
-        console.error('No se encontró el formulario de compra');
+    const formAlquiler = document.getElementById('alquilerForm');
+    if (formAlquiler) {
+        formAlquiler.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/posts/procesar_alquiler/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalAlquiler'));
+                    modal.hide();
+                    alert('¡Alquiler realizado con éxito!');
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Error al procesar el alquiler');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al procesar el alquiler');
+            }
+        });
+    }
+
+    // Agregar manejo para modal de alquiler
+    const modalAlquiler = document.getElementById('modalAlquiler');
+    if (modalAlquiler) {
+        modalAlquiler.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const publicacionId = button.getAttribute('data-publicacion-id');
+            const precioDia = button.getAttribute('data-precio-dia');
+            const deposito = button.getAttribute('data-deposito');
+            const titulo = button.getAttribute('data-titulo');
+            const imagen = button.getAttribute('data-imagen');
+            const propietario = button.getAttribute('data-propietario');
+
+            // Actualizar campos del modal
+            modalAlquiler.querySelector('#alquilerPublicacionId').value = publicacionId;
+            modalAlquiler.querySelector('#modalImagenPrendaAlquiler').src = imagen;
+            modalAlquiler.querySelector('#modalTituloPrendaAlquiler').textContent = titulo;
+            modalAlquiler.querySelector('#alquilerPrecioDia').textContent = `$${precioDia}`;
+            modalAlquiler.querySelector('#alquilerDeposito').textContent = `$${deposito}`;
+
+            // Establecer fecha mínima
+            const today = new Date().toISOString().split('T')[0];
+            modalAlquiler.querySelector('#fechaInicio').min = today;
+            modalAlquiler.querySelector('#fechaFin').min = today;
+        });
     }
 });
 
