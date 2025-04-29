@@ -87,7 +87,7 @@
                 </div>
                 <div class="card-footer p-2 bg-white">
                     <div class="d-flex gap-2">
-                        <a href="{% url 'posts:ver_publicacion' like.publicacion.id %}" 
+                        <a href="{% url 'users:ver_perfil_usuario' like.publicacion.usuario.id %}#publicacion-{{ like.publicacion.id }}" 
                            class="btn btn-sm btn-info flex-grow-1 d-flex align-items-center justify-content-center">
                             <i class="fas fa-eye me-2"></i> Ver Publicación
                         </a>
