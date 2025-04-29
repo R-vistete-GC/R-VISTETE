@@ -12,55 +12,146 @@
 
     <div class="row">
         {% for favorito in favoritos %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm" data-publicacion-id="{{ favorito.publicacion.id }}">
-                {% if favorito.publicacion.imagen %}
-                <img src="{{ favorito.publicacion.imagen.url }}" class="card-img-top" alt="{{ favorito.publicacion.titulo }}" style="height: 300px; object-fit: cover;">
-                {% endif %}
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="card-title mb-0">{{ favorito.publicacion.titulo }}</h5>
-                        <button onclick="event.preventDefault(); toggleFavorito({{ favorito.publicacion.id }});" class="btn btn-link text-danger p-0">
-                            <i class="fas fa-heart-broken"></i>
-                        </button>
-                    </div>
-                    <p class="card-text">{{ favorito.publicacion.descripcion }}</p>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        {% if favorito.publicacion.tipo == 'venta y alquiler' %}
-                            <div class="text-primary mb-0">
-                                <div>Venta: ${{ favorito.publicacion.precio_venta }}</div>
-                                <div>Alquiler: ${{ favorito.publicacion.precio_alquiler }}/día</div>
-                            </div>
-                        {% elif favorito.publicacion.tipo == 'venta' %}
-                            <h4 class="text-primary mb-0">${{ favorito.publicacion.precio_venta }}</h4>
+        <div class="col-12 col-sm-6 col-lg-4 mb-4">
+            <div class="card h-100" data-publicacion-id="{{ favorito.publicacion.id }}">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <div class="d-flex align-items-center">
+                        {% if favorito.publicacion.usuario.foto_perfil %}
+                            <img src="{{ favorito.publicacion.usuario.foto_perfil.url }}" 
+                                 alt="Foto de {{ favorito.publicacion.usuario.nombre }} {{ favorito.publicacion.usuario.apellido }}" 
+                                 class="rounded-circle me-2" 
+                                 style="width: 30px; height: 30px; object-fit: cover;">
                         {% else %}
-                            <h4 class="text-primary mb-0">${{ favorito.publicacion.precio_alquiler }}/día</h4>
+                            <img src="{% static 'users/img/default-profile.png' %}" 
+                                 alt="Foto de perfil por defecto" 
+                                 class="rounded-circle me-2" 
+                                 style="width: 30px; height: 30px; object-fit: cover;">
                         {% endif %}
-                        <small class="text-muted">Agregado el {{ favorito.fecha_favorito|date:"d/m/Y" }}</small>
+                        <a href="{% url 'users:ver_perfil_usuario' favorito.publicacion.usuario.id %}" style="font-size: 0.9rem; color: inherit; text-decoration: none;">
+                            <strong>{{ favorito.publicacion.usuario.nombre }} {{ favorito.publicacion.usuario.apellido }}</strong>
+                        </a>
+                    </div>
+                    <small class="text-muted" style="font-size: 0.8rem;">{{ favorito.publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
+                </div>
+                <img src="{{ favorito.publicacion.imagen.url }}" 
+                     class="card-img-top" 
+                     alt="{{ favorito.publicacion.titulo }}" 
+                     style="height: 450px; object-fit: cover;">
+                <div class="card-body p-3">
+                    <h5 class="card-title mb-2" style="font-size: 1rem;">{{ favorito.publicacion.titulo }}</h5>
+                    <p class="card-text mb-2" style="font-size: 0.85rem;">{{ favorito.publicacion.descripcion|truncatechars:100 }}</p>
+                    
+                    <div class="mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="bg-light rounded p-2">
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;"><strong>Público:</strong></small>
+                                    <span style="font-size: 0.85rem;">{{ favorito.publicacion.publico|title }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-light rounded p-2">
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;"><strong>Talla:</strong></small>
+                                    <span style="font-size: 0.85rem;">{{ favorito.publicacion.talla }}</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="bg-light rounded p-2">
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;"><strong>Estilos:</strong></small>
+                                    <div>
+                                        {% for estilo in favorito.publicacion.estilo %}
+                                            {% if not forloop.first %}, {% endif %}
+                                            {{ estilo }}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="bg-light rounded p-2">
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;"><strong>Colores:</strong></small>
+                                    <div>
+                                        {% for color in favorito.publicacion.colores %}
+                                            {% if not forloop.first %}, {% endif %}
+                                            {{ color }}
+                                        {% empty %}
+                                            <span class="text-muted">No hay colores especificados</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="price-info" style="color: #495057; font-size: 0.9rem;">
+                        {% if favorito.publicacion.tipo == 'venta y alquiler' %}
+                            <div class="price-item mb-1">
+                                <strong>Venta:</strong> ${{ favorito.publicacion.precio_venta }}
+                            </div>
+                            <div class="price-item">
+                                <strong>Alquiler:</strong> ${{ favorito.publicacion.precio_alquiler }}/día
+                                {% if favorito.publicacion.deposito %}
+                                    <div class="small text-muted">
+                                        (Depósito: ${{ favorito.publicacion.deposito }})
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            {% if favorito.publicacion.tipo == 'venta' %}
+                                <div class="price-item">
+                                    <strong>Venta:</strong> ${{ favorito.publicacion.precio_venta }}
+                                </div>
+                            {% else %}
+                                <div class="price-item">
+                                    <strong>Alquiler:</strong> ${{ favorito.publicacion.precio_alquiler }}/día
+                                    {% if favorito.publicacion.deposito %}
+                                        <div class="small text-muted">
+                                            (Depósito: ${{ favorito.publicacion.deposito }})
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
                     </div>
                 </div>
-                <div class="card-footer bg-white">
-                    <div class="d-flex gap-2">
-                        {% if favorito.publicacion.tipo in 'venta,venta y alquiler' %}
-                        <button class="btn btn-sm btn-success flex-grow-1" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#modalCompra"
-                                data-publicacion-id="{{ favorito.publicacion.id }}"
-                                data-precio="{{ favorito.publicacion.precio_venta }}">
-                            <i class="fas fa-shopping-cart"></i> Comprar
-                        </button>
-                        {% endif %}
-                        
-                        {% if favorito.publicacion.tipo in 'alquiler,venta y alquiler' %}
-                        <button class="btn btn-sm btn-warning flex-grow-1"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#modalAlquiler"
-                                data-publicacion-id="{{ favorito.publicacion.id }}"
-                                data-precio-dia="{{ favorito.publicacion.precio_alquiler }}"
-                                data-deposito="{{ favorito.publicacion.deposito|default:favorito.publicacion.precio_alquiler }}">
-                            <i class="fas fa-key"></i> Alquilar
-                        </button>
-                        {% endif %}
+                <div class="card-footer p-2 bg-white">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex justify-content-between gap-1">
+                            <div class="d-flex justify-content-between gap-2 px-3">
+                                {% if favorito.publicacion.tipo == "venta" or favorito.publicacion.tipo == "venta y alquiler" %}
+                                <button class="btn flex-grow-1 d-flex align-items-center justify-content-center" 
+                                        style="background-color: #4bae81; color: white; border: none; height: 40px; padding: 8px 24px;"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalCompra" 
+                                        data-publicacion-id="{{ favorito.publicacion.id }}"
+                                        data-precio="{{ favorito.publicacion.precio_venta }}"
+                                        data-titulo="{{ favorito.publicacion.titulo }}"
+                                        data-imagen="{{ favorito.publicacion.imagen.url }}"
+                                        data-vendedor="{{ favorito.publicacion.usuario.id }}">
+                                    <i class="fas fa-shopping-cart me-2"></i> Comprar
+                                </button>
+                                {% endif %}
+                                
+                                {% if favorito.publicacion.tipo == "alquiler" or favorito.publicacion.tipo == "venta y alquiler" %}
+                                <button class="btn flex-grow-1 d-flex align-items-center justify-content-center" 
+                                        style="background-color: #225a3a; color: white; border: none; height: 40px; padding: 8px 24px;"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalAlquiler"
+                                        data-publicacion-id="{{ favorito.publicacion.id }}"
+                                        data-precio="{{ favorito.publicacion.precio_alquiler }}"
+                                        data-deposito="{{ favorito.publicacion.deposito }}"
+                                        data-titulo="{{ favorito.publicacion.titulo }}"
+                                        data-imagen="{{ favorito.publicacion.imagen.url }}">
+                                    <i class="fas fa-key me-2"></i> Alquilar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex mt-2">
+                            <button onclick="event.preventDefault(); toggleFavorito({{ favorito.publicacion.id }});" 
+                                    class="btn btn-sm btn-danger flex-grow-1">
+                                <i class="fas fa-heart-broken"></i> Quitar de favoritos
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
