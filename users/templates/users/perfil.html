@@ -193,7 +193,8 @@
         <h5 class="card-title mb-0">{{ publicacion.titulo }}</h5>
         <div>
             <!-- Botón de edición -->
-            <button class="btn btn-outline-secondary btn-sm p-1" 
+            <button type="button" 
+                    class="btn btn-outline-secondary btn-sm p-1" 
                     data-bs-toggle="modal" 
                     data-bs-target="#editarPublicacionModal" 
                     data-publicacion-id="{{ publicacion.id }}"
@@ -366,5 +367,70 @@
 <script src="{% static 'posts/js/comentarios.js' %}"></script>
 <script src="{% static 'posts/js/interacciones.js' %}"></script>
 <script src="{% static 'posts/js/transacciones.js' %}"></script>
+<script src="{% static 'js/editar_publicacion.js' %}"></script>
+{% endblock %}
+
+{% block modals %}
+<!-- Modal de Edición -->
+<div class="modal fade" id="editarPublicacionModal" tabindex="-1" aria-labelledby="editarPublicacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarPublicacionModalLabel">Editar Publicación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarPublicacion" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" id="publicacion_id" name="publicacion_id">
+                    
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="publico" class="form-label">Público</label>
+                            <select class="form-select" id="publico" name="publico" required>
+                                <option value="mujer">Mujer</option>
+                                <option value="hombre">Hombre</option>
+                                <option value="niño">Niño</option>
+                                <option value="niña">Niña</option>
+                                <option value="mascota">Mascota</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="talla" class="form-label">Talla</label>
+                            <select class="form-select" id="talla" name="talla" required>
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Imagen actual</label>
+                        <img id="imagen_actual" src="" alt="Imagen de la publicación" class="img-fluid mb-2" style="max-height: 200px;">
+                        <input type="file" class="form-control" id="nueva_imagen" name="imagen" accept="image/*">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarEdicion()">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
