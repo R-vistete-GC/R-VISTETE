@@ -172,6 +172,7 @@
                         <div class="col-12 col-sm-6 col-lg-4 mb-4">
                             <div class="card h-100" data-publicacion-id="{{ publicacion.id }}">
                                 <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                    
                                     <div class="d-flex align-items-center">
                                         {% if publicacion.usuario.foto_perfil %}
                                             <img src="{{ publicacion.usuario.foto_perfil.url }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
@@ -180,16 +181,31 @@
                                     </div>
                                     <small class="text-muted">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
                                 </div>
+                               
                                 
                                 <img src="{{ publicacion.imagen.url }}" 
                                      class="card-img-top" 
                                      alt="{{ publicacion.titulo }}" 
                                      style="height: 450px; object-fit: cover;">
-                                
+                                     
+                                     <div class="card-body p-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ publicacion.titulo }}</h5>
+        <button class="btn btn-outline-secondary btn-sm" 
+                data-bs-toggle="modal" 
+                data-bs-target="#editarPublicacionModal" 
+                data-publicacion-id="{{ publicacion.id }}"
+                data-titulo="{{ publicacion.titulo }}"
+                data-descripcion="{{ publicacion.descripcion }}"
+                data-imagen="{{ publicacion.imagen.url }}">
+            <i class="fas fa-edit"></i>
+        </button>
+    </div>
+    <p class="card-text">{{ publicacion.descripcion }}</p>
+</div>
+
                                 <div class="card-body p-3">
-                                    <h5 class="card-title">{{ publicacion.titulo }}</h5>
-                                    <p class="card-text">{{ publicacion.descripcion }}</p>
-                                    
+                                   
                                     <!-- Información adicional -->
                                     <div class="mb-3">
                                         <div class="row g-2">
