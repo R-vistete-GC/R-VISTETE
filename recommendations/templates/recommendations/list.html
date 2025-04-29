@@ -81,7 +81,8 @@
                         </div>
                     </div>
                     <div class="card-footer bg-transparent border-0">
-                        <a href="/posts/{{ rec.publicacion.id }}/" class="btn btn-primary btn-block w-100">
+                        <a href="{% url 'users:ver_perfil_usuario' rec.publicacion.usuario.id %}#publicacion-{{ rec.publicacion.id }}" 
+                           class="btn btn-primary btn-block w-100">
                             Ver detalle
                             <i class="fas fa-arrow-right ms-2"></i>
                         </a>
