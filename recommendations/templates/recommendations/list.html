@@ -21,17 +21,39 @@
                     <div class="card-body">
                         <h5 class="card-title mb-3">{{ rec.publicacion.titulo }}</h5>
                         
-                        <!-- Precio y Tipo -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="precio">${{ rec.publicacion.precio }}</span>
-                            {% if rec.publicacion.tipo == 'venta' %}
-                                <span class="badge bg-gradient-success">Venta</span>
-                            {% else %}
-                                <span class="badge bg-gradient-info">Alquiler</span>
+                        <!-- Tipo con fondo de color sutil -->
+                        <div class="mb-3">
+                            {% if rec.publicacion.tipo == 'venta y alquiler' %}
+                                <span class="badge bg-light-info text-info px-2 py-1 rounded">Venta y Alquiler</span>
+                            {% elif rec.publicacion.tipo == 'venta' %}
+                                <span class="badge bg-light-success text-success px-2 py-1 rounded">Venta</span>
+                            {% elif rec.publicacion.tipo == 'alquiler' %}
+                                <span class="badge bg-light-warning text-warning px-2 py-1 rounded">Alquiler</span>
                             {% endif %}
                         </div>
 
-                        <p class="card-text text-muted mb-3">{{ rec.publicacion.descripcion|truncatechars:100 }}</p>
+                        <!-- Precio -->
+                        <div class="mb-3">
+                            {% if rec.publicacion.tipo == 'venta y alquiler' %}
+                                <div>
+                                    <strong>Venta:</strong> ${{ rec.publicacion.precio_venta }}<br>
+                                    <strong>Alquiler:</strong> ${{ rec.publicacion.precio_alquiler }}/día
+                                    {% if rec.publicacion.deposito %}
+                                        <div class="small text-muted">(Depósito: ${{ rec.publicacion.deposito }})</div>
+                                    {% endif %}
+                                </div>
+                            {% elif rec.publicacion.tipo == 'venta' %}
+                                <strong>Venta:</strong> ${{ rec.publicacion.precio_venta }}
+                            {% elif rec.publicacion.tipo == 'alquiler' %}
+                                <strong>Alquiler:</strong> ${{ rec.publicacion.precio_alquiler }}/día
+                                {% if rec.publicacion.deposito %}
+                                    <div class="small text-muted">(Depósito: ${{ rec.publicacion.deposito }})</div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Descripción completa -->
+                        <p class="card-text mb-3">{{ rec.publicacion.descripcion }}</p>
 
                         <!-- Razones de recomendación -->
                         <div class="razones-recomendacion">
@@ -117,23 +139,21 @@
         opacity: 0.9;
     }
 
-    .precio {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #28a745;
-    }
-
     .badge {
-        padding: 8px 12px;
+        font-size: 0.85rem;
         font-weight: 500;
     }
 
-    .bg-gradient-success {
-        background: linear-gradient(45deg, #28a745, #20c997);
+    .bg-light-info {
+        background-color: #e7f3ff;
     }
 
-    .bg-gradient-info {
-        background: linear-gradient(45deg, #17a2b8, #00bcd4);
+    .bg-light-success {
+        background-color: #e9f7ef;
+    }
+
+    .bg-light-warning {
+        background-color: #fff8e5;
     }
 
     .razones-recomendacion {

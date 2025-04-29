@@ -3,8 +3,6 @@
 
 {% block title %}Recomendaciones Personalizadas - R-Vístete{% endblock %}
 
-
-
 {% block content %}
 <div class="container recommendations-container">
     <h2 class="mb-4">Recomendaciones Personalizadas</h2>
@@ -14,7 +12,6 @@
         <div class="col-md-6">
             <div class="analysis-card">
                 <h4>Tus Preferencias</h4>
-                
                 <!-- Estilos Preferidos -->
                 <div class="mb-3">
                     <h6>Estilos Favoritos:</h6>
@@ -24,7 +21,6 @@
                         <p class="text-muted">No has seleccionado estilos preferidos</p>
                     {% endfor %}
                 </div>
-
                 <!-- Colores Preferidos -->
                 <div class="mb-3">
                     <h6>Colores Favoritos:</h6>
@@ -37,13 +33,11 @@
                         <p class="text-muted">No has seleccionado colores preferidos</p>
                     {% endfor %}
                 </div>
-
                 <!-- Talla -->
                 <div class="mb-3">
                     <h6>Tu Talla:</h6>
                     <span class="preference-tag">{{ preferencias.talla }}</span>
                 </div>
-
                 <!-- Rango de Precios -->
                 <div class="mb-3">
                     <h6>Rango de Precios:</h6>
@@ -53,11 +47,9 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-6">
             <div class="analysis-card">
                 <h4>Análisis de Interacciones</h4>
-
                 <!-- Estilos más likeados -->
                 <div class="mb-3">
                     <h6>Estilos que más te gustan:</h6>
@@ -69,7 +61,6 @@
                         <p class="text-muted">Aún no has interactuado con publicaciones</p>
                     {% endfor %}
                 </div>
-
                 <!-- Colores más likeados -->
                 <div class="mb-3">
                     <h6>Colores que más te gustan:</h6>
@@ -82,7 +73,6 @@
                         <p class="text-muted">Aún no has interactuado con publicaciones</p>
                     {% endfor %}
                 </div>
-
                 <!-- Análisis de Sentimiento -->
                 <div class="mb-3">
                     <h6>Análisis de tu perfil:</h6>
@@ -107,22 +97,46 @@
     <h3 class="mb-4">Prendas Recomendadas para Ti</h3>
     <div class="row">
         {% for publicacion in recomendaciones %}
-        <div class="col-md-4 mb-4">
-            <div class="card recommendation-card">
-                <img src="{{ publicacion.imagen_url }}" class="card-img-top" alt="{{ publicacion.titulo }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ publicacion.titulo }}</h5>
-                    <p class="card-text">{{ publicacion.descripcion|truncatechars:100 }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong class="text-success">${{ publicacion.precio }}</strong>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="toggleLike({{ publicacion.id }})">
-                                <i class="fas fa-thumbs-up"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="toggleFavorito({{ publicacion.id }})">
-                                <i class="fas fa-heart"></i>
-                            </button>
-                        </div>
+        <div class="col-12 col-sm-6 col-lg-4 mb-4">
+            <div class="card h-100" data-publicacion-id="{{ publicacion.id }}">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <div class="d-flex align-items-center">
+                        {% if publicacion.usuario.foto_perfil %}
+                            <img src="{{ publicacion.usuario.foto_perfil.url }}" 
+                                 alt="Foto de {{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}" 
+                                 class="rounded-circle me-2" 
+                                 style="width: 30px; height: 30px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'users/img/default-profile.png' %}" 
+                                 alt="Foto de perfil por defecto" 
+                                 class="rounded-circle me-2" 
+                                 style="width: 30px; height: 30px; object-fit: cover;">
+                        {% endif %}
+                        <a href="{% url 'users:ver_perfil_usuario' publicacion.usuario.id %}" style="font-size: 0.9rem; color: inherit; text-decoration: none;">
+                            <strong>{{ publicacion.usuario.nombre }} {{ publicacion.usuario.apellido }}</strong>
+                        </a>
+                    </div>
+                    <small class="text-muted" style="font-size: 0.8rem;">{{ publicacion.fecha_publicacion|date:"d/m/Y" }}</small>
+                </div>
+                <img src="{{ publicacion.imagen.url }}" 
+                     class="card-img-top" 
+                     alt="{{ publicacion.titulo }}" 
+                     style="height: 450px; object-fit: cover;">
+                <div class="card-body p-3">
+                    <h5 class="card-title mb-2" style="font-size: 1rem;">{{ publicacion.titulo }}</h5>
+                    <p class="card-text mb-2" style="font-size: 0.85rem;">{{ publicacion.descripcion }}</p>
+                    <div class="price-info" style="color: #495057; font-size: 0.9rem;">
+                        <strong>Precio:</strong> ${{ publicacion.precio }}
+                    </div>
+                </div>
+                <div class="card-footer p-2 bg-white">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="toggleLike({{ publicacion.id }})">
+                            <i class="fas fa-thumbs-up"></i> Like
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger flex-grow-1" onclick="toggleFavorito({{ publicacion.id }})">
+                            <i class="fas fa-heart"></i> Favorito
+                        </button>
                     </div>
                 </div>
             </div>
