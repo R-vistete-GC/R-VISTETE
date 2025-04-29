@@ -837,58 +837,52 @@ def procesar_compra(request):
     try:
         # Obtener datos del formulario
         publicacion_id = request.POST.get('publicacion_id')
-        direccion = request.POST.get('direccion')
+        vendedor_id = request.POST.get('vendedor_id')
+        direccion_envio = request.POST.get('direccion_envio')
         metodo_pago = request.POST.get('metodo_pago')
         notas = request.POST.get('notas')
 
-        # Validar datos
-        if not publicacion_id or not direccion or not metodo_pago:
-            return JsonResponse({'success': False, 'error': 'Faltan datos obligatorios'}, status=400)
-
         # Obtener la publicación
         publicacion = get_object_or_404(Publicacion, id=publicacion_id)
+        
+        # Calcular precio final (precio de venta + envío)
+        precio_final = publicacion.precio_venta + Decimal('5.00')  # $5 de envío
 
-        # Validar que la publicación esté disponible para la compra
-        if publicacion.tipo not in ['venta', 'venta y alquiler']:
-            return JsonResponse({'success': False, 'error': 'La publicación no está disponible para la compra'}, status=400)
-
-        # Obtener el vendedor
-        vendedor = publicacion.usuario
-
-        # Crear el registro en la tabla "ventas"
-        venta = Venta.objects.create(
+        # Crear registro de compra
+        compra = Compra.objects.create(
             publicacion=publicacion,
-            vendedor=vendedor,
-            comprador=request.user.usuario,  # Usuario autenticado como comprador
-            precio_final=publicacion.precio,
-            estado='pendiente',  # Estado inicial de la venta
+            comprador=request.user,
+            vendedor_id=vendedor_id,
+            precio_final=precio_final,
+            estado='pendiente',
             metodo_pago=metodo_pago,
-            direccion_envio=direccion,
+            direccion_envio=direccion_envio,
             notas=notas
         )
 
-        # Crear el registro en la tabla "compras"
-        compra = Compra.objects.create(
-            comprador=request.user.usuario,  # Usuario autenticado como comprador
+        # Crear registro de venta
+        venta = Venta.objects.create(
             publicacion=publicacion,
-            vendedor=vendedor,
-            precio_final=publicacion.precio,
+            vendedor_id=vendedor_id,
+            comprador=request.user,
+            precio_final=precio_final,
+            estado='pendiente',
             metodo_pago=metodo_pago,
-            direccion_envio=direccion,
+            direccion_envio=direccion_envio,
             notas=notas
         )
 
         return JsonResponse({
             'success': True,
-            'message': 'Compra procesada exitosamente',
-            'venta_id': venta.id,
-            'compra_id': compra.id
+            'compra_id': compra.id,
+            'venta_id': venta.id
         })
 
-    except Publicacion.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'La publicación no existe'}, status=404)
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
 @login_required
 @require_http_methods(["POST"])

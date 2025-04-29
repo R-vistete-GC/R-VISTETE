@@ -107,15 +107,33 @@ class MetricasSentimiento(models.Model):
 
 class Compra(models.Model):
     id = models.AutoField(primary_key=True)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario_id')
-    publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE, db_column='publicacion_id')
+    comprador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='compras_realizadas')
+    vendedor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='compras_vendidas')
+    publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE)
     fecha_compra = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('pendiente', 'Pendiente'),
+            ('pagado', 'Pagado'),
+            ('enviado', 'Enviado'),
+            ('entregado', 'Entregado'),
+            ('cancelado', 'Cancelado')
+        ],
+        default='pendiente'
+    )
+    precio_final = models.DecimalField(max_digits=10, decimal_places=2)
+    metodo_pago = models.CharField(max_length=50)
+    direccion_envio = models.TextField()
+    tracking_envio = models.CharField(max_length=100, null=True, blank=True)
+    notas = models.TextField(null=True, blank=True)
 
     class Meta:
         db_table = 'compras'
+        ordering = ['-fecha_compra']
 
     def __str__(self):
-        return f"Compra de {self.publicacion.titulo} por {self.usuario.nombre}"
+        return f"Compra #{self.id} - {self.publicacion.titulo}"
 
 
 class Like(models.Model):
@@ -168,9 +186,21 @@ class Venta(models.Model):
     class Meta:
         db_table = 'ventas'
         ordering = ['-fecha_venta']
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(estado__in=['pendiente', 'completada', 'cancelada']),
+                name='venta_estado_valid'
+            )
+        ]
 
     def __str__(self):
         return f"Venta de {self.publicacion.titulo} a {self.comprador.nombre}"
+
+    def save(self, *args, **kwargs):
+        # Validamos que el precio final sea positivo
+        if self.precio_final <= 0:
+            raise ValueError("El precio final debe ser mayor a 0")
+        super().save(*args, **kwargs)
 
 
 class Alquiler(models.Model):

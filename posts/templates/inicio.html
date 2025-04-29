@@ -162,13 +162,16 @@
                     <div class="card-footer p-2 bg-white">
                         <div class="d-flex flex-column gap-2">
                             <div class="d-flex justify-content-between gap-1">
+                                <!-- Reemplazar el botón de compra actual por este: -->
                                 {% if publicacion.tipo == "venta" or publicacion.tipo == "venta y alquiler" %}
-                                <!-- Botón de compra -->
-                                <button class="btn btn-sm flex-grow-1 btn-comprar" 
-                                        style="background-color: #52a976; color: white; border: none; font-size: 0.85rem;" 
+                                <button class="btn btn-success w-100" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#modalCompra"
-                                        data-publicacion-id="{{ publicacion.id }}">
+                                        data-bs-target="#modalCompra" 
+                                        data-publicacion-id="{{ publicacion.id }}"
+                                        data-precio="{{ publicacion.precio_venta }}"
+                                        data-titulo="{{ publicacion.titulo }}"
+                                        data-imagen="{{ publicacion.imagen.url }}"
+                                        data-vendedor="{{ publicacion.usuario.id }}">
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
                                 {% endif %}
@@ -220,6 +223,43 @@
 
 {% block extra_js %}
 <script src="{% static 'posts/js/transacciones.js' %}"></script>
+<script>
+    // Inicializar todos los tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Asegurarse que los datos se pasen correctamente al modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalCompra = document.getElementById('modalCompra');
+        if (modalCompra) {
+            modalCompra.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const publicacionId = button.getAttribute('data-publicacion-id');
+                const precio = button.getAttribute('data-precio');
+                const titulo = button.getAttribute('data-titulo');
+                const imagen = button.getAttribute('data-imagen');
+                const vendedor = button.getAttribute('data-vendedor');
+
+                // Actualizar campos del modal
+                modalCompra.querySelector('#publicacionId').value = publicacionId;
+                modalCompra.querySelector('#vendedorId').value = vendedor;
+                modalCompra.querySelector('#modalImagenPrenda').src = imagen;
+                modalCompra.querySelector('#modalPrecioPrenda').textContent = `$${precio}`;
+
+                // Calcular totales
+                const precioBase = parseFloat(precio);
+                const envio = 5.00;
+                const subtotal = precioBase;
+                const total = subtotal + envio;
+
+                modalCompra.querySelector('#subtotal').textContent = `$${subtotal.toFixed(2)}`;
+                modalCompra.querySelector('#total').textContent = `$${total.toFixed(2)}`;
+            });
+        }
+    });
+</script>
 {% endblock %}
 
 {% block modals %}

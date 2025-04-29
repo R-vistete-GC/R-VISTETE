@@ -1,4 +1,3 @@
-
 <!-- Modal de Compra -->
 <div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -10,42 +9,42 @@
             <div class="modal-body">
                 <form id="formCompraAlquiler" method="post" action="{% url 'posts:procesar_compra' %}">
                     {% csrf_token %}
-                    <!-- Campo oculto para el ID de la publicación -->
+                    <!-- Campos ocultos necesarios -->
                     <input type="hidden" id="publicacionId" name="publicacion_id">
-
-                    <!-- Imagen de la prenda -->
+                    <input type="hidden" id="vendedorId" name="vendedor_id">
+                    
+                    <!-- Campos existentes -->
                     <div class="text-center mb-3">
-                        <img id="modalImagenPrenda" src="" alt="Imagen de la prenda" class="img-fluid" style="max-height: 200px;">
+                        <img id="modalImagenPrenda" src="" alt="Imagen de la prenda" class="img-fluid">
                     </div>
-
-                    <!-- Título de la prenda -->
-                    <h5 id="modalTituloPrenda" class="text-center"></h5>
-
-                    <!-- Resumen de precios -->
+                    
+                    <!-- Información de precios -->
                     <div class="mt-3">
                         <p><strong>Precio:</strong> <span id="modalPrecioPrenda"></span></p>
+                        <p><strong>Envío:</strong> <span id="costoEnvio">$5.00</span></p>
                         <p><strong>Subtotal:</strong> <span id="subtotal"></span></p>
                         <p><strong>Total:</strong> <span id="total"></span></p>
                     </div>
 
-                    <!-- Dirección de envío -->
+                    <!-- Estado inicial -->
+                    <input type="hidden" name="estado" value="pendiente">
+                    
+                    <!-- Campos requeridos según el modelo -->
                     <div class="mb-3">
-                        <label for="direccion" class="form-label">Dirección de Envío</label>
-                        <input type="text" class="form-control" id="direccion" name="direccion" required>
+                        <label for="direccion_envio" class="form-label">Dirección de Envío</label>
+                        <input type="text" class="form-control" id="direccion_envio" name="direccion_envio" required>
                     </div>
 
-                    <!-- Método de pago -->
                     <div class="mb-3">
-                        <label for="metodoPago" class="form-label">Método de Pago</label>
-                        <select class="form-select" id="metodoPago" name="metodo_pago" required>
+                        <label for="metodo_pago" class="form-label">Método de Pago</label>
+                        <select class="form-select" id="metodo_pago" name="metodo_pago" required>
                             <option value="tarjeta">Tarjeta de Crédito</option>
                             <option value="paypal">PayPal</option>
                         </select>
                     </div>
 
-                    <!-- Notas adicionales -->
                     <div class="mb-3">
-                        <label for="notas" class="form-label">Notas</label>
+                        <label for="notas" class="form-label">Notas Adicionales</label>
                         <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
                     </div>
 
