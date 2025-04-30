@@ -215,9 +215,67 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al cargar datos de likes y favoritos:', error));
     }
 
+    // Gráfica de Sentimientos en Comentarios
+    const sentimientosCtx = document.getElementById('graficaSentimientos');
+    if (sentimientosCtx) {
+        fetch('/users/dashboard/comentarios-sentimientos-usuario/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const sentimientos = data.data;
+
+                    // Crear la gráfica de barras
+                    new Chart(sentimientosCtx, {
+                        type: 'bar', // Cambiar a 'line' si prefieres una gráfica de líneas
+                        data: {
+                            labels: ['Positivos', 'Neutros', 'Negativos'],
+                            datasets: [{
+                                label: 'Cantidad de Comentarios',
+                                data: [sentimientos.positivo, sentimientos.neutro, sentimientos.negativo],
+                                backgroundColor: ['#28a745', '#ffc107', '#dc3545'], // Colores para las barras
+                                borderColor: ['#28a745', '#ffc107', '#dc3545'], // Bordes de las barras
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false, // Permitir ajustar el tamaño
+                            plugins: {
+                                legend: {
+                                    display: false // Ocultar la leyenda
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Distribución de Sentimientos en Comentarios'
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Sentimientos'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Cantidad'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Error al cargar datos de sentimientos:', data.error);
+                }
+            })
+            .catch(error => console.error('Error al cargar datos de sentimientos:', error));
+    }
+
     // Función para actualizar las recomendaciones en tiempo real
     const actualizarRecomendaciones = () => {
-        fetch('/recommendations/api/')
+        fetch('/users/dashboard/recomendaciones-estilo-color/')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Error al obtener las recomendaciones');

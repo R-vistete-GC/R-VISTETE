@@ -45,6 +45,7 @@ import base64
 from django.db.models import Count, Q, Exists, OuterRef
 from collections import defaultdict
 import json
+from django.views.decorators.http import require_http_methods
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -643,3 +644,26 @@ def likes_favoritos_estilo_color(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+from django.db.models import Count
+
+def comentarios_sentimientos_usuario(request):
+    try:
+        # Obtener el ID del usuario desde la sesión
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
+
+        # Filtrar comentarios del usuario autenticado
+        comentarios = Comentario.objects.filter(usuario_id=usuario_id).values('clasificacion_chatgpt').annotate(total=Count('id'))
+
+        # Inicializar los datos
+        data = {'positivo': 0, 'neutro': 0, 'negativo': 0}
+        for comentario in comentarios:
+            clasificacion = comentario['clasificacion_chatgpt']
+            if clasificacion in data:
+                data[clasificacion] = comentario['total']
+
+        return JsonResponse({'success': True, 'data': data})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

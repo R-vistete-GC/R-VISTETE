@@ -15,8 +15,11 @@ urlpatterns = [
 
     # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('dashboard/recomendaciones-estilo-color/', views.recomendaciones_estilo_color, name='recomendaciones_estilo_color'),
     path('dashboard/data/', views.dashboard_data, name='dashboard_data'),
     path('dashboard/sentimientos/', views.dashboard_data_sentimientos, name='dashboard_data_sentimientos'),
-    path('dashboard/likes-favoritos-estilo-color/', views.likes_favoritos_estilo_color, name='likes_favoritos_estilo_color'),  # Nueva ruta
+    path('dashboard/recomendaciones-estilo-color/', views.recomendaciones_estilo_color, name='recomendaciones_estilo_color'),
+    path('dashboard/likes-favoritos-estilo-color/', views.likes_favoritos_estilo_color, name='likes_favoritos_estilo_color'),
+    path('dashboard/comentarios-sentimientos-usuario/', views.comentarios_sentimientos_usuario, name='comentarios_sentimientos_usuario'),
 ]
+
+# Example usage of the endpoint
