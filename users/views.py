@@ -592,3 +592,54 @@ def recomendaciones_estilo_color(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+from django.http import JsonResponse
+from collections import defaultdict
+
+def likes_favoritos_estilo_color(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Inicializar los datos
+        estilos = ['casual', 'formal', 'deportivo', 'elegante', 'bohemio', 'vintage', 'minimalista', 'streetwear']
+        colores = ['azul', 'negro', 'rojo', 'verde', 'amarillo', 'blanco', 'gris', 'marrón']
+        datos = {estilo: {color: {'likes': 0, 'favoritos': 0} for color in colores} for estilo in estilos}
+
+        # Obtener publicaciones con likes y favoritos
+        likes = Publicacion.objects.filter(
+            id__in=Like.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)
+        )
+        favoritos = Publicacion.objects.filter(
+            id__in=Favorito.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)
+        )
+
+        # Contar likes por estilo y color
+        for publicacion in likes:
+            estilos_publicacion = publicacion.estilo if isinstance(publicacion.estilo, list) else publicacion.estilo.split(',')
+            colores_publicacion = publicacion.colores if isinstance(publicacion.colores, list) else publicacion.colores.split(',')
+            for estilo in estilos_publicacion:
+                estilo = estilo.strip().lower()
+                if estilo in datos:
+                    for color in colores_publicacion:
+                        color = color.strip().lower()
+                        if color in datos[estilo]:
+                            datos[estilo][color]['likes'] += 1
+
+        # Contar favoritos por estilo y color
+        for publicacion in favoritos:
+            estilos_publicacion = publicacion.estilo if isinstance(publicacion.estilo, list) else publicacion.estilo.split(',')
+            colores_publicacion = publicacion.colores if isinstance(publicacion.colores, list) else publicacion.colores.split(',')
+            for estilo in estilos_publicacion:
+                estilo = estilo.strip().lower()
+                if estilo in datos:
+                    for color in colores_publicacion:
+                        color = color.strip().lower()
+                        if color in datos[estilo]:
+                            datos[estilo][color]['favoritos'] += 1
+
+        return JsonResponse(datos)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

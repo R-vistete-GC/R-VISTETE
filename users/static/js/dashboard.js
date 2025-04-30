@@ -158,6 +158,63 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al cargar datos de estilo y color:', error));
     }
 
+    // Gráfica de Likes y Favoritos por Estilo y Color
+    const likesFavoritosCtx = document.getElementById('graficaLikesFavoritos');
+    if (likesFavoritosCtx) {
+        fetch('/users/dashboard/likes-favoritos-estilo-color/')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos para la gráfica de likes y favoritos:', data);
+
+                const estilos = Object.keys(data); // Estilos como 'casual', 'formal', etc.
+                const colores = Object.keys(data[estilos[0]]); // Colores como 'azul', 'negro', etc.
+
+                // Preparar datasets para likes y favoritos
+                const datasets = colores.map(color => ({
+                    label: `Likes (${color})`,
+                    data: estilos.map(estilo => data[estilo][color].likes),
+                    backgroundColor: getColorForLabel(color),
+                    stack: 'likes'
+                })).concat(colores.map(color => ({
+                    label: `Favoritos (${color})`,
+                    data: estilos.map(estilo => data[estilo][color].favoritos),
+                    backgroundColor: getColorForLabel(color, true), // Colores más claros para favoritos
+                    stack: 'favoritos'
+                })));
+
+                // Crear la gráfica
+                new Chart(likesFavoritosCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: estilos, // Etiquetas en el eje X (estilos)
+                        datasets: datasets // Conjuntos de datos (likes y favoritos)
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Distribución de Likes y Favoritos por Estilo y Color'
+                            }
+                        },
+                        responsive: true,
+                        scales: {
+                            x: {
+                                stacked: true // Apilar las barras en el eje X
+                            },
+                            y: {
+                                stacked: true, // Apilar las barras en el eje Y
+                                beginAtZero: true // Comenzar desde 0
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de likes y favoritos:', error));
+    }
+
     // Función para actualizar las recomendaciones en tiempo real
     const actualizarRecomendaciones = () => {
         fetch('/recommendations/api/')
@@ -207,16 +264,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Función para asignar colores a las líneas
-function getColorForLabel(label) {
+function getColorForLabel(label, isLight = false) {
     const colorMap = {
-        'azul': '#36A2EB',
-        'negro': '#000000',
-        'rojo': '#FF6384',
-        'verde': '#4BC0C0',
-        'amarillo': '#FFCE56',
-        'blanco': '#FFFFFF',
-        'gris': '#808080',
-        'marrón': '#A52A2A'
+        'azul': isLight ? '#A8D5F2' : '#36A2EB',
+        'negro': isLight ? '#666666' : '#000000',
+        'rojo': isLight ? '#FFB3C1' : '#FF6384',
+        'verde': isLight ? '#A8E6CF' : '#4BC0C0',
+        'amarillo': isLight ? '#FFF5BA' : '#FFCE56',
+        'blanco': isLight ? '#F0F0F0' : '#FFFFFF',
+        'gris': isLight ? '#C0C0C0' : '#808080',
+        'marrón': isLight ? '#D2B48C' : '#A52A2A'
     };
-    return colorMap[label] || '#000000';
+    return colorMap[label] || (isLight ? '#CCCCCC' : '#000000');
 }
