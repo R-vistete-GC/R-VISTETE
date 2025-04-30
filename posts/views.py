@@ -1027,7 +1027,8 @@ def editar_publicacion(request):
             'error': str(e)
         }, status=500)
 
-@csrf_protect
+from .models import Publicacion
+
 @require_http_methods(["POST"])
 def borrar_publicacion(request, publicacion_id):
     try:
@@ -1035,17 +1036,17 @@ def borrar_publicacion(request, publicacion_id):
         usuario_id = request.session.get('usuario_id')
         if not usuario_id:
             return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
-            
+        
         # Obtener la publicación
         publicacion = get_object_or_404(Publicacion, id=publicacion_id)
         
         # Verificar que el usuario sea el dueño de la publicación
-        if str(publicacion.usuario.id) != str(usuario_id):
+        if publicacion.usuario.id != usuario_id:
             return JsonResponse({
                 'success': False, 
                 'error': 'No tienes permiso para borrar esta publicación'
             }, status=403)
-            
+        
         # Borrar la publicación
         publicacion.delete()
         

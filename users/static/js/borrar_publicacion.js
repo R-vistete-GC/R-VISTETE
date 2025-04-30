@@ -13,20 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
 function borrarPublicacion() {
     if (!publicacionIdABorrar) return;
 
-    // Obtener el token CSRF
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-    // URL correcta usando el nombre de la aplicación 'posts'
     fetch(`/posts/borrar/${publicacionIdABorrar}/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
         }
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('Network response was not ok');
         }
         return response.json();
     })
@@ -36,13 +32,13 @@ function borrarPublicacion() {
             const modal = bootstrap.Modal.getInstance(document.getElementById('borrarPublicacionModal'));
             modal.hide();
             
-            // Eliminar la publicación del DOM
-            const publicacionElement = document.querySelector(`.publicacion[data-publicacion-id="${publicacionIdABorrar}"]`);
-            if (publicacionElement) {
-                publicacionElement.remove();
+            // Eliminar el elemento del DOM
+            const publicacion = document.querySelector(`[data-publicacion-id="${publicacionIdABorrar}"]`);
+            if (publicacion) {
+                publicacion.closest('.publicacion-container').remove();
             }
             
-            // Mensaje de éxito
+            // Mostrar mensaje de éxito
             alert('Publicación eliminada exitosamente');
         } else {
             alert(data.error || 'Error al eliminar la publicación');
