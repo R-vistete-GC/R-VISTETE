@@ -261,85 +261,52 @@ def generar_grafica(datos, titulo, tipo='bar'):
 def dashboard(request):
     usuario_id = request.session.get('usuario_id')  # Obtener el usuario desde la sesión
     if not usuario_id:
-        return redirect('/users/login/')
+        return redirect('users:login')
 
-    try:
-        # Contadores para las cards
-        total_publicaciones = Publicacion.objects.filter(usuario_id=usuario_id).count()
-        total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
-        total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
-        total_likes = Like.objects.filter(usuario_id=usuario_id).count()
-        total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
-        total_compras = Venta.objects.filter(comprador_id=usuario_id).count()
-        total_recomendaciones = len(recomendaciones_view(request, return_as_list=True))
+    # Lista de estilos válidos
+    ESTILOS_VALIDOS = ['Casual', 'Formal', 'Deportivo', 'Elegante', 'Bohemio', 'Vintage', 'Minimalista', 'Streetwear']
 
-        # Inicializar contadores de estilos
-        estilos_count = defaultdict(int)
+    # Inicializar el contador de estilos
+    estilos_count = {estilo: 0 for estilo in ESTILOS_VALIDOS}
 
-        # Publicaciones del usuario
-        publicaciones = Publicacion.objects.filter(usuario_id=usuario_id)
-        for publicacion in publicaciones:
-            if publicacion.estilo:
-                for estilo in publicacion.estilo:
+    # Obtener las publicaciones asociadas al usuario
+    publicaciones = Publicacion.objects.filter(
+        Q(usuario_id=usuario_id) |
+        Q(id__in=Like.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)) |
+        Q(id__in=Favorito.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)) |
+        Q(id__in=Venta.objects.filter(comprador_id=usuario_id).values_list('publicacion_id', flat=True)) |
+        Q(id__in=Alquiler.objects.filter(cliente_id=usuario_id).values_list('publicacion_id', flat=True))
+    )
+
+    # Contar los estilos de las publicaciones
+    for publicacion in publicaciones:
+        if publicacion.estilo:  # Asegurarse de que el campo estilo no sea nulo
+            # Verificar si es una lista o una cadena
+            estilos = publicacion.estilo if isinstance(publicacion.estilo, list) else publicacion.estilo.split(", ")
+            for estilo in estilos:
+                if estilo in ESTILOS_VALIDOS:
                     estilos_count[estilo] += 1
 
-        # Likes del usuario
-        likes = Like.objects.filter(usuario_id=usuario_id).select_related('publicacion')
-        for like in likes:
-            if like.publicacion and like.publicacion.estilo:
-                for estilo in like.publicacion.estilo:
-                    estilos_count[estilo] += 1
+    # Calcular los contadores para los iCards
+    total_publicaciones = Publicacion.objects.filter(usuario_id=usuario_id).count()
+    total_ventas = Venta.objects.filter(comprador_id=usuario_id).count()
+    total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
+    total_likes = Like.objects.filter(usuario_id=usuario_id).count()
+    total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
+    total_compras = Venta.objects.filter(comprador_id=usuario_id).count()
+    total_recomendaciones = len(recomendaciones_view(request, return_as_list=True))
 
-        # Favoritos del usuario
-        favoritos = Favorito.objects.filter(usuario_id=usuario_id).select_related('publicacion')
-        for favorito in favoritos:
-            if favorito.publicacion and favorito.publicacion.estilo:
-                for estilo in favorito.publicacion.estilo:
-                    estilos_count[estilo] += 1
-
-        # Alquileres del usuario
-        alquileres = Alquiler.objects.filter(cliente_id=usuario_id).select_related('publicacion')
-        for alquiler in alquileres:
-            if alquiler.publicacion and alquiler.publicacion.estilo:
-                for estilo in alquiler.publicacion.estilo:
-                    estilos_count[estilo] += 1
-
-        # Compras del usuario
-        compras = Venta.objects.filter(comprador_id=usuario_id).select_related('publicacion')
-        for compra in compras:
-            if compra.publicacion and compra.publicacion.estilo:
-                for estilo in compra.publicacion.estilo:
-                    estilos_count[estilo] += 1
-
-        # Recomendaciones para el usuario
-        recomendaciones = recomendaciones_view(request, return_as_list=True)
-        for recomendacion in recomendaciones:
-            publicacion = recomendacion['publicacion']
-            if publicacion.estilo:
-                for estilo in publicacion.estilo:
-                    estilos_count[estilo] += 1
-
-        # Convertir los datos a JSON para pasarlos al frontend
-        estilos_count_json = json.dumps(estilos_count)
-
-        # Pasar los datos al contexto
-        context = {
-            'total_publicaciones': total_publicaciones,
-            'total_ventas': total_ventas,
-            'total_alquileres': total_alquileres,
-            'total_likes': total_likes,
-            'total_favoritos': total_favoritos,
-            'total_compras': total_compras,
-            'total_recomendaciones': total_recomendaciones,
-            'estilos_count': estilos_count_json,  # Datos para la gráfica
-        }
-        return render(request, 'users/dashboard.html', context)
-
-    except Exception as e:
-        print(f"Error en el Dashboard: {str(e)}")
-        return render(request, 'users/dashboard.html', {
-            'error': 'Ocurrió un error al cargar el Dashboard.'
-        })
+    context = {
+        'estilos_count': json.dumps(estilos_count),  # Pasar los datos de estilos al template
+        'total_publicaciones': total_publicaciones,
+        'total_ventas': total_ventas,
+        'total_alquileres': total_alquileres,
+        'total_likes': total_likes,
+        'total_favoritos': total_favoritos,
+        'total_compras': total_compras,
+        'total_recomendaciones': total_recomendaciones,
+    }
+    return render(request, 'users/dashboard.html', context)
 
 def dashboard_data(request):
     usuario_id = request.session.get('usuario_id')

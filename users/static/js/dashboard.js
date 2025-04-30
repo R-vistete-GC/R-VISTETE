@@ -72,12 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const estilosDistribucionCtx = document.getElementById('graficaDistribucionEstilos');
     if (estilosDistribucionCtx) {
         const estilosDistribucionChart = new Chart(estilosDistribucionCtx.getContext('2d'), {
-            type: 'bar', // Gráfica de barras
+            type: 'bar',
             data: {
-                labels: Object.keys(estilosDistribucionData), // Estilos
+                labels: Object.keys(estilosDistribucionData), // Estilos válidos
                 datasets: [{
                     label: 'Cantidad',
-                    data: Object.values(estilosDistribucionData), // Cantidades
+                    data: Object.values(estilosDistribucionData), // Cantidad por estilo
                     backgroundColor: [
                         '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#FF9F40', '#FF6384', '#4CAF50', '#FFC107'
                     ],
