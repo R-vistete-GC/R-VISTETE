@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     backgroundColor: getColorForLabel(color),
                     fill: false,
                     tension: 0.1,
-                    pointRadius: 5, // Tamaño normal de los puntos
-                    pointHoverRadius: 7 // Tamaño al pasar el mouse
+                    pointRadius: 8, // Tamaño normal de los puntos
+                    pointHoverRadius: 12 // Tamaño al pasar el mouse
                 }));
 
                 // Crear la gráfica
@@ -50,6 +50,32 @@ document.addEventListener('DOMContentLoaded', () => {
                             title: {
                                 display: true,
                                 text: 'Recomendaciones por Estilo y Color'
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fondo del tooltip
+                                titleFont: {
+                                    size: 16, // Tamaño de fuente del título
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 14 // Tamaño de fuente del cuerpo
+                                },
+                                padding: 15, // Espaciado interno del tooltip
+                                boxPadding: 10, // Espaciado entre el contenido y el borde
+                                callbacks: {
+                                    // Personalizar el contenido del tooltip
+                                    afterBody: function (tooltipItems) {
+                                        const estilo = tooltipItems[0].label; // Estilo actual
+                                        let resumen = 'Resumen de Recomendaciones:\n';
+                                        colores.forEach(color => {
+                                            const total = data[estilo][color];
+                                            if (total > 0) {
+                                                resumen += `${color}: ${total} recomendaciones\n`;
+                                            }
+                                        });
+                                        return resumen;
+                                    }
+                                }
                             }
                         },
                         scales: {
@@ -85,6 +111,31 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title: {
                                     display: true,
                                     text: 'Recomendaciones por Estilo y Color'
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fondo del tooltip
+                                    titleFont: {
+                                        size: 16, // Tamaño de fuente del título
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        size: 14 // Tamaño de fuente del cuerpo
+                                    },
+                                    padding: 15, // Espaciado interno del tooltip
+                                    boxPadding: 10, // Espaciado entre el contenido y el borde
+                                    callbacks: {
+                                        afterBody: function (tooltipItems) {
+                                            const estilo = tooltipItems[0].label; // Estilo actual
+                                            let resumen = 'Resumen de Recomendaciones:\n';
+                                            colores.forEach(color => {
+                                                const total = data[estilo][color];
+                                                if (total > 0) {
+                                                    resumen += `${color}: ${total} recomendaciones\n`;
+                                                }
+                                            });
+                                            return resumen;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
@@ -103,16 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('toggleChartType').textContent =
                         chartType === 'line' ? 'Cambiar a Gráfica de Puntos' : 'Cambiar a Gráfica de Líneas';
                 });
-
-                // Generar resumen de recomendaciones
-                const resumenContainer = document.getElementById('resumenRecomendaciones');
-                let resumenHTML = '<h5>Resumen de Recomendaciones</h5><ul>';
-                colores.forEach(color => {
-                    const total = estilos.reduce((sum, estilo) => sum + data[estilo][color], 0);
-                    resumenHTML += `<li>${color}: ${total} recomendaciones</li>`;
-                });
-                resumenHTML += '</ul>';
-                resumenContainer.innerHTML = resumenHTML;
             })
             .catch(error => console.error('Error al cargar datos de estilo y color:', error));
     }
