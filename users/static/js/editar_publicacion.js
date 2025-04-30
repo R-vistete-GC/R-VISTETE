@@ -30,6 +30,29 @@ document.addEventListener('DOMContentLoaded', function() {
             if (precioVenta) document.getElementById('precio_venta').value = precioVenta;
             if (precioAlquiler) document.getElementById('precio_alquiler').value = precioAlquiler;
             if (deposito) document.getElementById('deposito').value = deposito;
+
+            // Obtener estilos y colores
+            const estilos = this.getAttribute('data-estilos').split(',');
+            const colores = this.getAttribute('data-colores').split(',');
+            
+            // Desmarcar todos los checkboxes primero
+            document.querySelectorAll('input[name="estilo[]"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelectorAll('input[name="colores[]"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Marcar los checkboxes correspondientes
+            estilos.forEach(estilo => {
+                const checkbox = document.getElementById(`estilo${estilo.charAt(0).toUpperCase() + estilo.slice(1)}Edit`);
+                if (checkbox) checkbox.checked = true;
+            });
+            
+            colores.forEach(color => {
+                const checkbox = document.getElementById(`color${color.charAt(0).toUpperCase() + color.slice(1)}Edit`);
+                if (checkbox) checkbox.checked = true;
+            });
         });
     });
 
