@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_protect
 from django.db.models import Sum, Count, Q
 from .models import Publicacion, Comentario, Venta, Alquiler, Favorito, Like, Dislike, Compra
 from users.models import Usuario
@@ -1027,6 +1027,7 @@ def editar_publicacion(request):
             'error': str(e)
         }, status=500)
 
+@csrf_protect
 @require_http_methods(["POST"])
 def borrar_publicacion(request, publicacion_id):
     try:

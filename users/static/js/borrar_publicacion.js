@@ -13,13 +13,23 @@ document.addEventListener('DOMContentLoaded', function() {
 function borrarPublicacion() {
     if (!publicacionIdABorrar) return;
 
+    // Obtener el token CSRF
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // URL correcta usando el nombre de la aplicación 'posts'
     fetch(`/posts/borrar/${publicacionIdABorrar}/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-        },
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Cerrar el modal
@@ -27,34 +37,19 @@ function borrarPublicacion() {
             modal.hide();
             
             // Eliminar la publicación del DOM
-            const publicacionElement = document.querySelector(`[data-publicacion-id="${publicacionIdABorrar}"]`);
+            const publicacionElement = document.querySelector(`.publicacion[data-publicacion-id="${publicacionIdABorrar}"]`);
             if (publicacionElement) {
-                publicacionElement.closest('.col-12, .col-sm-6, .col-lg-4').remove();
+                publicacionElement.remove();
             }
             
-            // Mostrar mensaje de éxito usando SweetAlert2
-            Swal.fire({
-                title: '¡Éxito!',
-                text: 'Publicación eliminada exitosamente',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
+            // Mensaje de éxito
+            alert('Publicación eliminada exitosamente');
         } else {
-            Swal.fire({
-                title: 'Error',
-                text: data.error || 'Error al eliminar la publicación',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            alert(data.error || 'Error al eliminar la publicación');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Error al eliminar la publicación',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
+        alert('Error al eliminar la publicación');
     });
 }
