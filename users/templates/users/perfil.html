@@ -55,7 +55,7 @@
 
             <!-- Información Personal -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
+                <div
                     <h4 class="mb-0"><i class="fas fa-user me-2"></i>Información Personal</h4>
                 </div>
                 <div class="card-body">
@@ -200,7 +200,15 @@
                     data-publicacion-id="{{ publicacion.id }}"
                     data-titulo="{{ publicacion.titulo }}"
                     data-descripcion="{{ publicacion.descripcion }}"
-                    data-imagen="{{ publicacion.imagen.url }}">
+                    data-imagen="{{ publicacion.imagen.url }}"
+                    data-tipo="{{ publicacion.tipo }}"
+                    data-precio-venta="{{ publicacion.precio_venta|default:'' }}"
+                    data-precio-alquiler="{{ publicacion.precio_alquiler|default:'' }}"
+                    data-deposito="{{ publicacion.deposito|default:'' }}"
+                    data-publico="{{ publicacion.publico }}"
+                    data-talla="{{ publicacion.talla }}"
+                    data-estilos="{{ publicacion.estilo|join:',' }}"
+                    data-colores="{{ publicacion.colores|join:',' }}">
                 <i class="fas fa-edit"></i>
             </button>
 
@@ -371,9 +379,9 @@
 {% endblock %}
 
 {% block modals %}
-<!-- Modal de Edición -->
+<!-- Modal de Edición en perfil.html -->
 <div class="modal fade" id="editarPublicacionModal" tabindex="-1" aria-labelledby="editarPublicacionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editarPublicacionModalLabel">Editar Publicación</h5>
@@ -384,9 +392,19 @@
                     {% csrf_token %}
                     <input type="hidden" id="publicacion_id" name="publicacion_id">
                     
+                    <!-- Imagen -->
+                    <div class="form-section mb-3">
+                        <label class="form-label">Imagen de la Prenda</label>
+                        <div class="image-preview" id="imagePreviewEdit">
+                            <img id="imagen_actual" src="" alt="Imagen actual" class="img-fluid mb-2">
+                        </div>
+                        <input type="file" class="form-control" id="nueva_imagen" name="imagen" accept="image/*">
+                    </div>
+
+                    <!-- Título y Descripción -->
                     <div class="mb-3">
-                        <label for="titulo" class="form-label">Título</label>
-                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                        <label for="titulo" class="form-label">Título*</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required maxlength="255">
                     </div>
 
                     <div class="mb-3">
@@ -394,34 +412,76 @@
                         <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="publico" class="form-label">Público</label>
-                            <select class="form-select" id="publico" name="publico" required>
-                                <option value="mujer">Mujer</option>
-                                <option value="hombre">Hombre</option>
-                                <option value="niño">Niño</option>
-                                <option value="niña">Niña</option>
-                                <option value="mascota">Mascota</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="talla" class="form-label">Talla</label>
-                            <select class="form-select" id="talla" name="talla" required>
-                                <option value="XS">XS</option>
-                                <option value="S">S</option>
-                                <option value="M">M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
-                                <option value="XXL">XXL</option>
-                            </select>
+                    <!-- Tipo de Publicación -->
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Publicación*</label>
+                        <div class="tipo-toggle">
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" id="tipoVentaEdit" name="tipo" value="venta" required>
+                                <label class="form-check-label" for="tipoVentaEdit">Venta</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" id="tipoAlquilerEdit" name="tipo" value="alquiler">
+                                <label class="form-check-label" for="tipoAlquilerEdit">Alquiler</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" id="tipoAmbosEdit" name="tipo" value="venta y alquiler">
+                                <label class="form-check-label" for="tipoAmbosEdit">Venta y Alquiler</label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Imagen actual</label>
-                        <img id="imagen_actual" src="" alt="Imagen de la publicación" class="img-fluid mb-2" style="max-height: 200px;">
-                        <input type="file" class="form-control" id="nueva_imagen" name="imagen" accept="image/*">
+                    <!-- Campos de precios -->
+                    <div id="campos_venta" class="mb-3" style="display: none;">
+                        <label for="precio_venta" class="form-label">Precio de Venta*</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="precio_venta" name="precio_venta" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div id="campos_alquiler" class="mb-3" style="display: none;">
+                        <label for="precio_alquiler" class="form-label">Precio de Alquiler (por día)*</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="precio_alquiler" name="precio_alquiler" step="0.01" min="0">
+                        </div>
+                        
+                        <label for="deposito" class="form-label mt-2">Depósito de Seguridad*</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="deposito" name="deposito" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <!-- Resto de campos igual que en publicar -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="publico" class="form-label">Público*</label>
+                                <select class="form-select" id="publico" name="publico" required>
+                                    <option value="mujer">Mujer</option>
+                                    <option value="hombre">Hombre</option>
+                                    <option value="unisex">Unisex</option>
+                                    <option value="niño">Niño</option>
+                                    <option value="niña">Niña</option>
+                                    <option value="mascota">Mascota</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="talla" class="form-label">Talla*</label>
+                                <select class="form-select" id="talla" name="talla" required>
+                                    <option value="XS">XS</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                    <option value="XXL">XXL</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

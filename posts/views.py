@@ -974,3 +974,55 @@ def obtener_metricas_publicacion(request, publicacion_id):
         return JsonResponse({'success': False, 'error': 'Publicación no encontrada'}, status=404)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@require_http_methods(["POST"])
+def editar_publicacion(request):
+    try:
+        # Verificar autenticación
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
+            
+        # Obtener datos del formulario
+        publicacion_id = request.POST.get('publicacion_id')
+        publicacion = get_object_or_404(Publicacion, id=publicacion_id)
+        
+        # Verificar que el usuario sea el dueño de la publicación
+        if str(publicacion.usuario.id) != str(usuario_id):
+            return JsonResponse({'success': False, 'error': 'No autorizado'}, status=403)
+        
+        # Actualizar datos básicos
+        publicacion.titulo = request.POST.get('titulo')
+        publicacion.descripcion = request.POST.get('descripcion')
+        publicacion.tipo = request.POST.get('tipo')
+        publicacion.publico = request.POST.get('publico')
+        publicacion.talla = request.POST.get('talla')
+        
+        # Actualizar precios según el tipo
+        if publicacion.tipo in ['venta', 'venta y alquiler']:
+            publicacion.precio_venta = request.POST.get('precio_venta')
+        
+        if publicacion.tipo in ['alquiler', 'venta y alquiler']:
+            publicacion.precio_alquiler = request.POST.get('precio_alquiler')
+            publicacion.deposito = request.POST.get('deposito')
+            
+        # Actualizar estilos y colores
+        publicacion.estilo = request.POST.getlist('estilo[]')
+        publicacion.colores = request.POST.getlist('colores[]')
+        
+        # Actualizar imagen si se proporciona una nueva
+        if request.FILES.get('nueva_imagen'):
+            publicacion.imagen = request.FILES['nueva_imagen']
+            
+        publicacion.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Publicación actualizada exitosamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
