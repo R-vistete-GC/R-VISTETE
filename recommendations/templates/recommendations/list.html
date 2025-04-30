@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %} <!-- Cargar la biblioteca static -->
 
 {% block content %}
 <div class="container mt-5">
@@ -101,21 +102,21 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Estilos personalizados */
     .shadow-hover {
         transition: all 0.3s ease;
         border: none;
         border-radius: 15px;
         overflow: hidden;
     }
-    
     .shadow-hover:hover {
         transform: translateY(-10px);
         box-shadow: 0 15px 30px rgba(0,0,0,0.1);
     }
-
     .match-badge {
         position: absolute;
         top: 15px;
@@ -129,80 +130,17 @@
         align-items: center;
         line-height: 1;
     }
-
     .match-score {
         font-size: 1.2rem;
         font-weight: bold;
     }
-
     .match-label {
         font-size: 0.8rem;
         opacity: 0.9;
     }
-
-    .badge {
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-
-    .bg-light-info {
-        background-color: #e7f3ff;
-    }
-
-    .bg-light-success {
-        background-color: #e9f7ef;
-    }
-
-    .bg-light-warning {
-        background-color: #fff8e5;
-    }
-
-    .razones-recomendacion {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-    }
-
-    .razones-titulo {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .razon-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    .razon-item i {
-        margin-right: 0.5rem;
-        font-size: 1rem;
-    }
-
-    .razon-item.historial {
-        color: #17a2b8;
-    }
-
-    .razon-item.sentimiento {
-        color: #ffc107;
-    }
-
-    .btn-primary {
-        background: linear-gradient(45deg, #007bff, #00bcd4);
-        border: none;
-        padding: 0.8rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,123,255,0.3);
-    }
 </style>
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/recommendations.js' %}"></script>
 {% endblock %}

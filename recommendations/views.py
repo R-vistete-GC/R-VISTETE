@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from users.models import PerfilUsuario
 from posts.models import Publicacion, Venta, Alquiler, Comentario, MetricasSentimiento
 from collections import defaultdict
@@ -208,3 +209,58 @@ def obtener_recomendaciones_ids(request):
         return list(publicaciones.values_list('id', flat=True))
     except PerfilUsuario.DoesNotExist:
         return []
+
+def recomendaciones_api(request):
+    """
+    Devuelve las recomendaciones en formato JSON para el usuario autenticado.
+    """
+    if not request.user.is_authenticated and not request.session.get('usuario_id'):
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        usuario_id = request.user.id if request.user.is_authenticated else request.session.get('usuario_id')
+        perfil = PerfilUsuario.objects.get(usuario_id=usuario_id)
+
+        # Lógica de recomendaciones (reutilizamos la lógica de recomendaciones_view)
+        publicaciones = Publicacion.objects.exclude(usuario_id=usuario_id).filter(
+            publico=perfil.genero
+        )
+        recomendaciones = []
+        for publicacion in publicaciones:
+            puntuacion = 0
+            razones = []
+
+            # Puntuación basada en preferencias del perfil
+            if perfil.talla and publicacion.talla == perfil.talla:
+                puntuacion += 50
+                razones.append("Coincide con tu talla preferida")
+
+            if perfil.estilos_preferidos and publicacion.estilo:
+                estilos_usuario = perfil.estilos_preferidos.split(", ")
+                coincidencias = len(set(estilos_usuario) & set(publicacion.estilo))
+                if coincidencias > 0:
+                    puntuacion += 50 * (coincidencias / len(estilos_usuario))
+                    razones.append(f"Coincide con {coincidencias} de tus estilos preferidos")
+
+            if perfil.colores_preferidos and publicacion.colores:
+                colores_usuario = perfil.colores_preferidos.split(", ")
+                coincidencias = len(set(colores_usuario) & set(publicacion.colores))
+                if coincidencias > 0:
+                    puntuacion += 40 * (coincidencias / len(colores_usuario))
+                    razones.append(f"Incluye {coincidencias} de tus colores favoritos")
+
+            if puntuacion > 0:
+                recomendaciones.append({
+                    'id': publicacion.id,
+                    'titulo': publicacion.titulo,
+                    'imagen': publicacion.imagen.url,
+                    'puntuacion': round(puntuacion, 2),
+                    'razones': razones
+                })
+
+        # Ordenar por puntuación y devolver las 10 mejores recomendaciones
+        recomendaciones_ordenadas = sorted(recomendaciones, key=lambda x: x['puntuacion'], reverse=True)[:10]
+        return JsonResponse({'recomendaciones': recomendaciones_ordenadas})
+
+    except PerfilUsuario.DoesNotExist:
+        return JsonResponse({'error': 'Completa tu perfil para obtener recomendaciones.'}, status=400)
