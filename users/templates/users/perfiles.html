@@ -46,25 +46,25 @@
                 <div class="card-body">
                     {% if perfil.descripcion %}
                     <div class="mb-3">
-                        <i class="fas fa-comment-alt me-2 text-muted"></i>
-                        <strong>Descripción:</strong>
+                        <i class="fas fa-comment-alt text-success me-2"></i>
+                        <span class="fw-bold">Descripción:</span>
                         <p class="ms-4 mb-0">{{ perfil.descripcion }}</p>
                     </div>
                     {% endif %}
 
                     {% if perfil.telefono %}
                     <div class="mb-3">
-                        <i class="fas fa-phone me-2 text-muted"></i>
-                        <strong>Teléfono:</strong>
-                        <p class="ms-4 mb-0">{{ perfil.telefono }}</p>
+                        <i class="fas fa-phone text-success me-2"></i>
+                        <span class="fw-bold">Teléfono:</span>
+                        <span class="ms-2">{{ perfil.telefono }}</span>
                     </div>
                     {% endif %}
 
                     {% if perfil.ubicacion %}
                     <div class="mb-3">
-                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>
-                        <strong>Ubicación:</strong>
-                        <p class="ms-4 mb-0">{{ perfil.ubicacion }}</p>
+                        <i class="fas fa-map-marker-alt text-success me-2"></i>
+                        <span class="fw-bold">Ubicación:</span>
+                        <span class="ms-2">{{ perfil.ubicacion }}</span>
                     </div>
                     {% endif %}
                 </div>
