@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 {% block title %}Mi Dashboard{% endblock %}
 
@@ -69,63 +70,11 @@
         </div>
     </div>
 
-    <div class="container-fluid py-3">
-        <div class="row g-3">
-            <!-- Gráficas de la primera fila -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Distribución de Colores</h6>
-                        <div class="chart-container bar">
-                            <canvas id="coloresDistribucionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gráficas de sentimientos (solo la versión dona) -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Sentimientos</h6>
-                        <div class="chart-container circular">
-                            <canvas id="sentimientosChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title text-center">Recomendaciones por Estilo y Color</h5>
+            <canvas id="graficaEstiloColor"></canvas>
         </div>
     </div>
-
-    <div class="col-md-12">
-        <div class="card h-100">
-            <div class="card-body">
-                <h6 class="card-title text-center mb-3">Distribución de Estilos</h6>
-                <div class="chart-container bar">
-                    <canvas id="graficaDistribucionEstilos"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pasar datos al JavaScript -->
-    <script>
-        const estilosDistribucionData = JSON.parse('{{ estilos_count|safe }}');
-    </script>
-    <script id="sentimientosData" type="application/json">
-        {
-            "positivos": 8,
-            "neutros": 6,
-            "negativos": 4
-        }
-    </script>
-    <script id="recomendacionesData" type="application/json">
-        {
-            "algunDato": "valor",
-            "otroDato": "valor"
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'js/dashboard.js' %}"></script>
 </div>
 {% endblock %}

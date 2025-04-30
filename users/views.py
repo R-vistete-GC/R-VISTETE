@@ -13,7 +13,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse  # Importa reverse para construir URLs
 from sentiment_analysis.analyzer import MetricasSentimiento
 from recommendations.utils import obtener_estadisticas_usuario
-from recommendations.views import recomendaciones_view
+from recommendations.views import recomendaciones_view, obtener_recomendaciones_ids  # Importa la nueva función
 from sentiment_analysis.utils import SentimentAnalyzer
 import matplotlib
 matplotlib.use('Agg')  # Cambiar el backend a 'Agg' para evitar problemas con hilos
@@ -269,19 +269,19 @@ def dashboard(request):
     # Inicializar el contador de estilos
     estilos_count = {estilo: 0 for estilo in ESTILOS_VALIDOS}
 
-    # Obtener las publicaciones asociadas al usuario
-    publicaciones = Publicacion.objects.filter(
-        Q(usuario_id=usuario_id) |
-        Q(id__in=Like.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)) |
-        Q(id__in=Favorito.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True)) |
-        Q(id__in=Venta.objects.filter(comprador_id=usuario_id).values_list('publicacion_id', flat=True)) |
-        Q(id__in=Alquiler.objects.filter(cliente_id=usuario_id).values_list('publicacion_id', flat=True))
-    )
+    # Obtener publicaciones asociadas a cada interacción
+    likes = Publicacion.objects.filter(id__in=Like.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True))
+    favoritos = Publicacion.objects.filter(id__in=Favorito.objects.filter(usuario_id=usuario_id).values_list('publicacion_id', flat=True))
+    recomendaciones = Publicacion.objects.filter(id__in=obtener_recomendaciones_ids(request))
+    compras = Publicacion.objects.filter(id__in=Venta.objects.filter(comprador_id=usuario_id).values_list('publicacion_id', flat=True))
+    alquileres = Publicacion.objects.filter(id__in=Alquiler.objects.filter(cliente_id=usuario_id).values_list('publicacion_id', flat=True))
+
+    # Combinar todas las publicaciones únicas
+    publicaciones = likes | favoritos | recomendaciones | compras | alquileres
 
     # Contar los estilos de las publicaciones
-    for publicacion in publicaciones:
+    for publicacion in publicaciones.distinct():  # Evitar duplicados
         if publicacion.estilo:  # Asegurarse de que el campo estilo no sea nulo
-            # Verificar si es una lista o una cadena
             estilos = publicacion.estilo if isinstance(publicacion.estilo, list) else publicacion.estilo.split(", ")
             for estilo in estilos:
                 if estilo in ESTILOS_VALIDOS:
@@ -291,10 +291,10 @@ def dashboard(request):
     total_publicaciones = Publicacion.objects.filter(usuario_id=usuario_id).count()
     total_ventas = Venta.objects.filter(comprador_id=usuario_id).count()
     total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
-    total_likes = Like.objects.filter(usuario_id=usuario_id).count()
-    total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
-    total_compras = Venta.objects.filter(comprador_id=usuario_id).count()
-    total_recomendaciones = len(recomendaciones_view(request, return_as_list=True))
+    total_likes = likes.count()
+    total_favoritos = favoritos.count()
+    total_compras = compras.count()
+    total_recomendaciones = recomendaciones.count()
 
     context = {
         'estilos_count': json.dumps(estilos_count),  # Pasar los datos de estilos al template
@@ -503,3 +503,92 @@ def ver_perfil_usuario(request, usuario_id):
     }
     
     return render(request, 'users/perfiles.html', context)
+
+def dashboard_data_estilos(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Obtener todas las publicaciones con las que el usuario ha interactuado
+        likes = Publicacion.objects.filter(
+            likes__usuario_id=usuario_id
+        ).values_list('estilo', flat=True)
+        
+        favoritos = Publicacion.objects.filter(
+            favoritos__usuario_id=usuario_id
+        ).values_list('estilo', flat=True)
+        
+        compras = Publicacion.objects.filter(
+            venta__comprador_id=usuario_id
+        ).values_list('estilo', flat=True)
+        
+        alquileres = Publicacion.objects.filter(
+            alquiler__cliente_id=usuario_id
+        ).values_list('estilo', flat=True)
+
+        # Combinar todos los estilos
+        todos_estilos = list(likes) + list(favoritos) + list(compras) + list(alquileres)
+        
+        # Contador de estilos
+        estilos_count = {
+            'Casual': 0,
+            'Formal': 0,
+            'Deportivo': 0,
+            'Elegante': 0,
+            'Bohemio': 0,
+            'Vintage': 0,
+            'Minimalista': 0,
+            'Streetwear': 0
+        }
+
+        # Contar ocurrencias de cada estilo
+        for estilos in todos_estilos:
+            if estilos:  # Verificar que no sea None
+                if isinstance(estilos, str):
+                    estilos = estilos.split(',')
+                for estilo in estilos:
+                    estilo = estilo.strip()
+                    if estilo in estilos_count:
+                        estilos_count[estilo] += 1
+
+        return JsonResponse(estilos_count)
+
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Error al obtener datos de estilos: {str(e)}'
+        }, status=500)
+
+def recomendaciones_estilo_color(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Obtener las 14 recomendaciones del usuario autenticado
+        recomendaciones = Publicacion.objects.filter(
+            id__in=obtener_recomendaciones_ids(request)
+        )[:14]  # Limitar a 14 publicaciones
+
+        # Inicializar los datos
+        estilos = ['casual', 'formal', 'deportivo', 'elegante', 'bohemio', 'vintage', 'minimalista', 'streetwear']
+        colores = ['azul', 'negro', 'rojo', 'verde', 'amarillo', 'blanco', 'gris', 'marrón']
+        datos = {estilo: {color: 0 for color in colores} for estilo in estilos}
+
+        # Contar las recomendaciones por estilo y color
+        for publicacion in recomendaciones:
+            estilos_publicacion = publicacion.estilo if isinstance(publicacion.estilo, list) else publicacion.estilo.split(',')
+            colores_publicacion = publicacion.colores if isinstance(publicacion.colores, list) else publicacion.colores.split(',')
+
+            for estilo in estilos_publicacion:
+                estilo = estilo.strip().lower()  # Normalizar a minúsculas
+                if estilo in datos:
+                    for color in colores_publicacion:
+                        color = color.strip().lower()  # Normalizar a minúsculas
+                        if color in datos[estilo]:
+                            datos[estilo][color] += 1
+
+        return JsonResponse(datos)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

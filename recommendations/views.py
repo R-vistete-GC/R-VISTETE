@@ -190,3 +190,21 @@ def inicio_view(request):
         'publicaciones': publicaciones,
     }
     return render(request, 'inicio.html', context)
+
+def obtener_recomendaciones_ids(request):
+    """
+    Devuelve una lista de IDs de publicaciones recomendadas para el usuario.
+    """
+    try:
+        usuario_id = request.user.id if request.user.is_authenticated else request.session.get('usuario_id')
+        perfil = PerfilUsuario.objects.get(usuario_id=usuario_id)
+
+        # Filtrar publicaciones recomendadas
+        publicaciones = Publicacion.objects.exclude(usuario_id=usuario_id).filter(
+            publico=perfil.genero
+        )
+
+        # Retornar solo los IDs de las publicaciones recomendadas
+        return list(publicaciones.values_list('id', flat=True))
+    except PerfilUsuario.DoesNotExist:
+        return []
