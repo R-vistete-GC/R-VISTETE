@@ -304,8 +304,6 @@ def dashboard(request):
             'total_recomendaciones': total_recomendaciones,
             'grafica_estilos': grafica_estilos,
             'grafica_colores': grafica_colores,
-            'estilos_count': json.dumps(estilos_count),  # Convertir a JSON
-            'colores_count': json.dumps(colores_count),  # Convertir a JSON
         }
         return render(request, 'users/dashboard.html', context)
 

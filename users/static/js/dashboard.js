@@ -246,157 +246,171 @@ if (recomendacionesDataElement && recomendacionesChartElement) {
 } else {
     console.warn('No se encontró el elemento recomendacionesChart o los datos de recomendaciones.');
 }
-    // Configuración inicial de las gráficas
-    const ctxDistribucionSentimientos = document.getElementById('graficaDistribucionSentimientos').getContext('2d');
-    const ctxSentimientosInteractuados = document.getElementById('graficaSentimientosInteractuados').getContext('2d');
-    const ctxEvolucionSentimientos = document.getElementById('graficaEvolucionSentimientos').getContext('2d');
-
-    // Gráfica de Distribución de Sentimientos
-    const graficaDistribucionSentimientos = new Chart(ctxDistribucionSentimientos, {
-        type: 'pie',
-        data: {
-            labels: ['Positivos', 'Neutros', 'Negativos'],
-            datasets: [{
-                data: [5, 3, 2], // Datos estáticos de prueba
-                backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
-            }]
-        },
-        options: {
-            ...pieOptions,
-            plugins: {
-                ...pieOptions.plugins,
-                title: {
-                    display: false
-                }
-            }
-        }
-    });
 
     // Gráfica de Sentimientos en Publicaciones Interactuadas
-    const graficaSentimientosInteractuados = new Chart(ctxSentimientosInteractuados, {
-        type: 'bar',
-        data: {
-            labels: ['Positivos', 'Neutros', 'Negativos'],
-            datasets: [{
-                label: 'Interacciones',
-                data: [0, 0, 0], // Valores iniciales
-                backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
-            }]
-        },
-        options: {
-            ...barOptions,
-            plugins: {
-                ...barOptions.plugins,
-                title: {
-                    display: false
-                }
-            }
-        }
-    });
-
-    // Gráfica de Evolución Temporal de Sentimientos
-    const graficaEvolucionSentimientos = new Chart(ctxEvolucionSentimientos, {
-        type: 'line',
-        data: {
-            labels: [], // Fechas
-            datasets: [
-                {
-                    label: 'Positivos',
-                    data: [], // Datos positivos
-                    borderColor: '#4caf50',
-                    fill: false,
-                },
-                {
-                    label: 'Neutros',
-                    data: [], // Datos neutros
-                    borderColor: '#ffeb3b',
-                    fill: false,
-                },
-                {
-                    label: 'Negativos',
-                    data: [], // Datos negativos
-                    borderColor: '#f44336',
-                    fill: false,
-                }
-            ]
-        },
-        options: {
-            ...commonOptions,
-            plugins: {
-                ...commonOptions.plugins,
-                title: {
-                    display: false
-                }
+    const ctxSentimientosInteractuados = document.getElementById('graficaSentimientosInteractuados');
+    if (ctxSentimientosInteractuados) {
+        const sentimientosInteractuadosChart = new Chart(ctxSentimientosInteractuados.getContext('2d'), {
+            type: 'bar', // Tipo de gráfica
+            data: {
+                labels: ['Positivos', 'Neutros', 'Negativos'], // Etiquetas
+                datasets: [{
+                    label: 'Interacciones',
+                    data: [0, 0, 0], // Valores iniciales
+                    backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'], // Colores
+                }]
             },
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'day'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Sentimientos en Publicaciones'
                     }
                 },
-                y: {
-                    beginAtZero: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
 
-    // Obtener datos del backend
-    fetch('/dashboard/sentimientos/')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Datos recibidos del backend:', data);
-            // Actualizar Gráfica de Distribución de Sentimientos
-            graficaDistribucionSentimientos.data.datasets[0].data = [
-                data.comentarios.positivos,
-                data.comentarios.neutros,
-                data.comentarios.negativos
-            ];
-            graficaDistribucionSentimientos.update();
+        // Obtener datos del backend y actualizar la gráfica
+        fetch('/dashboard/sentimientos/')
+            .then(response => response.json())
+            .then(data => {
+                const interactuados = data.interactuados.reduce((acc, item) => {
+                    acc[item.clasificacion_chatgpt] = item.total;
+                    return acc;
+                }, { positivo: 0, neutro: 0, negativo: 0 });
 
-            console.log('Datos para Distribución de Sentimientos:', [
-                data.comentarios.positivos,
-                data.comentarios.neutros,
-                data.comentarios.negativos
-            ]);
+                sentimientosInteractuadosChart.data.datasets[0].data = [
+                    interactuados.positivo,
+                    interactuados.neutro,
+                    interactuados.negativo
+                ];
+                sentimientosInteractuadosChart.update();
 
-            // Actualizar Gráfica de Sentimientos en Publicaciones Interactuadas
-            const interactuados = data.interactuados.reduce((acc, item) => {
-                acc[item.clasificacion_chatgpt] = item.total;
-                return acc;
-            }, { positivo: 0, neutro: 0, negativo: 0 });
-            graficaSentimientosInteractuados.data.datasets[0].data = [
-                interactuados.positivo,
-                interactuados.neutro,
-                interactuados.negativo
-            ];
-            graficaSentimientosInteractuados.update();
+                console.log('Datos para Sentimientos en Publicaciones:', interactuados);
+            })
+            .catch(error => console.error('Error al cargar datos de sentimientos:', error));
+    } else {
+        console.error('El elemento graficaSentimientosInteractuados no existe en el DOM.');
+    }
 
-            console.log('Datos para Sentimientos Interactuados:', interactuados);
+    // Gráfica de Evolución Temporal de Sentimientos
+    const ctxEvolucionSentimientos = document.getElementById('graficaEvolucionSentimientos');
+    if (ctxEvolucionSentimientos) {
+        const graficaEvolucionSentimientos = new Chart(ctxEvolucionSentimientos.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [], // Fechas
+                datasets: [
+                    {
+                        label: 'Positivos',
+                        data: [], // Datos positivos
+                        borderColor: '#4caf50',
+                        fill: false,
+                    },
+                    {
+                        label: 'Neutros',
+                        data: [], // Datos neutros
+                        borderColor: '#ffeb3b',
+                        fill: false,
+                    },
+                    {
+                        label: 'Negativos',
+                        data: [], // Datos negativos
+                        borderColor: '#f44336',
+                        fill: false,
+                    }
+                ]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    ...commonOptions.plugins,
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                    }
+                }
+            }
+        });
 
-            // Actualizar Gráfica de Evolución Temporal de Sentimientos
-            const fechas = [...new Set(data.evolucion.map(item => item.fecha))];
-            const positivos = fechas.map(fecha => {
-                const item = data.evolucion.find(e => e.fecha === fecha && e.clasificacion_chatgpt === 'positivo');
-                return item ? item.total : 0;
-            });
-            const neutros = fechas.map(fecha => {
-                const item = data.evolucion.find(e => e.fecha === fecha && e.clasificacion_chatgpt === 'neutro');
-                return item ? item.total : 0;
-            });
-            const negativos = fechas.map(fecha => {
-                const item = data.evolucion.find(e => e.fecha === fecha && e.clasificacion_chatgpt === 'negativo');
-                return item ? item.total : 0;
-            });
+        // Obtener datos del backend
+        fetch('/dashboard/sentimientos/')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos recibidos del backend:', data);
+                // Actualizar Gráfica de Distribución de Sentimientos
+                graficaDistribucionSentimientos.data.datasets[0].data = [
+                    data.comentarios.positivos,
+                    data.comentarios.neutros,
+                    data.comentarios.negativos
+                ];
+                graficaDistribucionSentimientos.update();
 
-            graficaEvolucionSentimientos.data.labels = fechas; // Fechas deben ser un array de strings
-            graficaEvolucionSentimientos.data.datasets[0].data = positivos; // Datos deben ser un array de números
-            graficaEvolucionSentimientos.update();
+                console.log('Datos para Distribución de Sentimientos:', [
+                    data.comentarios.positivos,
+                    data.comentarios.neutros,
+                    data.comentarios.negativos
+                ]);
 
-            console.log('Datos para Evolución Temporal:', { fechas, positivos, neutros, negativos });
-        })
-        .catch(error => console.error('Error al cargar datos de sentimientos:', error));
+                // Actualizar Gráfica de Sentimientos en Publicaciones Interactuadas
+                const interactuados = data.interactuados.reduce((acc, item) => {
+                    acc[item.clasificacion_chatgpt] = item.total;
+                    return acc;
+                }, { positivo: 0, neutro: 0, negativo: 0 });
+                graficaSentimientosInteractuados.data.datasets[0].data = [
+                    interactuados.positivo,
+                    interactuados.neutro,
+                    interactuados.negativo
+                ];
+                graficaSentimientosInteractuados.update();
+
+                console.log('Datos para Sentimientos Interactuados:', interactuados);
+
+                // Actualizar Gráfica de Evolución Temporal de Sentimientos
+                const fechas = [...new Set(data.evolucion.map(item => item.fecha))];
+                const positivos = fechas.map(fecha => {
+                    const item = data.evolucion.find(e => e.fecha === fecha && e.clasificacion_chatgpt === 'positivo');
+                    return item ? item.total : 0;
+                });
+                const neutros = fechas.map(fecha => {
+                    const item = data.evolucion.find(e => e.fecha === fecha && e.clasificacion_chatgpt === 'neutro');
+                    return item ? item.total : 0;
+                });
+                const negativos = fechas.map(fecha => {
+                    const item = data.evolucion.find(e => e.fecha === fecha && e.clasificacion_chatgpt === 'negativo');
+                    return item ? item.total : 0;
+                });
+
+                graficaEvolucionSentimientos.data.labels = fechas; // Fechas deben ser un array de strings
+                graficaEvolucionSentimientos.data.datasets[0].data = positivos; // Datos deben ser un array de números
+                graficaEvolucionSentimientos.update();
+
+                console.log('Datos para Evolución Temporal:', { fechas, positivos, neutros, negativos });
+            })
+            .catch(error => console.error('Error al cargar datos de sentimientos:', error));
+    } else {
+        console.error('El elemento graficaEvolucionSentimientos no existe en el DOM.');
+    }
 
     // Función para actualizar estadísticas en tiempo real
     const actualizarEstadisticas = () => {

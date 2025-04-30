@@ -104,30 +104,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Gráfica de sentimientos interactuados -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Sentimientos en Publicaciones</h6>
-                        <div class="chart-container bar">
-                            <canvas id="graficaSentimientosInteractuados"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gráfica de evolución temporal -->
-            <div class="col-md-12">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Evolución Temporal de Sentimientos</h6>
-                        <div class="chart-container bar">
-                            <canvas id="graficaEvolucionSentimientos"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -135,6 +111,8 @@
     <script>
         const estilosDistribucionData = JSON.parse('{{ estilos_count|safe }}');
         const coloresDistribucionData = JSON.parse('{{ colores_count|safe }}');
+        const categoriasRecomendacionesData = JSON.parse('{{ categorias_count|safe }}');
+        const tallasRecomendacionesData = JSON.parse('{{ tallas_count|safe }}');
     </script>
     <script id="sentimientosData" type="application/json">
         {
