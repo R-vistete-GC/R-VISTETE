@@ -11,59 +11,59 @@
 
     <!-- Estadísticas generales -->
     <div class="row text-center my-4">
-        <div class="col-md-2">
-            <div class="card shadow-sm border-success">
+        <div class="col">
+            <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1 text-success">{{ total_publicaciones }}</h4>
-                    <p class="text-muted mb-0">Publicaciones</p>
+                    <h5 class="card-title">Publicaciones</h5>
+                    <p class="card-text">{{ total_publicaciones }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card shadow-sm border-success">
+        <div class="col">
+            <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1 text-success">{{ total_ventas }}</h4>
-                    <p class="text-muted mb-0">Ventas</p>
+                    <h5 class="card-title">Ventas</h5>
+                    <p class="card-text">{{ total_ventas }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card shadow-sm border-success">
+        <div class="col">
+            <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1 text-success">{{ total_alquileres }}</h4>
-                    <p class="text-muted mb-0">Alquileres</p>
+                    <h5 class="card-title">Alquileres</h5>
+                    <p class="card-text">{{ total_alquileres }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card shadow-sm border-success">
+        <div class="col">
+            <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1 text-success">{{ total_likes }}</h4>
-                    <p class="text-muted mb-0">Likes</p>
+                    <h5 class="card-title">Likes</h5>
+                    <p class="card-text">{{ total_likes }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card shadow-sm border-success">
+        <div class="col">
+            <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1 text-success">{{ total_favoritos }}</h4>
-                    <p class="text-muted mb-0">Favoritos</p>
+                    <h5 class="card-title">Favoritos</h5>
+                    <p class="card-text">{{ total_favoritos }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card shadow-sm border-success">
+        <div class="col">
+            <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1 text-success">{{ total_recomendaciones }}</h4>
-                    <p class="text-muted mb-0">Recomendaciones</p>
+                    <h5 class="card-title">Recomendaciones</h5>
+                    <p class="card-text">{{ total_recomendaciones }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card shadow-sm border-success">
+        <div class="col">
+            <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1 text-success">{{ total_compras }}</h4>
-                    <p class="text-muted mb-0">Compras</p>
+                    <h5 class="card-title">Compras</h5>
+                    <p class="card-text">{{ total_compras }}</p>
                 </div>
             </div>
         </div>
@@ -72,16 +72,6 @@
     <div class="container-fluid py-3">
         <div class="row g-3">
             <!-- Gráficas de la primera fila -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title text-center mb-3">Distribución de Estilos</h6>
-                        <div class="chart-container circular">
-                            <canvas id="estilosDistribucionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
@@ -107,12 +97,20 @@
         </div>
     </div>
 
+    <div class="col-md-12">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title text-center mb-3">Distribución de Estilos</h6>
+                <div class="chart-container bar">
+                    <canvas id="graficaDistribucionEstilos"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Pasar datos al JavaScript -->
     <script>
         const estilosDistribucionData = JSON.parse('{{ estilos_count|safe }}');
-        const coloresDistribucionData = JSON.parse('{{ colores_count|safe }}');
-        const categoriasRecomendacionesData = JSON.parse('{{ categorias_count|safe }}');
-        const tallasRecomendacionesData = JSON.parse('{{ tallas_count|safe }}');
     </script>
     <script id="sentimientosData" type="application/json">
         {

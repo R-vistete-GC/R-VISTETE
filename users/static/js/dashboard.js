@@ -68,29 +68,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Gráfica de Distribución de Estilos (de 'pie' a 'bar')
-    const estilosDistribucionCtx = document.getElementById('estilosDistribucionChart');
+    // Gráfica de Distribución de Estilos
+    const estilosDistribucionCtx = document.getElementById('graficaDistribucionEstilos');
     if (estilosDistribucionCtx) {
-        const ctx = estilosDistribucionCtx.getContext('2d');
-        const estilosDistribucionChart = new Chart(ctx, {
-            type: 'bar', // Cambiado de 'pie' a 'bar'
+        const estilosDistribucionChart = new Chart(estilosDistribucionCtx.getContext('2d'), {
+            type: 'bar', // Gráfica de barras
             data: {
-                labels: ['Athleisure', 'Deportivo', 'Retro', 'Lujo', 'Vintage', 'Streetwear', 'Casual', 'Elegante'],
+                labels: Object.keys(estilosDistribucionData), // Estilos
                 datasets: [{
-                    data: [8.3, 16.7, 8.3, 8.3, 16.7, 8.3, 16.7, 16.7],
+                    label: 'Cantidad',
+                    data: Object.values(estilosDistribucionData), // Cantidades
                     backgroundColor: [
                         '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#FF9F40', '#FF6384', '#4CAF50', '#FFC107'
                     ],
+                    borderColor: '#4CAF50',
+                    borderWidth: 1
                 }]
             },
             options: {
-                ...barOptions, // Usar opciones de barras
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    ...barOptions.plugins,
-                    title: {
-                        display: true,
-                        text: 'Distribución de Estilos'
-                    }
+                    legend: { display: false },
+                    title: { display: true, text: 'Distribución de Estilos' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
                 }
             }
         });

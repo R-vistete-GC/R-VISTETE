@@ -43,6 +43,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 from django.db.models import Count, Q, Exists, OuterRef
+from collections import defaultdict
+import json
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -257,53 +259,79 @@ def generar_grafica(datos, titulo, tipo='bar'):
     return imagen_base64
 
 def dashboard(request):
-    usuario_id = request.session.get('usuario_id')
+    usuario_id = request.session.get('usuario_id')  # Obtener el usuario desde la sesión
     if not usuario_id:
         return redirect('/users/login/')
 
     try:
-        # Mantener las estadísticas existentes
-        total_likes = Like.objects.filter(usuario_id=usuario_id).count()
-        total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
+        # Contadores para las cards
         total_publicaciones = Publicacion.objects.filter(usuario_id=usuario_id).count()
         total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
         total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
+        total_likes = Like.objects.filter(usuario_id=usuario_id).count()
+        total_favoritos = Favorito.objects.filter(usuario_id=usuario_id).count()
         total_compras = Venta.objects.filter(comprador_id=usuario_id).count()
+        total_recomendaciones = len(recomendaciones_view(request, return_as_list=True))
 
-        # Obtener recomendaciones
-        recomendaciones = recomendaciones_view(request, return_as_list=True)
-        total_recomendaciones = len(recomendaciones)
+        # Inicializar contadores de estilos
+        estilos_count = defaultdict(int)
 
-        # Calcular datos para las gráficas existentes
-        estilos_count = {}
-        colores_count = {}
-
-        for rec in recomendaciones:
-            publicacion = rec['publicacion']
-            # Contar estilos
+        # Publicaciones del usuario
+        publicaciones = Publicacion.objects.filter(usuario_id=usuario_id)
+        for publicacion in publicaciones:
             if publicacion.estilo:
                 for estilo in publicacion.estilo:
-                    estilos_count[estilo] = estilos_count.get(estilo, 0) + 1
-            # Contar colores
-            if publicacion.colores:
-                for color in publicacion.colores:
-                    colores_count[color] = colores_count.get(color, 0) + 1
+                    estilos_count[estilo] += 1
 
-        # Generar gráficas con matplotlib
-        grafica_estilos = generar_grafica(estilos_count, 'Distribución de Estilos', tipo='bar')
-        grafica_colores = generar_grafica(colores_count, 'Distribución de Colores', tipo='bar')
+        # Likes del usuario
+        likes = Like.objects.filter(usuario_id=usuario_id).select_related('publicacion')
+        for like in likes:
+            if like.publicacion and like.publicacion.estilo:
+                for estilo in like.publicacion.estilo:
+                    estilos_count[estilo] += 1
 
-        # Pasar todos los datos al contexto
+        # Favoritos del usuario
+        favoritos = Favorito.objects.filter(usuario_id=usuario_id).select_related('publicacion')
+        for favorito in favoritos:
+            if favorito.publicacion and favorito.publicacion.estilo:
+                for estilo in favorito.publicacion.estilo:
+                    estilos_count[estilo] += 1
+
+        # Alquileres del usuario
+        alquileres = Alquiler.objects.filter(cliente_id=usuario_id).select_related('publicacion')
+        for alquiler in alquileres:
+            if alquiler.publicacion and alquiler.publicacion.estilo:
+                for estilo in alquiler.publicacion.estilo:
+                    estilos_count[estilo] += 1
+
+        # Compras del usuario
+        compras = Venta.objects.filter(comprador_id=usuario_id).select_related('publicacion')
+        for compra in compras:
+            if compra.publicacion and compra.publicacion.estilo:
+                for estilo in compra.publicacion.estilo:
+                    estilos_count[estilo] += 1
+
+        # Recomendaciones para el usuario
+        recomendaciones = recomendaciones_view(request, return_as_list=True)
+        for recomendacion in recomendaciones:
+            publicacion = recomendacion['publicacion']
+            if publicacion.estilo:
+                for estilo in publicacion.estilo:
+                    estilos_count[estilo] += 1
+
+        # Convertir los datos a JSON para pasarlos al frontend
+        estilos_count_json = json.dumps(estilos_count)
+
+        # Pasar los datos al contexto
         context = {
-            'total_likes': total_likes,
-            'total_favoritos': total_favoritos,
             'total_publicaciones': total_publicaciones,
             'total_ventas': total_ventas,
             'total_alquileres': total_alquileres,
+            'total_likes': total_likes,
+            'total_favoritos': total_favoritos,
             'total_compras': total_compras,
             'total_recomendaciones': total_recomendaciones,
-            'grafica_estilos': grafica_estilos,
-            'grafica_colores': grafica_colores,
+            'estilos_count': estilos_count_json,  # Datos para la gráfica
         }
         return render(request, 'users/dashboard.html', context)
 
