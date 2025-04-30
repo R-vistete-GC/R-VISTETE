@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('El archivo dashboard.js se está ejecutando correctamente.');
+    console.log('Archivo dashboard.js cargado correctamente.');
 
     const sentimientosData = JSON.parse(document.getElementById('sentimientosData').textContent);
     console.log('Datos de sentimientos:', sentimientosData);
@@ -68,103 +68,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Gráfica de sentimientos (versión dona)
-    const sentimientosCtx = document.getElementById('sentimientosChart');
-    if (sentimientosCtx) {
-        const ctx = sentimientosCtx.getContext('2d');
-        const sentimientosChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Positivos', 'Neutros', 'Negativos'],
-                datasets: [{
-                    data: [40, 35, 25],
-                    backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
-                }]
-            },
-            options: {
-                ...pieOptions,
-                plugins: {
-                    ...pieOptions.plugins,
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.raw}%`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Gráfica de estilos preferidos
-    const estilosCtx = document.getElementById('estilosChart');
-    if (estilosCtx) {
-        const ctx = estilosCtx.getContext('2d');
-        const estilosChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Casual', 'Elegante', 'Deportivo'],
-                datasets: [{
-                    data: [10, 20, 30], // Reemplazar con datos dinámicos
-                    backgroundColor: ['#4caf50', '#ffeb3b', '#f44336'],
-                }]
-            },
-            options: {
-                ...barOptions,
-                plugins: {
-                    ...barOptions.plugins,
-                    title: {
-                        display: false
-                    }
-                }
-            }
-        });
-    } else {
-        console.error('El elemento estilosChart no existe en el DOM.');
-    }
-
-    // Gráfica de distribución de estilos
+    // Gráfica de Distribución de Estilos (de 'pie' a 'bar')
     const estilosDistribucionCtx = document.getElementById('estilosDistribucionChart');
     if (estilosDistribucionCtx) {
         const ctx = estilosDistribucionCtx.getContext('2d');
         const estilosDistribucionChart = new Chart(ctx, {
-            type: 'pie',
+            type: 'bar', // Cambiado de 'pie' a 'bar'
             data: {
                 labels: ['Athleisure', 'Deportivo', 'Retro', 'Lujo', 'Vintage', 'Streetwear', 'Casual', 'Elegante'],
                 datasets: [{
                     data: [8.3, 16.7, 8.3, 8.3, 16.7, 8.3, 16.7, 16.7],
                     backgroundColor: [
-                        '#36A2EB', // Athleisure
-                        '#FF6384', // Deportivo
-                        '#FFCE56', // Retro
-                        '#4BC0C0', // Lujo
-                        '#FF9F40', // Vintage
-                        '#FF6384', // Streetwear
-                        '#4CAF50', // Casual
-                        '#FFC107'  // Elegante
-                    ]
+                        '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#FF9F40', '#FF6384', '#4CAF50', '#FFC107'
+                    ],
                 }]
             },
             options: {
-                ...pieOptions,
+                ...barOptions, // Usar opciones de barras
                 plugins: {
-                    ...pieOptions.plugins,
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.raw}%`;
-                            }
-                        }
-                    },
+                    ...barOptions.plugins,
                     title: {
-                        display: false
+                        display: true,
+                        text: 'Distribución de Estilos'
                     }
                 }
             }
         });
     } else {
         console.error('El elemento estilosDistribucionChart no existe en el DOM.');
+    }
+
+    // Gráfica de Sentimientos (de 'doughnut' a 'line')
+    const sentimientosCtx = document.getElementById('sentimientosChart');
+    if (sentimientosCtx) {
+        const ctx = sentimientosCtx.getContext('2d');
+        const sentimientosChart = new Chart(ctx, {
+            type: 'line', // Cambiado a 'line'
+            data: {
+                labels: ['Positivos', 'Neutros', 'Negativos'],
+                datasets: [{
+                    label: 'Sentimientos',
+                    data: [sentimientosData.positivos, sentimientosData.neutros, sentimientosData.negativos],
+                    borderColor: '#4caf50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    ...commonOptions.plugins,
+                    title: {
+                        display: true,
+                        text: 'Distribución de Sentimientos'
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        console.error('El elemento estilosChart no existe en el DOM.');
     }
 
     // Gráfica de distribución de colores

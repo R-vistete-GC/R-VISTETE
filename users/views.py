@@ -290,7 +290,7 @@ def dashboard(request):
                     colores_count[color] = colores_count.get(color, 0) + 1
 
         # Generar gráficas con matplotlib
-        grafica_estilos = generar_grafica(estilos_count, 'Distribución de Estilos', tipo='pie')
+        grafica_estilos = generar_grafica(estilos_count, 'Distribución de Estilos', tipo='bar')
         grafica_colores = generar_grafica(colores_count, 'Distribución de Colores', tipo='bar')
 
         # Pasar todos los datos al contexto
