@@ -1,20 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Archivo dashboard.js cargado correctamente.');
 
-   
-    const recomendacionesDataElement = document.getElementById('recomendacionesData');
-    if (recomendacionesDataElement) {
-        const recomendacionesData = JSON.parse(recomendacionesDataElement.textContent);
-        console.log('Datos de recomendaciones:', recomendacionesData);
-    } else {
-        console.error('El elemento recomendacionesData no existe en el DOM.');
-    }
-
-   
-
-   
     // Gráfica de Estilo y Color
     const estiloColorCtx = document.getElementById('graficaEstiloColor');
+    let estiloColorChart; // Variable para almacenar la instancia de la gráfica
+    let chartType = 'line'; // Tipo de gráfica inicial
+
     if (estiloColorCtx) {
         fetch('/users/dashboard/recomendaciones-estilo-color/')
             .then(response => response.json())
@@ -27,25 +18,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Preparar datasets para cada color
                 const datasets = colores.map(color => ({
                     label: color, // Nombre del color
-                    data: estilos.map(estilo => data[estilo][color]), // Valores para cada estilo
+                    data: estilos.map((estilo, index) => ({
+                        x: estilo, // Usar el nombre del estilo como valor en el eje X
+                        y: data[estilo][color] // Valor en el eje Y
+                    })), // Datos para la gráfica de puntos
                     borderColor: getColorForLabel(color), // Asignar color a la línea
                     backgroundColor: getColorForLabel(color),
                     fill: false,
-                    tension: 0.1
+                    tension: 0.1,
+                    pointRadius: 5, // Tamaño normal de los puntos
+                    pointHoverRadius: 7 // Tamaño al pasar el mouse
                 }));
 
                 // Crear la gráfica
-                new Chart(estiloColorCtx, {
-                    type: 'line', // Gráfica lineal
+                estiloColorChart = new Chart(estiloColorCtx, {
+                    type: chartType, // Gráfica inicial (línea)
                     data: {
                         labels: estilos, // Etiquetas en el eje X (estilos)
                         datasets: datasets // Conjuntos de datos (colores)
                     },
                     options: {
-                        responsive: true,
+                        interaction: {
+                            mode: 'nearest', // Interacción con el punto más cercano
+                            axis: 'x', // Interacción en el eje X
+                            intersect: true // Solo interactuar con puntos específicos
+                        },
                         plugins: {
                             legend: {
-                                position: 'top' // Posición de la leyenda
+                                position: 'top'
                             },
                             title: {
                                 display: true,
@@ -53,23 +53,69 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         },
                         scales: {
+                            x: {
+                                type: 'category', // Mostrar categorías en el eje X
+                                labels: estilos // Etiquetas en el eje X
+                            },
                             y: {
                                 beginAtZero: true // Comenzar el eje Y desde 0
                             }
                         }
                     }
                 });
+
+                // Agregar funcionalidad para alternar el tipo de gráfica
+                document.getElementById('toggleChartType').addEventListener('click', () => {
+                    chartType = chartType === 'line' ? 'scatter' : 'line'; // Alternar entre 'line' y 'scatter'
+
+                    // Destruir la gráfica actual y crear una nueva
+                    estiloColorChart.destroy();
+                    estiloColorChart = new Chart(estiloColorCtx, {
+                        type: chartType,
+                        data: {
+                            labels: estilos,
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Recomendaciones por Estilo y Color'
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    type: chartType === 'scatter' ? 'category' : 'category', // Mostrar categorías en ambos casos
+                                    labels: estilos // Etiquetas en el eje X
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    // Cambiar el texto del botón
+                    document.getElementById('toggleChartType').textContent =
+                        chartType === 'line' ? 'Cambiar a Gráfica de Puntos' : 'Cambiar a Gráfica de Líneas';
+                });
+
+                // Generar resumen de recomendaciones
+                const resumenContainer = document.getElementById('resumenRecomendaciones');
+                let resumenHTML = '<h5>Resumen de Recomendaciones</h5><ul>';
+                colores.forEach(color => {
+                    const total = estilos.reduce((sum, estilo) => sum + data[estilo][color], 0);
+                    resumenHTML += `<li>${color}: ${total} recomendaciones</li>`;
+                });
+                resumenHTML += '</ul>';
+                resumenContainer.innerHTML = resumenHTML;
             })
             .catch(error => console.error('Error al cargar datos de estilo y color:', error));
     }
-
-    
-
-    // Llamar a la función cada 30 segundos
-    setInterval(actualizarEstadisticas, 30000);
-
-    // Llamar a la función inmediatamente al cargar la página
-    actualizarEstadisticas();
 });
 
 // Función para asignar colores a las líneas
