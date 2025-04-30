@@ -27,4 +27,5 @@ urlpatterns = [
     path('get_publicacion/<int:publicacion_id>/', views.get_publicacion, name='get_publicacion'),
     path('metricas/<int:publicacion_id>/', views.obtener_metricas_publicacion, name='obtener_metricas_publicacion'),
     path('editar-publicacion/', views.editar_publicacion, name='editar_publicacion'),  # Nueva URL para editar publicaciones
+    path('borrar/<int:publicacion_id>/', views.borrar_publicacion, name='borrar_publicacion'),
 ]

@@ -1026,3 +1026,35 @@ def editar_publicacion(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
+@require_http_methods(["POST"])
+def borrar_publicacion(request, publicacion_id):
+    try:
+        # Verificar que el usuario esté autenticado
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({'success': False, 'error': 'Usuario no autenticado'}, status=401)
+            
+        # Obtener la publicación
+        publicacion = get_object_or_404(Publicacion, id=publicacion_id)
+        
+        # Verificar que el usuario sea el dueño de la publicación
+        if str(publicacion.usuario.id) != str(usuario_id):
+            return JsonResponse({
+                'success': False, 
+                'error': 'No tienes permiso para borrar esta publicación'
+            }, status=403)
+            
+        # Borrar la publicación
+        publicacion.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Publicación eliminada exitosamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)

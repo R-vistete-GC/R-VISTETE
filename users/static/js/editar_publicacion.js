@@ -1,115 +1,77 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Debug para verificar que el script se está cargando
-    console.log('Script de edición cargado');
-
-    // Agregamos el evento click a todos los botones de edición
-    const botonesEditar = document.querySelectorAll('[data-bs-target="#editarPublicacionModal"]');
-    botonesEditar.forEach(boton => {
-        boton.addEventListener('click', function(event) {
-            console.log('Botón de editar clickeado');
-            const publicacionId = this.getAttribute('data-publicacion-id');
-            const titulo = this.getAttribute('data-titulo');
-            const descripcion = this.getAttribute('data-descripcion');
-            const imagen = this.getAttribute('data-imagen');
-            const tipo = this.getAttribute('data-tipo');
-            const precioVenta = this.getAttribute('data-precio-venta');
-            const precioAlquiler = this.getAttribute('data-precio-alquiler');
-            const deposito = this.getAttribute('data-deposito');
-
-            // Llenar el formulario con los datos
-            document.getElementById('publicacion_id').value = publicacionId;
-            document.getElementById('titulo').value = titulo;
-            document.getElementById('descripcion').value = descripcion;
-            document.getElementById('imagen_actual').src = imagen;
-            document.getElementById('tipo').value = tipo;
-            
-            // Mostrar/ocultar campos de precios según el tipo
-            actualizarCamposPrecios(tipo);
-            
-            // Llenar precios si existen
-            if (precioVenta) document.getElementById('precio_venta').value = precioVenta;
-            if (precioAlquiler) document.getElementById('precio_alquiler').value = precioAlquiler;
-            if (deposito) document.getElementById('deposito').value = deposito;
-
-            // Obtener estilos y colores
-            const estilos = this.getAttribute('data-estilos').split(',');
-            const colores = this.getAttribute('data-colores').split(',');
-            
-            // Desmarcar todos los checkboxes primero
-            document.querySelectorAll('input[name="estilo[]"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            document.querySelectorAll('input[name="colores[]"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            
-            // Marcar los checkboxes correspondientes
-            estilos.forEach(estilo => {
-                const checkbox = document.getElementById(`estilo${estilo.charAt(0).toUpperCase() + estilo.slice(1)}Edit`);
-                if (checkbox) checkbox.checked = true;
-            });
-            
-            colores.forEach(color => {
-                const checkbox = document.getElementById(`color${color.charAt(0).toUpperCase() + color.slice(1)}Edit`);
-                if (checkbox) checkbox.checked = true;
-            });
-        });
-    });
-
-    // Función para actualizar campos de precios
+    // Función para mostrar/ocultar campos de precios
     function actualizarCamposPrecios(tipo) {
-        const camposVenta = document.getElementById('campos_venta');
-        const camposAlquiler = document.getElementById('campos_alquiler');
+        console.log('Tipo seleccionado:', tipo); // Debug
+
+        const camposVenta = document.getElementById('precio_venta_container');
+        const camposAlquiler = document.getElementById('precio_alquiler_container');
+        const camposDeposito = document.getElementById('deposito_container');
 
         // Ocultar todos los campos primero
         camposVenta.style.display = 'none';
         camposAlquiler.style.display = 'none';
+        camposDeposito.style.display = 'none';
 
-        // Mostrar campos según el tipo seleccionado
+        // Quitar required de todos los campos
+        document.getElementById('precio_venta').required = false;
+        document.getElementById('precio_alquiler').required = false;
+        document.getElementById('deposito').required = false;
+
+        // Mostrar y hacer required según el tipo
         switch(tipo) {
             case 'venta':
                 camposVenta.style.display = 'block';
+                document.getElementById('precio_venta').required = true;
                 break;
             case 'alquiler':
                 camposAlquiler.style.display = 'block';
+                camposDeposito.style.display = 'block';
+                document.getElementById('precio_alquiler').required = true;
+                document.getElementById('deposito').required = true;
                 break;
             case 'venta y alquiler':
                 camposVenta.style.display = 'block';
                 camposAlquiler.style.display = 'block';
+                camposDeposito.style.display = 'block';
+                document.getElementById('precio_venta').required = true;
+                document.getElementById('precio_alquiler').required = true;
+                document.getElementById('deposito').required = true;
                 break;
         }
     }
 
-    // Agregar listeners para los radio buttons
-    document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+    // Agregar event listeners a los radio buttons
+    const radiosTipo = document.querySelectorAll('input[name="tipo"]');
+    radiosTipo.forEach(radio => {
         radio.addEventListener('change', function() {
+            console.log('Radio changed:', this.value); // Debug
             actualizarCamposPrecios(this.value);
         });
     });
-});
 
-// En el JavaScript que maneja el formulario de edición
-function guardarEdicion() {
-    const form = document.getElementById('formEditarPublicacion');
-    const formData = new FormData(form);
-    
-    fetch('/posts/editar-publicacion/', {
-        method: 'POST',
-        body: formData,
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Cerrar modal y actualizar la página
-            bootstrap.Modal.getInstance(document.getElementById('editarPublicacionModal')).hide();
-            location.reload();
-        } else {
-            alert(data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error al guardar los cambios');
+    // Event listener para el botón de editar
+    const botonesEditar = document.querySelectorAll('[data-bs-target="#editarPublicacionModal"]');
+    botonesEditar.forEach(boton => {
+        boton.addEventListener('click', function() {
+            const tipo = this.getAttribute('data-tipo');
+            console.log('Tipo al abrir modal:', tipo); // Debug
+
+            // Marcar el radio button correspondiente
+            const radioTipo = document.querySelector(`input[name="tipo"][value="${tipo}"]`);
+            if (radioTipo) {
+                radioTipo.checked = true;
+                // Llamar a la función inmediatamente después de marcar el radio
+                actualizarCamposPrecios(tipo);
+            }
+
+            // Establecer los valores de los campos si existen
+            const precioVenta = this.getAttribute('data-precio-venta');
+            const precioAlquiler = this.getAttribute('data-precio-alquiler');
+            const deposito = this.getAttribute('data-deposito');
+
+            if (precioVenta) document.getElementById('precio_venta').value = precioVenta;
+            if (precioAlquiler) document.getElementById('precio_alquiler').value = precioAlquiler;
+            if (deposito) document.getElementById('deposito').value = deposito;
+        });
     });
-}
+});

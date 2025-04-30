@@ -376,6 +376,7 @@
 <script src="{% static 'posts/js/interacciones.js' %}"></script>
 <script src="{% static 'posts/js/transacciones.js' %}"></script>
 <script src="{% static 'js/editar_publicacion.js' %}"></script>
+<script src="{% static 'js/borrar_publicacion.js' %}"></script>
 {% endblock %}
 
 {% block modals %}
@@ -414,25 +415,25 @@
 
                     <!-- Tipo de Publicación -->
                     <div class="mb-3">
-                        <label class="form-label">Tipo de Publicación*</label>
-                        <div class="tipo-toggle">
-                            <div class="form-check">
-                                <input type="radio" class="form-check-input" id="tipoVentaEdit" name="tipo" value="venta" required>
-                                <label class="form-check-label" for="tipoVentaEdit">Venta</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" class="form-check-input" id="tipoAlquilerEdit" name="tipo" value="alquiler">
-                                <label class="form-check-label" for="tipoAlquilerEdit">Alquiler</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" class="form-check-input" id="tipoAmbosEdit" name="tipo" value="venta y alquiler">
-                                <label class="form-check-label" for="tipoAmbosEdit">Venta y Alquiler</label>
-                            </div>
-                        </div>
-                    </div>
+    <label class="form-label">Tipo de Publicación*</label>
+    <div class="tipo-toggle">
+        <div class="form-check">
+            <input type="radio" class="form-check-input" id="tipoVentaEdit" name="tipo" value="venta" required>
+            <label class="form-check-label" for="tipoVentaEdit">Venta</label>
+        </div>
+        <div class="form-check">
+            <input type="radio" class="form-check-input" id="tipoAlquilerEdit" name="tipo" value="alquiler">
+            <label class="form-check-label" for="tipoAlquilerEdit">Alquiler</label>
+        </div>
+        <div class="form-check">
+            <input type="radio" class="form-check-input" id="tipoAmbosEdit" name="tipo" value="venta y alquiler">
+            <label class="form-check-label" for="tipoAmbosEdit">Venta y Alquiler</label>
+        </div>
+    </div>
+</div>
 
-                    <!-- Campos de precios -->
-                    <div id="campos_venta" class="mb-3" style="display: none;">
+                    <!-- Campos de precios que se mostrarán/ocultarán -->
+                    <div id="precio_venta_container" class="mb-3" style="display: none;">
                         <label for="precio_venta" class="form-label">Precio de Venta*</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
@@ -440,14 +441,16 @@
                         </div>
                     </div>
 
-                    <div id="campos_alquiler" class="mb-3" style="display: none;">
+                    <div id="precio_alquiler_container" class="mb-3" style="display: none;">
                         <label for="precio_alquiler" class="form-label">Precio de Alquiler (por día)*</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
                             <input type="number" class="form-control" id="precio_alquiler" name="precio_alquiler" step="0.01" min="0">
                         </div>
-                        
-                        <label for="deposito" class="form-label mt-2">Depósito de Seguridad*</label>
+                    </div>
+
+                    <div id="deposito_container" class="mb-3" style="display: none;">
+                        <label for="deposito" class="form-label">Depósito de Seguridad*</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
                             <input type="number" class="form-control" id="deposito" name="deposito" step="0.01" min="0">
@@ -577,5 +580,26 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para borrar publicación -->
+<div class="modal fade" id="borrarPublicacionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar esta publicación?</p>
+                <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="borrarPublicacion()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
