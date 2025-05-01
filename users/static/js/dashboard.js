@@ -171,30 +171,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Procesar los datos para la gráfica
                 const puntos = data.data.map(item => ({
-                    x: item.estilo,
-                    y: item.color,
-                    tipo: item.tipo
+                    x: item.cantidad, // Cantidad en el eje X
+                    y: item.color, // Color en el eje Y
+                    estilo: item.estilo, // Estilo para el tooltip
+                    tipo: item.tipo, // Tipo de transacción para el tooltip
                 }));
 
                 // Crear la gráfica de puntos
                 new Chart(estilosColoresCtx, {
-                    type: 'scatter',
+                    type: 'scatter', // Gráfica de puntos
                     data: {
                         datasets: [
                             {
                                 label: 'Ventas',
                                 data: puntos.filter(p => p.tipo === 'venta'),
-                                backgroundColor: '#FF6384',
+                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                                borderColor: '#FF6384',
+                                borderWidth: 1,
                             },
                             {
                                 label: 'Compras',
                                 data: puntos.filter(p => p.tipo === 'compra'),
-                                backgroundColor: '#36A2EB',
+                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                borderColor: '#36A2EB',
+                                borderWidth: 1,
                             },
                             {
                                 label: 'Alquileres',
                                 data: puntos.filter(p => p.tipo === 'alquiler'),
-                                backgroundColor: '#FFCE56',
+                                backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                                borderColor: '#FFCE56',
+                                borderWidth: 1,
                             },
                         ],
                     },
@@ -208,14 +215,22 @@ document.addEventListener('DOMContentLoaded', () => {
                                 display: true,
                                 text: 'Estilos y Colores Más Solicitados',
                             },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const punto = context.raw;
+                                        return `${context.dataset.label}: Estilo "${punto.estilo}", Color "${punto.y}", Cantidad: ${punto.x}`;
+                                    },
+                                },
+                            },
                         },
                         scales: {
                             x: {
-                                type: 'category',
                                 title: {
                                     display: true,
-                                    text: 'Estilos',
+                                    text: 'Cantidad',
                                 },
+                                beginAtZero: true,
                             },
                             y: {
                                 type: 'category',

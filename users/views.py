@@ -780,6 +780,7 @@ def dashboard_ingresos_gastos(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 from django.http import JsonResponse
+from collections import Counter
 
 def dashboard_estilos_colores(request):
     usuario_id = request.session.get('usuario_id')
@@ -788,7 +789,7 @@ def dashboard_estilos_colores(request):
 
     try:
         # Inicializar contadores
-        estilos_colores_count = []
+        estilos_colores_count = Counter()
 
         # Procesar ventas
         ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id)
@@ -797,11 +798,7 @@ def dashboard_estilos_colores(request):
             colores = venta.publicacion.colores or []
             for estilo in estilos:
                 for color in colores:
-                    estilos_colores_count.append({
-                        'estilo': estilo.strip().lower(),
-                        'color': color.strip().lower(),
-                        'tipo': 'venta'
-                    })
+                    estilos_colores_count[(estilo.strip().lower(), color.strip().lower(), 'venta')] += 1
 
         # Procesar compras
         compras = Compra.objects.filter(comprador_id=usuario_id)
@@ -810,11 +807,7 @@ def dashboard_estilos_colores(request):
             colores = compra.publicacion.colores or []
             for estilo in estilos:
                 for color in colores:
-                    estilos_colores_count.append({
-                        'estilo': estilo.strip().lower(),
-                        'color': color.strip().lower(),
-                        'tipo': 'compra'
-                    })
+                    estilos_colores_count[(estilo.strip().lower(), color.strip().lower(), 'compra')] += 1
 
         # Procesar alquileres
         alquileres = Alquiler.objects.filter(cliente_id=usuario_id)
@@ -823,13 +816,14 @@ def dashboard_estilos_colores(request):
             colores = alquiler.publicacion.colores or []
             for estilo in estilos:
                 for color in colores:
-                    estilos_colores_count.append({
-                        'estilo': estilo.strip().lower(),
-                        'color': color.strip().lower(),
-                        'tipo': 'alquiler'
-                    })
+                    estilos_colores_count[(estilo.strip().lower(), color.strip().lower(), 'alquiler')] += 1
 
         # Formatear los datos para enviarlos al frontend
-        return JsonResponse({'data': estilos_colores_count})
+        data = [
+            {'estilo': estilo, 'color': color, 'tipo': tipo, 'cantidad': cantidad}
+            for (estilo, color, tipo), cantidad in estilos_colores_count.items()
+        ]
+
+        return JsonResponse({'data': data})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
