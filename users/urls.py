@@ -29,4 +29,7 @@ urlpatterns = [
 
     # Nueva ruta para la gráfica de transacciones por estado
     path('dashboard/transacciones-por-estado/', views.dashboard_transacciones_por_estado, name='dashboard_transacciones_por_estado'),
+
+    # Nueva ruta para la gráfica de ingresos y gastos
+    path('dashboard/ingresos-gastos/', views.dashboard_ingresos_gastos, name='dashboard_ingresos_gastos'),
 ]

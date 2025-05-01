@@ -512,6 +512,78 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al cargar datos de transacciones por estado:', error));
     }
 
+    // Gráfica de Ingresos y Gastos
+    const ingresosGastosCtx = document.getElementById('graficaIngresosGastos');
+    if (ingresosGastosCtx) {
+        fetch('/users/dashboard/ingresos-gastos/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error al cargar datos de ingresos y gastos:', data.error);
+                    return;
+                }
+
+                // Extraer los datos de ingresos y gastos
+                const ingresosVentas = data.ingresos_ventas;
+                const ingresosAlquileres = data.ingresos_alquileres;
+                const gastosCompras = data.gastos_compras;
+
+                // Crear la gráfica de área sombreada
+                new Chart(ingresosGastosCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Ingresos por Ventas', 'Ingresos por Alquileres', 'Gastos en Compras'], // Etiquetas en el eje X
+                        datasets: [
+                            {
+                                label: 'Ingresos',
+                                data: [ingresosVentas, ingresosAlquileres, 0], // Ingresos
+                                borderColor: '#4CAF50',
+                                backgroundColor: 'rgba(76, 175, 80, 0.2)', // Área sombreada
+                                fill: true,
+                                tension: 0.4, // Líneas suaves
+                            },
+                            {
+                                label: 'Gastos',
+                                data: [0, 0, gastosCompras], // Gastos
+                                borderColor: '#FF5722',
+                                backgroundColor: 'rgba(255, 87, 34, 0.2)', // Área sombreada
+                                fill: true,
+                                tension: 0.4, // Líneas suaves
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Comparación de Ingresos y Gastos',
+                            },
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Categorías',
+                                },
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Monto Total ($)',
+                                },
+                            },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de ingresos y gastos:', error));
+    }
+
     // Función para actualizar las recomendaciones en tiempo real
     const actualizarRecomendaciones = () => {
         fetch('/users/dashboard/recomendaciones-estilo-color/')

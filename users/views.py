@@ -750,3 +750,31 @@ def dashboard_transacciones_por_estado(request):
         return JsonResponse(data)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+from django.db.models import Sum
+
+def dashboard_ingresos_gastos(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Calcular ingresos por ventas
+        ingresos_ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id).aggregate(total=Sum('precio_final'))['total'] or 0
+
+        # Calcular ingresos por alquileres
+        ingresos_alquileres = Alquiler.objects.filter(publicacion__usuario_id=usuario_id).aggregate(total=Sum('precio_total'))['total'] or 0
+
+        # Calcular gastos en compras
+        gastos_compras = Compra.objects.filter(comprador_id=usuario_id).aggregate(total=Sum('precio_final'))['total'] or 0
+
+        # Formatear los datos para enviarlos al frontend
+        data = {
+            'ingresos_ventas': ingresos_ventas,
+            'ingresos_alquileres': ingresos_alquileres,
+            'gastos_compras': gastos_compras,
+        }
+
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
