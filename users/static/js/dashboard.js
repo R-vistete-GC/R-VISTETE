@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Combinar todas las fechas únicas
                 const mesesUnicos = [...new Set([...mesesCompras, ...mesesVentas, ...mesesAlquileres])];
 
-                // Crear la gráfica de líneas
+                // Crear la gráfica de líneas con marcadores
                 new Chart(actividadTiempoCtx, {
                     type: 'line',
                     data: {
@@ -364,21 +364,33 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data: mesesUnicos.map(mes => totalesCompras[mesesCompras.indexOf(mes)] || 0),
                                 borderColor: '#36A2EB',
                                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                tension: 0.1,
+                                tension: 0.4, // Líneas suaves
+                                pointStyle: 'circle', // Marcadores circulares
+                                pointRadius: 5, // Tamaño de los puntos
+                                pointBackgroundColor: '#36A2EB',
+                                fill: false,
                             },
                             {
                                 label: 'Ventas',
                                 data: mesesUnicos.map(mes => totalesVentas[mesesVentas.indexOf(mes)] || 0),
                                 borderColor: '#FF6384',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                tension: 0.1,
+                                tension: 0.4, // Líneas suaves
+                                pointStyle: 'triangle', // Marcadores triangulares
+                                pointRadius: 5, // Tamaño de los puntos
+                                pointBackgroundColor: '#FF6384',
+                                fill: false,
                             },
                             {
                                 label: 'Alquileres',
                                 data: mesesUnicos.map(mes => totalesAlquileres[mesesAlquileres.indexOf(mes)] || 0),
                                 borderColor: '#FFCE56',
                                 backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                                tension: 0.1,
+                                tension: 0.4, // Líneas suaves
+                                pointStyle: 'rect', // Marcadores rectangulares
+                                pointRadius: 5, // Tamaño de los puntos
+                                pointBackgroundColor: '#FFCE56',
+                                fill: false,
                             },
                         ],
                     },
