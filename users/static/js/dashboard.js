@@ -528,53 +528,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ingresosAlquileres = data.ingresos_alquileres;
                 const gastosCompras = data.gastos_compras;
 
-                // Crear la gráfica de área sombreada
+                // Crear la gráfica de barras horizontales apiladas
                 new Chart(ingresosGastosCtx, {
-                    type: 'line',
+                    type: 'bar',
                     data: {
-                        labels: ['Ingresos por Ventas', 'Ingresos por Alquileres', 'Gastos en Compras'], // Etiquetas en el eje X
+                        labels: ['Ingresos por Ventas', 'Ingresos por Alquileres', 'Gastos en Compras'], // Etiquetas en el eje Y
                         datasets: [
                             {
                                 label: 'Ingresos',
-                                data: [ingresosVentas, ingresosAlquileres, 0], // Ingresos
-                                borderColor: '#4CAF50',
-                                backgroundColor: 'rgba(76, 175, 80, 0.2)', // Área sombreada
-                                fill: true,
-                                tension: 0.4, // Líneas suaves
+                                data: [ingresosVentas, ingresosAlquileres, 0],
+                                backgroundColor: '#4CAF50',
                             },
                             {
                                 label: 'Gastos',
-                                data: [0, 0, gastosCompras], // Gastos
-                                borderColor: '#FF5722',
-                                backgroundColor: 'rgba(255, 87, 34, 0.2)', // Área sombreada
-                                fill: true,
-                                tension: 0.4, // Líneas suaves
+                                data: [0, 0, gastosCompras],
+                                backgroundColor: '#FF5722',
                             },
                         ],
                     },
                     options: {
                         responsive: true,
+                        indexAxis: 'y', // Cambiar a barras horizontales
                         plugins: {
                             legend: {
                                 position: 'top',
                             },
                             title: {
                                 display: true,
-                                text: 'Comparación de Ingresos y Gastos',
+                                text: 'Comparación de Ingresos y Gastos (Barras Horizontales Apiladas)',
                             },
                         },
                         scales: {
                             x: {
-                                title: {
-                                    display: true,
-                                    text: 'Categorías',
-                                },
-                            },
-                            y: {
-                                beginAtZero: true,
+                                stacked: true, // Apilar las barras en el eje X
                                 title: {
                                     display: true,
                                     text: 'Monto Total ($)',
+                                },
+                            },
+                            y: {
+                                stacked: true, // Apilar las barras en el eje Y
+                                title: {
+                                    display: true,
+                                    text: 'Categorías',
                                 },
                             },
                         },
