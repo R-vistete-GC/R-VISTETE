@@ -580,6 +580,53 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al cargar datos de ingresos y gastos:', error));
     }
 
+    // Gráfica de Categorías de Publicaciones
+    const categoriasPublicacionesCtx = document.getElementById('graficaCategoriasPublicaciones');
+    if (categoriasPublicacionesCtx) {
+        fetch('/users/dashboard/categorias-publicaciones/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error al cargar datos de categorías de publicaciones:', data.error);
+                    return;
+                }
+
+                // Extraer las categorías y sus totales
+                const categorias = Object.keys(data);
+                const totales = Object.values(data);
+
+                // Crear la gráfica de pastel/donut
+                new Chart(categoriasPublicacionesCtx, {
+                    type: 'doughnut', // Cambiar a 'pie' si prefieres una gráfica de pastel
+                    data: {
+                        labels: categorias, // Etiquetas de las categorías
+                        datasets: [{
+                            data: totales, // Totales de cada categoría
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#8BC34A'
+                            ], // Colores para cada categoría
+                            hoverBackgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#8BC34A'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Distribución de Categorías de Publicaciones'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de categorías de publicaciones:', error));
+    }
+
     // Función para actualizar las recomendaciones en tiempo real
     const actualizarRecomendaciones = () => {
         fetch('/users/dashboard/recomendaciones-estilo-color/')
