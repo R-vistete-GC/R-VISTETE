@@ -11,61 +11,74 @@
     <h1 class="text-center">Mi Dashboard</h1>
     <p class="text-muted text-center">Aquí puedes ver estadísticas sobre tu actividad en la aplicación.</p>
 
-    <!-- Estadísticas generales -->
     <div class="row text-center my-4">
-        <div class="col">
-            <div class="card">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card p-2" style="border: 2px solid #28a745; border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; text-align: center; padding: 5px; height: 100px; background-color: #ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0, 0, 0, 0.1)';">
                 <div class="card-body">
-                    <h5 class="card-title">Publicaciones</h5>
-                    <p class="card-text">{{ total_publicaciones }}</p>
+                    <h6 class="card-title" style="font-size: 16px; font-weight: bold; color: #28a745; margin-bottom: 5px;">Publicaciones</h6>
+                    <p class="card-text" style="font-size: 20px; font-weight: bold; color: #000;">{{ total_publicaciones }}</p>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card p-2" style="border: 2px solid #28a745; border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; text-align: center; padding: 5px; height: 100px; background-color: #ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0, 0, 0, 0.1)';">
                 <div class="card-body">
-                    <h5 class="card-title">Ventas</h5>
-                    <p class="card-text">{{ total_ventas }}</p>
+                    <h6 class="card-title" style="font-size: 16px; font-weight: bold; color: #28a745; margin-bottom: 5px;">Ventas</h6>
+                    <p class="card-text" style="font-size: 20px; font-weight: bold; color: #000;">{{ total_ventas }}</p>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card p-2" style="border: 2px solid #28a745; border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; text-align: center; padding: 5px; height: 100px; background-color: #ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0, 0, 0, 0.1)';">
                 <div class="card-body">
-                    <h5 class="card-title">Alquileres</h5>
-                    <p class="card-text">{{ total_alquileres }}</p>
+                    <h6 class="card-title" style="font-size: 16px; font-weight: bold; color: #28a745; margin-bottom: 5px;">Alquileres</h6>
+                    <p class="card-text" style="font-size: 20px; font-weight: bold; color: #000;">{{ total_alquileres }}</p>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card p-2" style="border: 2px solid #28a745; border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; text-align: center; padding: 5px; height: 100px; background-color: #ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0, 0, 0, 0.1)';">
                 <div class="card-body">
-                    <h5 class="card-title">Likes</h5>
-                    <p class="card-text">{{ total_likes }}</p>
+                    <h6 class="card-title" style="font-size: 16px; font-weight: bold; color: #28a745; margin-bottom: 5px;">Likes</h6>
+                    <p class="card-text" style="font-size: 20px; font-weight: bold; color: #000;">{{ total_likes }}</p>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card p-2" style="border: 2px solid #28a745; border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; text-align: center; padding: 5px; height: 100px; background-color: #ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0, 0, 0, 0.1)';">
                 <div class="card-body">
-                    <h5 class="card-title">Favoritos</h5>
-                    <p class="card-text">{{ total_favoritos }}</p>
+                    <h6 class="card-title" style="font-size: 16px; font-weight: bold; color: #28a745; margin-bottom: 5px;">Favoritos</h6>
+                    <p class="card-text" style="font-size: 20px; font-weight: bold; color: #000;">{{ total_favoritos }}</p>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card p-2" style="border: 2px solid #28a745; border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; text-align: center; padding: 5px; height: 100px; background-color: #ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0, 0, 0, 0.1)';">
                 <div class="card-body">
-                    <h5 class="card-title">Recomendaciones</h5>
-                    <p class="card-text">{{ total_recomendaciones }}</p>
+                    <h6 class="card-title" style="font-size: 16px; font-weight: bold; color: #28a745; margin-bottom: 5px;">Recomendaciones</h6>
+                    <p class="card-text" style="font-size: 20px; font-weight: bold; color: #000;">{{ total_recomendaciones }}</p>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card">
+        <div class="col-6 col-md-2 mb-3">
+            <div class="card p-2" style="border: 2px solid #28a745; border-radius: 10px; transition: transform 0.3s ease, box-shadow 0.3s ease; text-align: center; padding: 5px; height: 100px; background-color: #ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0, 0, 0, 0.1)';">
                 <div class="card-body">
-                    <h5 class="card-title">Compras</h5>
-                    <p class="card-text">{{ total_compras }}</p>
+                    <h6 class="card-title" style="font-size: 16px; font-weight: bold; color: #28a745; margin-bottom: 5px;">Compras</h6>
+                    <p class="card-text" style="font-size: 20px; font-weight: bold; color: #000;">{{ total_compras }}</p>
                 </div>
             </div>
         </div>

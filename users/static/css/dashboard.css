@@ -1,36 +1,52 @@
-/* Estilo para las tarjetas */
+/* Estilo general para las cards */
 .card {
-    border-radius: 10px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 2px solid #28a745; /* Borde verde */
+    border-radius: 10px; /* Bordes redondeados */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animación suave */
+    text-align: center; /* Centrar contenido */
+    padding: 5px; /* Reducir el padding */
+    height: 80px; /* Reducir la altura */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #ffffff; /* Fondo blanco */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    font-size: 12px; /* Reducir el tamaño del texto */
 }
 
+/* Animación al hacer hover */
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(0, 128, 0, 0.2);
+    transform: scale(1.1); /* Aumentar tamaño al hacer hover */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+    border-color: #28a745; /* Mantener el borde verde */
 }
 
-.card-body {
-    padding: 1rem;
+/* Alinear las cards en una fila */
+.row.text-center {
+    display: flex;
+    flex-wrap: wrap; /* Permitir que las cards se ajusten si no caben */
+    justify-content: center; /* Centrar las cards */
+    gap: 10px; /* Espaciado entre las cards */
 }
 
-.card-body h4 {
+/* Ajustar el tamaño de las columnas */
+.row.text-center .col {
+    flex: 1 1 calc(12% - 10px); /* Reducir el tamaño de las columnas */
+    max-width: calc(12% - 10px); /* Limitar el ancho máximo */
+}
+
+/* Ajustar el texto dentro de las cards */
+.card-title {
+    font-size: 14px;
     font-weight: bold;
+    color: #28a745; /* Color verde */
+    margin-bottom: 5px;
 }
 
-.card-body p {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-
-/* Colores personalizados */
-.text-success {
-    color: #28a745 !important;
-}
-
-.border-success {
-    border-color: #28a745 !important;
+.card-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000; /* Color negro */
 }
 
 /* Estilo para las gráficas */
