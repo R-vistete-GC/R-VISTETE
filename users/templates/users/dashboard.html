@@ -84,69 +84,85 @@
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Recomendaciones por Estilo y Color</h5>
-            <canvas id="graficaEstiloColor"></canvas>
-            <button id="toggleChartType" class="btn btn-primary mt-3">Cambiar a Gráfica de Puntos</button>
+                <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Recomendaciones por Estilo y Color</h5>
+                    <canvas id="graficaEstiloColor"></canvas>
+                    <button id="toggleChartType" class="btn btn-primary mt-3">Cambiar a Gráfica de Puntos</button>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Likes y Favoritos por Estilo y Color</h5>
-            <canvas id="graficaLikesFavoritos"></canvas>
-        </div>
-    </div>
-
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Distribución de Sentimientos en Comentarios</h5>
-            <div style="height: 300px; width: 100%;"> <!-- Ajustar el tamaño -->
-                <canvas id="graficaSentimientos"></canvas>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Likes y Favoritos por Estilo y Color</h5>
+                    <canvas id="graficaLikesFavoritos"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Comparación de Compras, Ventas y Alquileres</h5>
-            <!-- Pasar los valores de las cards como atributos data-* -->
-            <canvas id="graficaComprasVentasAlquileres" 
-                    data-compras="{{ total_compras }}" 
-                    data-ventas="{{ total_ventas }}" 
-                    data-alquileres="{{ total_alquileres }}"></canvas>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Distribución de Sentimientos en Comentarios</h5>
+                    <div style="height: 300px; width: 100%;">
+                        <canvas id="graficaSentimientos"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Comparación de Compras, Ventas y Alquileres</h5>
+                    <canvas id="graficaComprasVentasAlquileres" 
+                            data-compras="{{ total_compras }}" 
+                            data-ventas="{{ total_ventas }}" 
+                            data-alquileres="{{ total_alquileres }}"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Comparación de Ingresos y Gastos</h5>
-            <canvas id="graficaIngresosGastos"></canvas>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Comparación de Ingresos y Gastos</h5>
+                    <canvas id="graficaIngresosGastos"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Actividad en el Tiempo</h5>
+                    <canvas id="graficaActividadTiempo"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Actividad en el Tiempo</h5>
-            <canvas id="graficaActividadTiempo"></canvas>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Transacciones por Estado</h5>
+                    <canvas id="graficaTransaccionesPorEstado"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Estilos y Colores Más Solicitados</h5>
+                    <canvas id="graficaEstilosColores"></canvas>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Transacciones por Estado</h5>
-            <canvas id="graficaTransaccionesPorEstado"></canvas>
-        </div>
-    </div>
-
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title text-center">Estilos y Colores Más Solicitados</h5>
-            <canvas id="graficaEstilosColores"></canvas>
-        </div>
-    </div>
-
 </div>
 {% endblock %}
 
