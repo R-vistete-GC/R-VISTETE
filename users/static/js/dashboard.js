@@ -273,6 +273,62 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al cargar datos de sentimientos:', error));
     }
 
+    // Gráfica de Compras, Ventas y Alquileres
+    const comprasVentasAlquileresCtx = document.getElementById('graficaComprasVentasAlquileres');
+    if (comprasVentasAlquileresCtx) {
+        fetch('/users/dashboard/compras-ventas-alquileres/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error al cargar datos de compras, ventas y alquileres:', data.error);
+                    return;
+                }
+
+                // Crear la gráfica de barras
+                new Chart(comprasVentasAlquileresCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Compras', 'Ventas', 'Alquileres'], // Etiquetas en el eje X
+                        datasets: [{
+                            label: 'Cantidad',
+                            data: [data.compras, data.ventas, data.alquileres], // Datos de la gráfica
+                            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56'], // Colores de las barras
+                            borderColor: ['#36A2EB', '#FF6384', '#FFCE56'], // Bordes de las barras
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false // Ocultar la leyenda
+                            },
+                            title: {
+                                display: true,
+                                text: 'Comparación de Compras, Ventas y Alquileres'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Tipo de Transacción'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de compras, ventas y alquileres:', error));
+    }
+
     // Función para actualizar las recomendaciones en tiempo real
     const actualizarRecomendaciones = () => {
         fetch('/users/dashboard/recomendaciones-estilo-color/')

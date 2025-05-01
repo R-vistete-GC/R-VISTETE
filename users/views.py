@@ -667,3 +667,25 @@ def comentarios_sentimientos_usuario(request):
         return JsonResponse({'success': True, 'data': data})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+from django.http import JsonResponse
+from posts.models import Venta, Alquiler, Compra
+
+def dashboard_compras_ventas_alquileres(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Contar las compras, ventas y alquileres del usuario
+        total_compras = Compra.objects.filter(comprador_id=usuario_id).count()
+        total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
+        total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
+
+        return JsonResponse({
+            'compras': total_compras,
+            'ventas': total_ventas,
+            'alquileres': total_alquileres,
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

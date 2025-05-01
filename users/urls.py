@@ -20,6 +20,7 @@ urlpatterns = [
     path('dashboard/recomendaciones-estilo-color/', views.recomendaciones_estilo_color, name='recomendaciones_estilo_color'),
     path('dashboard/likes-favoritos-estilo-color/', views.likes_favoritos_estilo_color, name='likes_favoritos_estilo_color'),
     path('dashboard/comentarios-sentimientos-usuario/', views.comentarios_sentimientos_usuario, name='comentarios_sentimientos_usuario'),
+    
+    # Nueva ruta para la gráfica de compras, ventas y alquileres
+    path('dashboard/compras-ventas-alquileres/', views.dashboard_compras_ventas_alquileres, name='dashboard_compras_ventas_alquileres'),
 ]
-
-# Example usage of the endpoint
