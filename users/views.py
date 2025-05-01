@@ -781,17 +781,57 @@ def dashboard_ingresos_gastos(request):
 
 from django.db.models import Count
 
-def dashboard_categorias_publicaciones(request):
+def dashboard_estilos_colores(request):
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
         return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
     try:
-        # Agrupar publicaciones por categoría
-        categorias = Publicacion.objects.filter(usuario_id=usuario_id).values('categoria').annotate(total=Count('id'))
+        # Inicializar contadores
+        estilos_count = {'ventas': {}, 'compras': {}, 'alquileres': {}}
+        colores_count = {'ventas': {}, 'compras': {}, 'alquileres': {}}
+
+        # Procesar ventas
+        ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id)
+        for venta in ventas:
+            estilos = venta.publicacion.estilo or []  # Manejar valores nulos
+            colores = venta.publicacion.colores or []
+            for estilo in estilos:
+                estilo = estilo.strip().lower()
+                estilos_count['ventas'][estilo] = estilos_count['ventas'].get(estilo, 0) + 1
+            for color in colores:
+                color = color.strip().lower()
+                colores_count['ventas'][color] = colores_count['ventas'].get(color, 0) + 1
+
+        # Procesar compras
+        compras = Compra.objects.filter(comprador_id=usuario_id)
+        for compra in compras:
+            estilos = compra.publicacion.estilo or []
+            colores = compra.publicacion.colores or []
+            for estilo in estilos:
+                estilo = estilo.strip().lower()
+                estilos_count['compras'][estilo] = estilos_count['compras'].get(estilo, 0) + 1
+            for color in colores:
+                color = color.strip().lower()
+                colores_count['compras'][color] = colores_count['compras'].get(color, 0) + 1
+
+        # Procesar alquileres
+        alquileres = Alquiler.objects.filter(cliente_id=usuario_id)
+        for alquiler in alquileres:
+            estilos = alquiler.publicacion.estilo or []
+            colores = alquiler.publicacion.colores or []
+            for estilo in estilos:
+                estilo = estilo.strip().lower()
+                estilos_count['alquileres'][estilo] = estilos_count['alquileres'].get(estilo, 0) + 1
+            for color in colores:
+                color = color.strip().lower()
+                colores_count['alquileres'][color] = colores_count['alquileres'].get(color, 0) + 1
 
         # Formatear los datos para enviarlos al frontend
-        data = {categoria['categoria']: categoria['total'] for categoria in categorias}
+        data = {
+            'estilos': estilos_count,
+            'colores': colores_count,
+        }
 
         return JsonResponse(data)
     except Exception as e:

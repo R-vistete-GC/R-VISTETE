@@ -158,6 +158,83 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al cargar datos de estilo y color:', error));
     }
 
+    // Gráfica de Estilos y Colores
+    const estilosColoresCtx = document.getElementById('graficaEstilosColores');
+    if (estilosColoresCtx) {
+        fetch('/users/dashboard/estilos-colores/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error al cargar datos de estilos y colores:', data.error);
+                    return;
+                }
+
+                // Validar que los datos existan
+                const estilos = data.estilos || {};
+                const colores = data.colores || {};
+
+                if (!estilos.ventas || !colores.ventas) {
+                    console.error('Datos incompletos recibidos:', data);
+                    return;
+                }
+
+                // Crear la gráfica de barras apiladas para estilos
+                new Chart(estilosColoresCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(estilos.ventas), // Estilos únicos
+                        datasets: [
+                            {
+                                label: 'Ventas',
+                                data: Object.values(estilos.ventas),
+                                backgroundColor: '#4CAF50',
+                            },
+                            {
+                                label: 'Compras',
+                                data: Object.values(estilos.compras),
+                                backgroundColor: '#FF9800',
+                            },
+                            {
+                                label: 'Alquileres',
+                                data: Object.values(estilos.alquileres),
+                                backgroundColor: '#2196F3',
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Estilos Más Solicitados',
+                            },
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Estilos',
+                                },
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad',
+                                },
+                            },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de estilos y colores:', error));
+    }
+
     // Gráfica de Likes y Favoritos por Estilo y Color
     const likesFavoritosCtx = document.getElementById('graficaLikesFavoritos');
     if (likesFavoritosCtx) {
@@ -578,53 +655,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             })
             .catch(error => console.error('Error al cargar datos de ingresos y gastos:', error));
-    }
-
-    // Gráfica de Categorías de Publicaciones
-    const categoriasPublicacionesCtx = document.getElementById('graficaCategoriasPublicaciones');
-    if (categoriasPublicacionesCtx) {
-        fetch('/users/dashboard/categorias-publicaciones/')
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error('Error al cargar datos de categorías de publicaciones:', data.error);
-                    return;
-                }
-
-                // Extraer las categorías y sus totales
-                const categorias = Object.keys(data);
-                const totales = Object.values(data);
-
-                // Crear la gráfica de pastel/donut
-                new Chart(categoriasPublicacionesCtx, {
-                    type: 'doughnut', // Cambiar a 'pie' si prefieres una gráfica de pastel
-                    data: {
-                        labels: categorias, // Etiquetas de las categorías
-                        datasets: [{
-                            data: totales, // Totales de cada categoría
-                            backgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#8BC34A'
-                            ], // Colores para cada categoría
-                            hoverBackgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#8BC34A'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                            title: {
-                                display: true,
-                                text: 'Distribución de Categorías de Publicaciones'
-                            }
-                        }
-                    }
-                });
-            })
-            .catch(error => console.error('Error al cargar datos de categorías de publicaciones:', error));
     }
 
     // Función para actualizar las recomendaciones en tiempo real

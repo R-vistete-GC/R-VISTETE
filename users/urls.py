@@ -33,6 +33,6 @@ urlpatterns = [
     # Nueva ruta para la gráfica de ingresos y gastos
     path('dashboard/ingresos-gastos/', views.dashboard_ingresos_gastos, name='dashboard_ingresos_gastos'),
 
-    # Nueva ruta para la gráfica de categorías de publicaciones
-    path('dashboard/categorias-publicaciones/', views.dashboard_categorias_publicaciones, name='dashboard_categorias_publicaciones'),
+    # Nueva ruta para la gráfica de estilos y colores
+    path('dashboard/estilos-colores/', views.dashboard_estilos_colores, name='dashboard_estilos_colores'),
 ]
