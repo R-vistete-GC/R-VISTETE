@@ -169,35 +169,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Validar que los datos existan
-                const estilos = data.estilos || {};
-                const colores = data.colores || {};
+                // Procesar los datos para la gráfica
+                const puntos = data.data.map(item => ({
+                    x: item.estilo,
+                    y: item.color,
+                    tipo: item.tipo
+                }));
 
-                if (!estilos.ventas || !colores.ventas) {
-                    console.error('Datos incompletos recibidos:', data);
-                    return;
-                }
-
-                // Crear la gráfica de barras apiladas para estilos
+                // Crear la gráfica de puntos
                 new Chart(estilosColoresCtx, {
-                    type: 'bar',
+                    type: 'scatter',
                     data: {
-                        labels: Object.keys(estilos.ventas), // Estilos únicos
                         datasets: [
                             {
                                 label: 'Ventas',
-                                data: Object.values(estilos.ventas),
-                                backgroundColor: '#4CAF50',
+                                data: puntos.filter(p => p.tipo === 'venta'),
+                                backgroundColor: '#FF6384',
                             },
                             {
                                 label: 'Compras',
-                                data: Object.values(estilos.compras),
-                                backgroundColor: '#FF9800',
+                                data: puntos.filter(p => p.tipo === 'compra'),
+                                backgroundColor: '#36A2EB',
                             },
                             {
                                 label: 'Alquileres',
-                                data: Object.values(estilos.alquileres),
-                                backgroundColor: '#2196F3',
+                                data: puntos.filter(p => p.tipo === 'alquiler'),
+                                backgroundColor: '#FFCE56',
                             },
                         ],
                     },
@@ -209,23 +206,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             },
                             title: {
                                 display: true,
-                                text: 'Estilos Más Solicitados',
+                                text: 'Estilos y Colores Más Solicitados',
                             },
                         },
                         scales: {
                             x: {
-                                stacked: true,
+                                type: 'category',
                                 title: {
                                     display: true,
                                     text: 'Estilos',
                                 },
                             },
                             y: {
-                                stacked: true,
-                                beginAtZero: true,
+                                type: 'category',
                                 title: {
                                     display: true,
-                                    text: 'Cantidad',
+                                    text: 'Colores',
                                 },
                             },
                         },

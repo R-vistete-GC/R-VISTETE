@@ -779,7 +779,7 @@ def dashboard_ingresos_gastos(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-from django.db.models import Count
+from django.http import JsonResponse
 
 def dashboard_estilos_colores(request):
     usuario_id = request.session.get('usuario_id')
@@ -788,20 +788,20 @@ def dashboard_estilos_colores(request):
 
     try:
         # Inicializar contadores
-        estilos_count = {'ventas': {}, 'compras': {}, 'alquileres': {}}
-        colores_count = {'ventas': {}, 'compras': {}, 'alquileres': {}}
+        estilos_colores_count = []
 
         # Procesar ventas
         ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id)
         for venta in ventas:
-            estilos = venta.publicacion.estilo or []  # Manejar valores nulos
+            estilos = venta.publicacion.estilo or []
             colores = venta.publicacion.colores or []
             for estilo in estilos:
-                estilo = estilo.strip().lower()
-                estilos_count['ventas'][estilo] = estilos_count['ventas'].get(estilo, 0) + 1
-            for color in colores:
-                color = color.strip().lower()
-                colores_count['ventas'][color] = colores_count['ventas'].get(color, 0) + 1
+                for color in colores:
+                    estilos_colores_count.append({
+                        'estilo': estilo.strip().lower(),
+                        'color': color.strip().lower(),
+                        'tipo': 'venta'
+                    })
 
         # Procesar compras
         compras = Compra.objects.filter(comprador_id=usuario_id)
@@ -809,11 +809,12 @@ def dashboard_estilos_colores(request):
             estilos = compra.publicacion.estilo or []
             colores = compra.publicacion.colores or []
             for estilo in estilos:
-                estilo = estilo.strip().lower()
-                estilos_count['compras'][estilo] = estilos_count['compras'].get(estilo, 0) + 1
-            for color in colores:
-                color = color.strip().lower()
-                colores_count['compras'][color] = colores_count['compras'].get(color, 0) + 1
+                for color in colores:
+                    estilos_colores_count.append({
+                        'estilo': estilo.strip().lower(),
+                        'color': color.strip().lower(),
+                        'tipo': 'compra'
+                    })
 
         # Procesar alquileres
         alquileres = Alquiler.objects.filter(cliente_id=usuario_id)
@@ -821,18 +822,14 @@ def dashboard_estilos_colores(request):
             estilos = alquiler.publicacion.estilo or []
             colores = alquiler.publicacion.colores or []
             for estilo in estilos:
-                estilo = estilo.strip().lower()
-                estilos_count['alquileres'][estilo] = estilos_count['alquileres'].get(estilo, 0) + 1
-            for color in colores:
-                color = color.strip().lower()
-                colores_count['alquileres'][color] = colores_count['alquileres'].get(color, 0) + 1
+                for color in colores:
+                    estilos_colores_count.append({
+                        'estilo': estilo.strip().lower(),
+                        'color': color.strip().lower(),
+                        'tipo': 'alquiler'
+                    })
 
         # Formatear los datos para enviarlos al frontend
-        data = {
-            'estilos': estilos_count,
-            'colores': colores_count,
-        }
-
-        return JsonResponse(data)
+        return JsonResponse({'data': estilos_colores_count})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
