@@ -438,16 +438,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Procesar los datos para la gráfica
-                const estados = ['pendiente', 'completada', 'cancelada']; // Estados posibles
-                const compras = estados.map(estado => {
+                const estadosCompras = ['pendiente', 'entregado']; // Estados posibles para compras
+                const estadosAlquileres = ['activo', 'reservado', 'completado']; // Estados posibles para alquileres
+                const estadosVentas = ['pendiente', 'completada', 'cancelada']; // Estados posibles para ventas
+
+                const compras = estadosCompras.map(estado => {
                     const compra = data.compras.find(item => item.estado === estado);
                     return compra ? compra.total : 0;
                 });
-                const ventas = estados.map(estado => {
+                const ventas = estadosVentas.map(estado => {
                     const venta = data.ventas.find(item => item.estado === estado);
                     return venta ? venta.total : 0;
                 });
-                const alquileres = estados.map(estado => {
+                const alquileres = estadosAlquileres.map(estado => {
                     const alquiler = data.alquileres.find(item => item.estado === estado);
                     return alquiler ? alquiler.total : 0;
                 });
@@ -456,21 +459,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 new Chart(transaccionesPorEstadoCtx, {
                     type: 'bar',
                     data: {
-                        labels: estados, // Etiquetas en el eje X (estados)
+                        labels: [...estadosCompras, ...estadosVentas, ...estadosAlquileres], // Etiquetas en el eje X
                         datasets: [
                             {
                                 label: 'Compras',
-                                data: compras,
+                                data: [...compras, ...Array(estadosVentas.length).fill(0), ...Array(estadosAlquileres.length).fill(0)],
                                 backgroundColor: '#36A2EB',
                             },
                             {
                                 label: 'Ventas',
-                                data: ventas,
+                                data: [...Array(estadosCompras.length).fill(0), ...ventas, ...Array(estadosAlquileres.length).fill(0)],
                                 backgroundColor: '#FF6384',
                             },
                             {
                                 label: 'Alquileres',
-                                data: alquileres,
+                                data: [...Array(estadosCompras.length).fill(0), ...Array(estadosVentas.length).fill(0), ...alquileres],
                                 backgroundColor: '#FFCE56',
                             },
                         ],

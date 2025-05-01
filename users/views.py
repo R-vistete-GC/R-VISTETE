@@ -731,13 +731,13 @@ def dashboard_transacciones_por_estado(request):
         return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
     try:
-        # Agrupar compras por estado
+        # Agrupar compras por estado (entregado, pendiente)
         compras = Compra.objects.filter(comprador_id=usuario_id).values('estado').annotate(total=Count('id'))
 
         # Agrupar ventas por estado
         ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id).values('estado').annotate(total=Count('id'))
 
-        # Agrupar alquileres por estado
+        # Agrupar alquileres por estado (activo, reservado, completado)
         alquileres = Alquiler.objects.filter(cliente_id=usuario_id).values('estado').annotate(total=Count('id'))
 
         # Formatear los datos para enviarlos al frontend
