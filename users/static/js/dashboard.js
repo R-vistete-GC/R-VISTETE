@@ -172,9 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Procesar los datos para la gráfica
                 const puntos = data.data.map(item => ({
                     x: item.cantidad, // Cantidad en el eje X
-                    y: item.color, // Color en el eje Y
-                    estilo: item.estilo, // Estilo para el tooltip
-                    tipo: item.tipo, // Tipo de transacción para el tooltip
+                    y: item.estilo, // Estilo en el eje Y
+                    color: item.color, // Color para el tooltip
+                    tipo: item.tipo, // Tipo de transacción para el título del tooltip
                 }));
 
                 // Crear la gráfica de puntos
@@ -217,9 +217,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             },
                             tooltip: {
                                 callbacks: {
+                                    title: function (tooltipItems) {
+                                        // Mostrar el tipo de transacción como título
+                                        const punto = tooltipItems[0].raw;
+                                        return `${punto.tipo.charAt(0).toUpperCase() + punto.tipo.slice(1)}`; // Capitalizar
+                                    },
                                     label: function (context) {
+                                        // Mostrar el color y la cantidad en el tooltip
                                         const punto = context.raw;
-                                        return `${context.dataset.label}: Estilo "${punto.estilo}", Color "${punto.y}", Cantidad: ${punto.x}`;
+                                        return `Color: "${punto.color}", Cantidad: ${punto.x}`;
                                     },
                                 },
                             },
@@ -236,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 type: 'category',
                                 title: {
                                     display: true,
-                                    text: 'Colores',
+                                    text: 'Estilos',
                                 },
                             },
                         },
