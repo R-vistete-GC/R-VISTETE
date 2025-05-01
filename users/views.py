@@ -677,9 +677,12 @@ def dashboard_compras_ventas_alquileres(request):
         return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
     try:
-        # Contar las compras, ventas y alquileres del usuario
-        total_compras = Compra.objects.filter(comprador_id=usuario_id).count()
-        total_ventas = Venta.objects.filter(vendedor_id=usuario_id).count()
+        # Calcular las compras realizadas por el usuario
+        total_compras = Venta.objects.filter(comprador_id=usuario_id).count()
+        # Calcular las ventas realizadas por el usuario
+        total_ventas = Venta.objects.filter(comprador_id=usuario_id).count()
+
+        # Calcular los alquileres realizados por el usuario
         total_alquileres = Alquiler.objects.filter(cliente_id=usuario_id).count()
 
         return JsonResponse({
