@@ -23,4 +23,7 @@ urlpatterns = [
     
     # Nueva ruta para la gráfica de compras, ventas y alquileres
     path('dashboard/compras-ventas-alquileres/', views.dashboard_compras_ventas_alquileres, name='dashboard_compras_ventas_alquileres'),
+
+    # Nueva ruta para la gráfica de actividad en el tiempo
+    path('dashboard/actividad-tiempo/', views.dashboard_actividad_tiempo, name='dashboard_actividad_tiempo'),
 ]

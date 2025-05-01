@@ -324,6 +324,96 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Gráfica de Actividad en el Tiempo
+    const actividadTiempoCtx = document.getElementById('graficaActividadTiempo');
+    if (actividadTiempoCtx) {
+        fetch('/users/dashboard/actividad-tiempo/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error al cargar datos de actividad en el tiempo:', data.error);
+                    return;
+                }
+
+                // Formatear los datos para agrupar por meses
+                const formatearMes = (mes) => {
+                    const fecha = new Date(mes);
+                    return fecha.toLocaleString('default', { month: 'short', year: 'numeric' });
+                };
+
+                const mesesCompras = data.compras.map(item => formatearMes(item.mes));
+                const totalesCompras = data.compras.map(item => item.total);
+
+                const mesesVentas = data.ventas.map(item => formatearMes(item.mes));
+                const totalesVentas = data.ventas.map(item => item.total);
+
+                const mesesAlquileres = data.alquileres.map(item => formatearMes(item.mes));
+                const totalesAlquileres = data.alquileres.map(item => item.total);
+
+                // Combinar todas las fechas únicas
+                const mesesUnicos = [...new Set([...mesesCompras, ...mesesVentas, ...mesesAlquileres])];
+
+                // Crear la gráfica de líneas
+                new Chart(actividadTiempoCtx, {
+                    type: 'line',
+                    data: {
+                        labels: mesesUnicos, // Mostrar los meses únicos en el eje X
+                        datasets: [
+                            {
+                                label: 'Compras',
+                                data: mesesUnicos.map(mes => totalesCompras[mesesCompras.indexOf(mes)] || 0),
+                                borderColor: '#36A2EB',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                tension: 0.1,
+                            },
+                            {
+                                label: 'Ventas',
+                                data: mesesUnicos.map(mes => totalesVentas[mesesVentas.indexOf(mes)] || 0),
+                                borderColor: '#FF6384',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                tension: 0.1,
+                            },
+                            {
+                                label: 'Alquileres',
+                                data: mesesUnicos.map(mes => totalesAlquileres[mesesAlquileres.indexOf(mes)] || 0),
+                                borderColor: '#FFCE56',
+                                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                tension: 0.1,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Actividad en el Tiempo',
+                            },
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Meses',
+                                },
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad de Transacciones',
+                                },
+                            },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de actividad en el tiempo:', error));
+    }
+
     // Función para actualizar las recomendaciones en tiempo real
     const actualizarRecomendaciones = () => {
         fetch('/users/dashboard/recomendaciones-estilo-color/')

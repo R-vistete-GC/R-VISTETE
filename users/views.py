@@ -46,6 +46,7 @@ from django.db.models import Count, Q, Exists, OuterRef
 from collections import defaultdict
 import json
 from django.views.decorators.http import require_http_methods
+from django.db.models.functions import TruncDate, TruncMonth
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -690,5 +691,31 @@ def dashboard_compras_ventas_alquileres(request):
             'ventas': total_ventas,
             'alquileres': total_alquileres,
         })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def dashboard_actividad_tiempo(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Agrupar compras por mes
+        compras = Venta.objects.filter(comprador_id=usuario_id).annotate(mes=TruncMonth('fecha_venta')).values('mes').annotate(total=Count('id')).order_by('mes')
+
+        # Agrupar ventas por mes
+        ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id).annotate(mes=TruncMonth('fecha_venta')).values('mes').annotate(total=Count('id')).order_by('mes')
+
+        # Agrupar alquileres por mes
+        alquileres = Alquiler.objects.filter(cliente_id=usuario_id).annotate(mes=TruncMonth('fecha_inicio')).values('mes').annotate(total=Count('id')).order_by('mes')
+
+        # Formatear los datos para enviarlos al frontend
+        data = {
+            'compras': list(compras),
+            'ventas': list(ventas),
+            'alquileres': list(alquileres),
+        }
+
+        return JsonResponse(data)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
