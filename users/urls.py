@@ -26,4 +26,7 @@ urlpatterns = [
 
     # Nueva ruta para la gráfica de actividad en el tiempo
     path('dashboard/actividad-tiempo/', views.dashboard_actividad_tiempo, name='dashboard_actividad_tiempo'),
+
+    # Nueva ruta para la gráfica de transacciones por estado
+    path('dashboard/transacciones-por-estado/', views.dashboard_transacciones_por_estado, name='dashboard_transacciones_por_estado'),
 ]

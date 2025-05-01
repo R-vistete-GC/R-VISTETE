@@ -426,6 +426,89 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error al cargar datos de actividad en el tiempo:', error));
     }
 
+    // Gráfica de Transacciones por Estado
+    const transaccionesPorEstadoCtx = document.getElementById('graficaTransaccionesPorEstado');
+    if (transaccionesPorEstadoCtx) {
+        fetch('/users/dashboard/transacciones-por-estado/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error al cargar datos de transacciones por estado:', data.error);
+                    return;
+                }
+
+                // Procesar los datos para la gráfica
+                const estados = ['pendiente', 'completada', 'cancelada']; // Estados posibles
+                const compras = estados.map(estado => {
+                    const compra = data.compras.find(item => item.estado === estado);
+                    return compra ? compra.total : 0;
+                });
+                const ventas = estados.map(estado => {
+                    const venta = data.ventas.find(item => item.estado === estado);
+                    return venta ? venta.total : 0;
+                });
+                const alquileres = estados.map(estado => {
+                    const alquiler = data.alquileres.find(item => item.estado === estado);
+                    return alquiler ? alquiler.total : 0;
+                });
+
+                // Crear la gráfica de barras apiladas
+                new Chart(transaccionesPorEstadoCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: estados, // Etiquetas en el eje X (estados)
+                        datasets: [
+                            {
+                                label: 'Compras',
+                                data: compras,
+                                backgroundColor: '#36A2EB',
+                            },
+                            {
+                                label: 'Ventas',
+                                data: ventas,
+                                backgroundColor: '#FF6384',
+                            },
+                            {
+                                label: 'Alquileres',
+                                data: alquileres,
+                                backgroundColor: '#FFCE56',
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Transacciones por Estado',
+                            },
+                        },
+                        scales: {
+                            x: {
+                                stacked: true, // Apilar las barras en el eje X
+                                title: {
+                                    display: true,
+                                    text: 'Estados',
+                                },
+                            },
+                            y: {
+                                stacked: true, // Apilar las barras en el eje Y
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad',
+                                },
+                            },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error('Error al cargar datos de transacciones por estado:', error));
+    }
+
     // Función para actualizar las recomendaciones en tiempo real
     const actualizarRecomendaciones = () => {
         fetch('/users/dashboard/recomendaciones-estilo-color/')

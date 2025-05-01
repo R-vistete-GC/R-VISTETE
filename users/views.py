@@ -719,3 +719,34 @@ def dashboard_actividad_tiempo(request):
         return JsonResponse(data)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+from django.http import JsonResponse
+from django.db.models import Count
+from posts.models import Venta, Alquiler
+from compras.models import Compra
+
+def dashboard_transacciones_por_estado(request):
+    usuario_id = request.session.get('usuario_id')  # Obtener el ID del usuario autenticado
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Agrupar compras por estado
+        compras = Compra.objects.filter(comprador_id=usuario_id).values('estado').annotate(total=Count('id'))
+
+        # Agrupar ventas por estado
+        ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id).values('estado').annotate(total=Count('id'))
+
+        # Agrupar alquileres por estado
+        alquileres = Alquiler.objects.filter(cliente_id=usuario_id).values('estado').annotate(total=Count('id'))
+
+        # Formatear los datos para enviarlos al frontend
+        data = {
+            'compras': list(compras),
+            'ventas': list(ventas),
+            'alquileres': list(alquileres),
+        }
+
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
