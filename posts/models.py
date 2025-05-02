@@ -49,6 +49,7 @@ class Comentario(models.Model):
     polaridad = models.DecimalField(max_digits=4, decimal_places=3, null=True, blank=True)  # Polaridad (análisis previo)
     subjetividad = models.DecimalField(max_digits=4, decimal_places=3, null=True, blank=True)  # Subjetividad (análisis previo)
     clasificacion_chatgpt = models.CharField(max_length=10, null=True, blank=True)  # Positivo, neutro o negativo
+    clasificacion_textblob = models.CharField(max_length=10, null=True, blank=True)  # Positivo, neutro o negativo
     analizado_por_chatgpt = models.BooleanField(default=False)  # Indica si ya fue analizado por ChatGPT
     fecha_analisis = models.DateTimeField(null=True, blank=True)  # Fecha del análisis
 

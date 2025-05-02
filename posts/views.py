@@ -48,6 +48,11 @@ def inicio_view(request):
         publicacion.comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
         publicacion.total_comentarios = comentarios.count()
         
+        # Agregar métricas de comentarios con TextBlob
+        publicacion.comentarios_positivos_textblob = comentarios.filter(clasificacion_textblob='positivo').count()
+        publicacion.comentarios_neutros_textblob = comentarios.filter(clasificacion_textblob='neutro').count()
+        publicacion.comentarios_negativos_textblob = comentarios.filter(clasificacion_textblob='negativo').count()
+        
         # Agregar contadores existentes
         publicacion.likes_count = Like.objects.filter(publicacion=publicacion).count()
         publicacion.favoritos_count = Favorito.objects.filter(publicacion=publicacion).count()
@@ -430,6 +435,7 @@ def ver_likes(request):
         return redirect('/usuarios/login/')
 
 #agregar comentarios a las publicaciones
+
 @require_http_methods(["POST"])
 def agregar_comentario(request, publicacion_id):
     try:
@@ -462,15 +468,19 @@ def agregar_comentario(request, publicacion_id):
 
         # Analizar el sentimiento del comentario
         analyzer = SentimentAnalyzer()
-        resultado = analyzer.analyze_text_with_chatgpt(comentario_texto)
+        
+        # Análisis con OpenAI
+        resultado_chatgpt = analyzer.analyze_text_with_chatgpt(comentario_texto)
+        if resultado_chatgpt:
+            comentario.clasificacion_chatgpt = resultado_chatgpt['sentimiento']
+        
+        # Análisis con TextBlob
+        resultado_textblob = analyzer.analyze_text_with_textblob(comentario_texto)
+        comentario.clasificacion_textblob = resultado_textblob
 
-        if resultado:
-            comentario.clasificacion_chatgpt = resultado['sentimiento']  # Guardar el sentimiento
-            comentario.fecha_analisis = resultado['fecha_analisis']  # Guardar la fecha del análisis
-            comentario.analizado_por_chatgpt = True
-            comentario.save()
+        comentario.save()
 
-        # Responder con el comentario y su análisis
+        # Responder con ambos análisis
         return JsonResponse({
             'success': True,
             'comentario': {
@@ -478,7 +488,8 @@ def agregar_comentario(request, publicacion_id):
                 'usuario': comentario.usuario.nombre,
                 'texto': comentario.comentario,
                 'fecha': comentario.fecha_comentario.strftime('%d/%m/%Y %H:%M'),
-                'sentimiento': comentario.clasificacion_chatgpt
+                'sentimiento_chatgpt': comentario.clasificacion_chatgpt,
+                'sentimiento_textblob': comentario.clasificacion_textblob
             }
         })
     except Usuario.DoesNotExist:

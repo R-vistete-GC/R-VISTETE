@@ -127,6 +127,36 @@
                         </div>
                         <!-- Fin de valoración de la comunidad -->
 
+                        <!-- Valoración de TextBlob -->
+                        <div class="sentiment-stats p-2 bg-light rounded mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted" style="font-size: 0.75rem;">Valoración de TextBlob:</small>
+                                <div class="sentiment-indicator">
+                                    {% if publicacion.comentarios_positivos_textblob > publicacion.comentarios_negativos_textblob %}
+                                        <i class="fas fa-smile text-success"></i>
+                                    {% elif publicacion.comentarios_negativos_textblob > publicacion.comentarios_positivos_textblob %}
+                                        <i class="fas fa-frown text-danger"></i>
+                                    {% else %}
+                                        <i class="fas fa-meh text-warning"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="sentiment-details">
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {% widthratio publicacion.comentarios_positivos_textblob|default:0 publicacion.total_comentarios|default:1 100 %}%">
+                                    </div>
+                                    <div class="progress-bar bg-warning" role="progressbar" 
+                                         style="width: {% widthratio publicacion.comentarios_neutros_textblob|default:0 publicacion.total_comentarios|default:1 100 %}%">
+                                    </div>
+                                    <div class="progress-bar bg-danger" role="progressbar" 
+                                         style="width: {% widthratio publicacion.comentarios_negativos_textblob|default:0 publicacion.total_comentarios|default:1 100 %}%">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Fin de valoración de TextBlob -->
+
                         <!-- Reemplazar la sección de precios actual por: -->
                         <div class="price-info" style="color: #495057; font-size: 0.9rem;">
                             {% if publicacion.tipo == 'venta y alquiler' %}

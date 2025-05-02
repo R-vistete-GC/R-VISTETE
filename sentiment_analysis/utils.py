@@ -102,6 +102,21 @@ class SentimentAnalyzer:
             logger.error(f"Error al analizar el sentimiento con ChatGPT: {e}")
             return None
 
+    def analyze_text_with_textblob(self, texto):
+        """Analiza el sentimiento usando TextBlob."""
+        try:
+            analysis = TextBlob(texto)
+            polaridad = analysis.sentiment.polarity
+            if polaridad > 0:
+                return 'positivo'
+            elif polaridad < 0:
+                return 'negativo'
+            else:
+                return 'neutro'
+        except Exception as e:
+            logger.error(f"Error al analizar el sentimiento con TextBlob: {e}")
+            return 'neutro'
+
     def analyze_batch(self, comentarios, limit=100):
         """Analiza un lote de comentarios"""
         from posts.models import Comentario, MetricasSentimiento

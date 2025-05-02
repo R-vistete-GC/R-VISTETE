@@ -48,6 +48,8 @@ function mostrarComentarios(publicacionId) {
                         <small class="text-muted">${comentario.fecha_comentario}</small>
                     </div>
                     <p class="mb-1">${comentario.comentario}</p>
+                    <small>ChatGPT: ${comentario.sentimiento_chatgpt}</small><br>
+                    <small>TextBlob: ${comentario.sentimiento_textblob}</small>
                 </div>
             `).join('');
         })
