@@ -739,37 +739,37 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(resumen);
     });
 
-    // Resumen para la gráfica de Sentimientos
+    // Función para generar el resumen de Sentimientos
     document.getElementById('resumenSentimientos').addEventListener('click', () => {
         const resumen = generarResumenSentimientos(sentimientosChart.data);
         alert(resumen);
     });
 
-    // Resumen para la gráfica de Compras, Ventas y Alquileres
+    // Función para generar el resumen de Compras, Ventas y Alquileres
     document.getElementById('resumenComprasVentasAlquileres').addEventListener('click', () => {
         const resumen = generarResumenComprasVentasAlquileres();
         alert(resumen);
     });
 
-    // Resumen para la gráfica de Ingresos y Gastos
+    // Función para generar el resumen de Ingresos y Gastos
     document.getElementById('resumenIngresosGastos').addEventListener('click', () => {
         const resumen = generarResumenIngresosGastos();
         alert(resumen);
     });
 
-    // Resumen para la gráfica de Actividad en el Tiempo
+    // Función para generar el resumen de Actividad en el Tiempo
     document.getElementById('resumenActividadTiempo').addEventListener('click', () => {
         const resumen = generarResumenActividadTiempo();
         alert(resumen);
     });
 
-    // Resumen para la gráfica de Transacciones por Estado
+    // Función para generar el resumen de Transacciones por Estado
     document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', () => {
         const resumen = generarResumenTransaccionesPorEstado();
         alert(resumen);
     });
 
-    // Resumen para la gráfica de Estilos y Colores
+    // Función para generar el resumen de Estilos y Colores
     document.getElementById('resumenEstilosColores').addEventListener('click', () => {
         const resumen = generarResumenEstilosColores(estilosColoresChart.data.datasets);
         alert(resumen);
