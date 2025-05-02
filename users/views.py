@@ -694,6 +694,8 @@ def dashboard_compras_ventas_alquileres(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+from django.db.models.functions import TruncMonth
+
 def dashboard_actividad_tiempo(request):
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
@@ -709,14 +711,11 @@ def dashboard_actividad_tiempo(request):
         # Agrupar alquileres por mes
         alquileres = Alquiler.objects.filter(cliente_id=usuario_id).annotate(mes=TruncMonth('fecha_inicio')).values('mes').annotate(total=Count('id')).order_by('mes')
 
-        # Formatear los datos para enviarlos al frontend
-        data = {
+        return JsonResponse({
             'compras': list(compras),
             'ventas': list(ventas),
             'alquileres': list(alquileres),
-        }
-
-        return JsonResponse(data)
+        })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
@@ -726,28 +725,25 @@ from posts.models import Venta, Alquiler
 from compras.models import Compra
 
 def dashboard_transacciones_por_estado(request):
-    usuario_id = request.session.get('usuario_id')  # Obtener el ID del usuario autenticado
+    usuario_id = request.session.get('usuario_id')
     if not usuario_id:
         return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
     try:
-        # Agrupar compras por estado (entregado, pendiente)
+        # Agrupar compras por estado
         compras = Compra.objects.filter(comprador_id=usuario_id).values('estado').annotate(total=Count('id'))
 
         # Agrupar ventas por estado
         ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id).values('estado').annotate(total=Count('id'))
 
-        # Agrupar alquileres por estado (activo, reservado, completado)
+        # Agrupar alquileres por estado
         alquileres = Alquiler.objects.filter(cliente_id=usuario_id).values('estado').annotate(total=Count('id'))
 
-        # Formatear los datos para enviarlos al frontend
-        data = {
+        return JsonResponse({
             'compras': list(compras),
             'ventas': list(ventas),
             'alquileres': list(alquileres),
-        }
-
-        return JsonResponse(data)
+        })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
@@ -759,23 +755,20 @@ def dashboard_ingresos_gastos(request):
         return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
     try:
-        # Calcular ingresos por ventas (publicaciones del usuario que han sido compradas)
+        # Calcular ingresos por ventas
         ingresos_ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id).aggregate(total=Sum('precio_final'))['total'] or 0
 
-        # Calcular ingresos por alquileres (publicaciones del usuario que han sido alquiladas)
+        # Calcular ingresos por alquileres
         ingresos_alquileres = Alquiler.objects.filter(publicacion__usuario_id=usuario_id).aggregate(total=Sum('precio_total'))['total'] or 0
 
-        # Calcular gastos en compras (compras realizadas por el usuario)
+        # Calcular gastos en compras
         gastos_compras = Compra.objects.filter(comprador_id=usuario_id).aggregate(total=Sum('precio_final'))['total'] or 0
 
-        # Formatear los datos para enviarlos al frontend
-        data = {
+        return JsonResponse({
             'ingresos_ventas': ingresos_ventas,
             'ingresos_alquileres': ingresos_alquileres,
             'gastos_compras': gastos_compras,
-        }
-
-        return JsonResponse(data)
+        })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 

@@ -1,3 +1,6 @@
+// Variable global para almacenar la instancia de la gráfica
+let ingresosGastosChart;
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Archivo dashboard.js cargado correctamente.');
 
@@ -435,38 +438,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Formatear los datos para agrupar por meses
-                const formatearMes = (mes) => {
-                    const fecha = new Date(mes);
-                    return fecha.toLocaleString('default', { month: 'short', year: 'numeric' });
-                };
-
-                const mesesCompras = data.compras.map(item => formatearMes(item.mes));
+                const mesesCompras = data.compras.map(item => item.mes);
                 const totalesCompras = data.compras.map(item => item.total);
 
-                const mesesVentas = data.ventas.map(item => formatearMes(item.mes));
+                const mesesVentas = data.ventas.map(item => item.mes);
                 const totalesVentas = data.ventas.map(item => item.total);
 
-                const mesesAlquileres = data.alquileres.map(item => formatearMes(item.mes));
+                const mesesAlquileres = data.alquileres.map(item => item.mes);
                 const totalesAlquileres = data.alquileres.map(item => item.total);
 
-                // Combinar todas las fechas únicas
                 const mesesUnicos = [...new Set([...mesesCompras, ...mesesVentas, ...mesesAlquileres])];
 
-                // Crear la gráfica de líneas con marcadores
                 new Chart(actividadTiempoCtx, {
                     type: 'line',
                     data: {
-                        labels: mesesUnicos, // Mostrar los meses únicos en el eje X
+                        labels: mesesUnicos,
                         datasets: [
                             {
                                 label: 'Compras',
                                 data: mesesUnicos.map(mes => totalesCompras[mesesCompras.indexOf(mes)] || 0),
                                 borderColor: '#36A2EB',
                                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                tension: 0.4, // Líneas suaves
-                                pointStyle: 'circle', // Marcadores circulares
-                                pointRadius: 5, // Tamaño de los puntos
+                                tension: 0.4,
+                                pointStyle: 'circle',
+                                pointRadius: 5,
                                 pointBackgroundColor: '#36A2EB',
                                 fill: false,
                             },
@@ -475,9 +470,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data: mesesUnicos.map(mes => totalesVentas[mesesVentas.indexOf(mes)] || 0),
                                 borderColor: '#FF6384',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                tension: 0.4, // Líneas suaves
-                                pointStyle: 'triangle', // Marcadores triangulares
-                                pointRadius: 5, // Tamaño de los puntos
+                                tension: 0.4,
+                                pointStyle: 'triangle',
+                                pointRadius: 5,
                                 pointBackgroundColor: '#FF6384',
                                 fill: false,
                             },
@@ -486,9 +481,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data: mesesUnicos.map(mes => totalesAlquileres[mesesAlquileres.indexOf(mes)] || 0),
                                 borderColor: '#FFCE56',
                                 backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                                tension: 0.4, // Líneas suaves
-                                pointStyle: 'rect', // Marcadores rectangulares
-                                pointRadius: 5, // Tamaño de los puntos
+                                tension: 0.4,
+                                pointStyle: 'rect',
+                                pointRadius: 5,
                                 pointBackgroundColor: '#FFCE56',
                                 fill: false,
                             },
@@ -614,6 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gráfica de Ingresos y Gastos
     const ingresosGastosCtx = document.getElementById('graficaIngresosGastos');
+
     if (ingresosGastosCtx) {
         fetch('/users/dashboard/ingresos-gastos/')
             .then(response => response.json())
@@ -623,16 +619,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Extraer los datos de ingresos y gastos
                 const ingresosVentas = data.ingresos_ventas;
                 const ingresosAlquileres = data.ingresos_alquileres;
                 const gastosCompras = data.gastos_compras;
 
-                // Crear la gráfica de barras horizontales apiladas
-                new Chart(ingresosGastosCtx, {
+                // Crear la gráfica y almacenar la instancia
+                ingresosGastosChart = new Chart(ingresosGastosCtx, {
                     type: 'bar',
                     data: {
-                        labels: ['Ingresos por Ventas', 'Ingresos por Alquileres', 'Gastos en Compras'], // Etiquetas en el eje Y
+                        labels: ['Ingresos por Ventas', 'Ingresos por Alquileres', 'Gastos en Compras'],
                         datasets: [
                             {
                                 label: 'Ingresos',
@@ -648,26 +643,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     options: {
                         responsive: true,
-                        indexAxis: 'y', // Cambiar a barras horizontales
+                        indexAxis: 'y',
                         plugins: {
                             legend: {
                                 position: 'top',
                             },
                             title: {
                                 display: true,
-                                text: 'Comparación de Ingresos y Gastos (Barras Horizontales Apiladas)',
+                                text: 'Comparación de Ingresos y Gastos',
                             },
                         },
                         scales: {
                             x: {
-                                stacked: true, // Apilar las barras en el eje X
+                                stacked: true,
                                 title: {
                                     display: true,
                                     text: 'Monto Total ($)',
                                 },
                             },
                             y: {
-                                stacked: true, // Apilar las barras en el eje Y
+                                stacked: true,
                                 title: {
                                     display: true,
                                     text: 'Categorías',
@@ -748,25 +743,70 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función para generar el resumen de Compras, Ventas y Alquileres
     document.getElementById('resumenComprasVentasAlquileres').addEventListener('click', () => {
         const resumen = generarResumenComprasVentasAlquileres();
-        alert(resumen);
+         alert(resumen);
     });
 
     // Función para generar el resumen de Ingresos y Gastos
     document.getElementById('resumenIngresosGastos').addEventListener('click', () => {
-        const resumen = generarResumenIngresosGastos();
-        alert(resumen);
+        if (ingresosGastosChart) {
+            const chartData = ingresosGastosChart.data.datasets; // Obtener los datasets de la gráfica
+            const labels = ingresosGastosChart.data.labels; // Obtener las etiquetas de la gráfica
+
+            let resumen = 'Resumen de Ingresos y Gastos:\n';
+            chartData.forEach((dataset) => {
+                dataset.data.forEach((value, i) => {
+                    if (value > 0) {
+                        resumen += `- ${labels[i]} (${dataset.label}): $${value}\n`; // Mostrar el valor y la etiqueta
+                    }
+                });
+            });
+
+            alert(resumen); // Mostrar el resumen en un modal o alerta
+        } else {
+            alert('No se encontraron datos para generar el resumen.');
+        }
     });
 
     // Función para generar el resumen de Actividad en el Tiempo
     document.getElementById('resumenActividadTiempo').addEventListener('click', () => {
-        const resumen = generarResumenActividadTiempo();
-        alert(resumen);
+        if (actividadTiempoCtx && actividadTiempoCtx.chart) {
+            const chartData = actividadTiempoCtx.chart.data.datasets;
+            const labels = actividadTiempoCtx.chart.data.labels;
+
+            let resumen = 'Resumen de Actividad en el Tiempo:\n';
+            chartData.forEach((dataset) => {
+                dataset.data.forEach((value, i) => {
+                    if (value > 0) {
+                        resumen += `- ${dataset.label} en ${labels[i]}: ${value} transacciones\n`;
+                    }
+                });
+            });
+
+            alert(resumen);
+        } else {
+            alert('No se encontraron datos para generar el resumen.');
+        }
     });
 
     // Función para generar el resumen de Transacciones por Estado
     document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', () => {
-        const resumen = generarResumenTransaccionesPorEstado();
-        alert(resumen);
+        if (transaccionesPorEstadoCtx && transaccionesPorEstadoCtx.chart) {
+            const chartData = transaccionesPorEstadoCtx.chart.data.datasets;
+            const labels = transaccionesPorEstadoCtx.chart.data.labels;
+
+            let resumen = 'Resumen de Transacciones por Estado:\n';
+            chartData.forEach((dataset) => {
+                dataset.data.forEach((value, i) => {
+                    if (value > 0) {
+                        resumen += `- ${dataset.label} (${labels[i]}): ${value}\n`;
+                    }
+                });
+            });
+
+            alert(resumen);
+        } else {
+            alert('No se encontraron datos para generar el resumen.');
+        }
     });
 
     // Función para generar el resumen de Estilos y Colores
