@@ -160,6 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gráfica de Estilos y Colores
     const estilosColoresCtx = document.getElementById('graficaEstilosColores');
+    let estilosColoresChart; // Variable para almacenar la instancia de la gráfica
+
     if (estilosColoresCtx) {
         fetch('/users/dashboard/estilos-colores/')
             .then(response => response.json())
@@ -178,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }));
 
                 // Crear la gráfica de puntos
-                new Chart(estilosColoresCtx, {
+                estilosColoresChart = new Chart(estilosColoresCtx, {
                     type: 'scatter', // Gráfica de puntos
                     data: {
                         datasets: [
@@ -254,6 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gráfica de Likes y Favoritos por Estilo y Color
     const likesFavoritosCtx = document.getElementById('graficaLikesFavoritos');
+    let likesFavoritosChart; // Variable para almacenar la instancia de la gráfica
+
     if (likesFavoritosCtx) {
         fetch('/users/dashboard/likes-favoritos-estilo-color/')
             .then(response => response.json())
@@ -277,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })));
 
                 // Crear la gráfica
-                new Chart(likesFavoritosCtx, {
+                likesFavoritosChart = new Chart(likesFavoritosCtx, {
                     type: 'bar',
                     data: {
                         labels: estilos, // Etiquetas en el eje X (estilos)
@@ -311,6 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gráfica de Sentimientos en Comentarios
     const sentimientosCtx = document.getElementById('graficaSentimientos');
+    let sentimientosChart; // Variable para almacenar la instancia de la gráfica
+
     if (sentimientosCtx) {
         fetch('/users/dashboard/comentarios-sentimientos-usuario/')
             .then(response => response.json())
@@ -319,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const sentimientos = data.data;
 
                     // Crear la gráfica de barras
-                    new Chart(sentimientosCtx, {
+                    sentimientosChart = new Chart(sentimientosCtx, {
                         type: 'bar', // Cambiar a 'line' si prefieres una gráfica de líneas
                         data: {
                             labels: ['Positivos', 'Neutros', 'Negativos'],
@@ -720,6 +726,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Llamar a la función inmediatamente al cargar la página
     actualizarRecomendaciones();
+
+    // Resumen para la gráfica de Estilo y Color
+    document.getElementById('resumenEstiloColor').addEventListener('click', () => {
+        const resumen = generarResumenEstiloColor(estiloColorChart.data.datasets);
+        alert(resumen); // Mostrar el resumen en un alert (puedes usar un modal si prefieres)
+    });
+
+    // Resumen para la gráfica de Likes y Favoritos
+    document.getElementById('resumenLikesFavoritos').addEventListener('click', () => {
+        const resumen = generarResumenLikesFavoritos(likesFavoritosChart.data.datasets);
+        alert(resumen);
+    });
+
+    // Resumen para la gráfica de Sentimientos
+    document.getElementById('resumenSentimientos').addEventListener('click', () => {
+        const resumen = generarResumenSentimientos(sentimientosChart.data);
+        alert(resumen);
+    });
+
+    // Resumen para la gráfica de Compras, Ventas y Alquileres
+    document.getElementById('resumenComprasVentasAlquileres').addEventListener('click', () => {
+        const resumen = generarResumenComprasVentasAlquileres();
+        alert(resumen);
+    });
+
+    // Resumen para la gráfica de Ingresos y Gastos
+    document.getElementById('resumenIngresosGastos').addEventListener('click', () => {
+        const resumen = generarResumenIngresosGastos();
+        alert(resumen);
+    });
+
+    // Resumen para la gráfica de Actividad en el Tiempo
+    document.getElementById('resumenActividadTiempo').addEventListener('click', () => {
+        const resumen = generarResumenActividadTiempo();
+        alert(resumen);
+    });
+
+    // Resumen para la gráfica de Transacciones por Estado
+    document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', () => {
+        const resumen = generarResumenTransaccionesPorEstado();
+        alert(resumen);
+    });
+
+    // Resumen para la gráfica de Estilos y Colores
+    document.getElementById('resumenEstilosColores').addEventListener('click', () => {
+        const resumen = generarResumenEstilosColores(estilosColoresChart.data.datasets);
+        alert(resumen);
+    });
 });
 
 // Función para asignar colores a las líneas
@@ -735,4 +789,62 @@ function getColorForLabel(label, isLight = false) {
         'marrón': isLight ? '#D2B48C' : '#A52A2A'
     };
     return colorMap[label] || (isLight ? '#CCCCCC' : '#000000');
+}
+
+// Función para generar el resumen de la gráfica de Estilo y Color
+function generarResumenEstiloColor(datasets) {
+    let resumen = 'Resumen de Recomendaciones por Estilo y Color:\n';
+    datasets.forEach(dataset => {
+        const total = dataset.data.reduce((sum, point) => sum + point.y, 0);
+        resumen += `- ${dataset.label}: ${total} recomendaciones\n`;
+    });
+    return resumen;
+}
+
+// Función para generar el resumen de la gráfica de Likes y Favoritos
+function generarResumenLikesFavoritos(datasets) {
+    let resumen = 'Resumen de Likes y Favoritos por Estilo y Color:\n';
+    datasets.forEach(dataset => {
+        const total = dataset.data.reduce((sum, value) => sum + value, 0);
+        resumen += `- ${dataset.label}: ${total}\n`;
+    });
+    return resumen;
+}
+
+// Función para generar el resumen de Sentimientos
+function generarResumenSentimientos(data) {
+    return `Resumen de Sentimientos:\n- Positivos: ${data.datasets[0].data[0]}\n- Neutros: ${data.datasets[0].data[1]}\n- Negativos: ${data.datasets[0].data[2]}`;
+}
+
+// Función para generar el resumen de Compras, Ventas y Alquileres
+function generarResumenComprasVentasAlquileres() {
+    const compras = document.getElementById('graficaComprasVentasAlquileres').getAttribute('data-compras');
+    const ventas = document.getElementById('graficaComprasVentasAlquileres').getAttribute('data-ventas');
+    const alquileres = document.getElementById('graficaComprasVentasAlquileres').getAttribute('data-alquileres');
+    return `Resumen de Compras, Ventas y Alquileres:\n- Compras: ${compras}\n- Ventas: ${ventas}\n- Alquileres: ${alquileres}`;
+}
+
+// Función para generar el resumen de Ingresos y Gastos
+function generarResumenIngresosGastos() {
+    return 'Resumen de Ingresos y Gastos:\n- Ingresos por Ventas: $X\n- Ingresos por Alquileres: $Y\n- Gastos en Compras: $Z';
+}
+
+// Función para generar el resumen de Actividad en el Tiempo
+function generarResumenActividadTiempo() {
+    return 'Resumen de Actividad en el Tiempo:\n- Compras: X\n- Ventas: Y\n- Alquileres: Z';
+}
+
+// Función para generar el resumen de Transacciones por Estado
+function generarResumenTransaccionesPorEstado() {
+    return 'Resumen de Transacciones por Estado:\n- Pendientes: X\n- Completadas: Y\n- Canceladas: Z';
+}
+
+// Función para generar el resumen de Estilos y Colores
+function generarResumenEstilosColores(datasets) {
+    let resumen = 'Resumen de Estilos y Colores Más Solicitados:\n';
+    datasets.forEach(dataset => {
+        const total = dataset.data.reduce((sum, point) => sum + point.x, 0);
+        resumen += `- ${dataset.label}: ${total}\n`;
+    });
+    return resumen;
 }
