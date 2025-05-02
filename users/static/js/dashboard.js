@@ -1,5 +1,6 @@
 // Variable global para almacenar la instancia de la gráfica
 let ingresosGastosChart;
+let transaccionesPorEstadoChart;
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Archivo dashboard.js cargado correctamente.');
@@ -523,6 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gráfica de Transacciones por Estado
     const transaccionesPorEstadoCtx = document.getElementById('graficaTransaccionesPorEstado');
+
     if (transaccionesPorEstadoCtx) {
         fetch('/users/dashboard/transacciones-por-estado/')
             .then(response => response.json())
@@ -534,8 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Procesar los datos para la gráfica
                 const estadosCompras = ['pendiente', 'entregado']; // Estados posibles para compras
-                const estadosAlquileres = ['activo', 'reservado', 'completado']; // Estados posibles para alquileres
                 const estadosVentas = ['pendiente', 'completada', 'cancelada']; // Estados posibles para ventas
+                const estadosAlquileres = ['activo', 'reservado', 'completado']; // Estados posibles para alquileres
 
                 const compras = estadosCompras.map(estado => {
                     const compra = data.compras.find(item => item.estado === estado);
@@ -550,8 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     return alquiler ? alquiler.total : 0;
                 });
 
-                // Crear la gráfica de barras apiladas
-                new Chart(transaccionesPorEstadoCtx, {
+                // Crear la gráfica y almacenar la instancia
+                transaccionesPorEstadoChart = new Chart(transaccionesPorEstadoCtx, {
                     type: 'bar',
                     data: {
                         labels: [...estadosCompras, ...estadosVentas, ...estadosAlquileres], // Etiquetas en el eje X
@@ -770,19 +772,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función para generar el resumen de Actividad en el Tiempo
     document.getElementById('resumenActividadTiempo').addEventListener('click', () => {
         if (actividadTiempoCtx && actividadTiempoCtx.chart) {
-            const chartData = actividadTiempoCtx.chart.data.datasets;
-            const labels = actividadTiempoCtx.chart.data.labels;
+            const chartData = actividadTiempoCtx.chart.data.datasets; // Obtener los datasets de la gráfica
+            const labels = actividadTiempoCtx.chart.data.labels; // Obtener las etiquetas de la gráfica (meses)
 
             let resumen = 'Resumen de Actividad en el Tiempo:\n';
             chartData.forEach((dataset) => {
                 dataset.data.forEach((value, i) => {
                     if (value > 0) {
-                        resumen += `- ${dataset.label} en ${labels[i]}: ${value} transacciones\n`;
+                        resumen += `- ${dataset.label} en ${labels[i]}: ${value} transacciones\n`; // Mostrar el valor y la etiqueta
                     }
                 });
             });
 
-            alert(resumen);
+            alert(resumen); // Mostrar el resumen en un modal o alerta
         } else {
             alert('No se encontraron datos para generar el resumen.');
         }
@@ -790,20 +792,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función para generar el resumen de Transacciones por Estado
     document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', () => {
-        if (transaccionesPorEstadoCtx && transaccionesPorEstadoCtx.chart) {
-            const chartData = transaccionesPorEstadoCtx.chart.data.datasets;
-            const labels = transaccionesPorEstadoCtx.chart.data.labels;
+        if (transaccionesPorEstadoChart) {
+            const chartData = transaccionesPorEstadoChart.data.datasets; // Obtener los datasets de la gráfica
+            const labels = transaccionesPorEstadoChart.data.labels; // Obtener las etiquetas de la gráfica (estados)
 
             let resumen = 'Resumen de Transacciones por Estado:\n';
             chartData.forEach((dataset) => {
                 dataset.data.forEach((value, i) => {
                     if (value > 0) {
-                        resumen += `- ${dataset.label} (${labels[i]}): ${value}\n`;
+                        resumen += `- ${dataset.label} (${labels[i]}): ${value}\n`; // Mostrar el valor y la etiqueta
                     }
                 });
             });
 
-            alert(resumen);
+            alert(resumen); // Mostrar el resumen en un modal o alerta
         } else {
             alert('No se encontraron datos para generar el resumen.');
         }
