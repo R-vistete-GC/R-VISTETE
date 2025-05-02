@@ -153,6 +153,18 @@
                                          style="width: {% widthratio publicacion.comentarios_negativos_textblob|default:0 publicacion.total_comentarios|default:1 100 %}%">
                                     </div>
                                 </div>
+                                <!-- Contadores de comentarios con emojis -->
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small style="color: #6c757d; font-size: 0.8rem;">
+                                        {{ publicacion.comentarios_positivos_textblob|default:0 }} <i class="far fa-thumbs-up"></i>
+                                    </small>
+                                    <small style="color: #6c757d; font-size: 0.8rem;">
+                                        {{ publicacion.comentarios_neutros_textblob|default:0 }} <i class="far fa-meh"></i>
+                                    </small>
+                                    <small style="color: #6c757d; font-size: 0.8rem;">
+                                        {{ publicacion.comentarios_negativos_textblob|default:0 }} <i class="far fa-thumbs-down"></i>
+                                    </small>
+                                </div>
                             </div>
                         </div>
                         <!-- Fin de valoración de TextBlob -->
