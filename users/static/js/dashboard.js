@@ -430,6 +430,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gráfica de Actividad en el Tiempo
     const actividadTiempoCtx = document.getElementById('graficaActividadTiempo');
+    let actividadTiempoChart; // Variable para almacenar la instancia de la gráfica
+
     if (actividadTiempoCtx) {
         fetch('/users/dashboard/actividad-tiempo/')
             .then(response => response.json())
@@ -450,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const mesesUnicos = [...new Set([...mesesCompras, ...mesesVentas, ...mesesAlquileres])];
 
-                new Chart(actividadTiempoCtx, {
+                actividadTiempoChart = new Chart(actividadTiempoCtx, {
                     type: 'line',
                     data: {
                         labels: mesesUnicos,
@@ -771,9 +773,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función para generar el resumen de Actividad en el Tiempo
     document.getElementById('resumenActividadTiempo').addEventListener('click', () => {
-        if (actividadTiempoCtx && actividadTiempoCtx.chart) {
-            const chartData = actividadTiempoCtx.chart.data.datasets; // Obtener los datasets de la gráfica
-            const labels = actividadTiempoCtx.chart.data.labels; // Obtener las etiquetas de la gráfica (meses)
+        if (actividadTiempoChart) { // Asegúrate de que la instancia de la gráfica esté inicializada
+            const chartData = actividadTiempoChart.data.datasets; // Obtener los datasets de la gráfica
+            const labels = actividadTiempoChart.data.labels; // Obtener las etiquetas de la gráfica (meses)
 
             let resumen = 'Resumen de Actividad en el Tiempo:\n';
             chartData.forEach((dataset) => {
