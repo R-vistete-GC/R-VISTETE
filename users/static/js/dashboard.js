@@ -728,26 +728,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Resumen para la gráfica de Estilo y Color
     document.getElementById('resumenEstiloColor').addEventListener('click', () => {
-        const resumen = generarResumenEstiloColor(estiloColorChart.data.datasets);
-        alert(resumen); // Mostrar el resumen en un alert (puedes usar un modal si prefieres)
+        if (estiloColorChart) {
+            let resumen = '<ul style="text-align: left;">';
+            estiloColorChart.data.datasets.forEach((dataset) => {
+                const total = dataset.data.reduce((sum, point) => sum + point.y, 0);
+                resumen += `<li><strong>${dataset.label}:</strong> ${total} recomendaciones</li>`;
+            });
+            resumen += '</ul>';
+
+            Swal.fire({
+                title: '<h3 style="margin: 0;">Resumen de Recomendaciones por Estilo y Color</h3>',
+                html: resumen,
+                icon: null, // Eliminar el ícono
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    popup: 'swal-wide',
+                },
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se encontraron datos para generar el resumen.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
+        }
     });
 
     // Resumen para la gráfica de Likes y Favoritos
     document.getElementById('resumenLikesFavoritos').addEventListener('click', () => {
-        const resumen = generarResumenLikesFavoritos(likesFavoritosChart.data.datasets);
-        alert(resumen);
+        if (likesFavoritosChart) {
+            let resumen = '<ul style="text-align: left;">';
+            likesFavoritosChart.data.datasets.forEach((dataset) => {
+                const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                resumen += `<li><strong>${dataset.label}:</strong> ${total}</li>`;
+            });
+            resumen += '</ul>';
+
+            Swal.fire({
+                title: '<h3 style="margin: 0;">Resumen de Likes y Favoritos por Estilo y Color</h3>',
+                html: resumen,
+                icon: null, // Eliminar el ícono
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    popup: 'swal-wide',
+                },
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se encontraron datos para generar el resumen.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
+        }
     });
 
     // Función para generar el resumen de Sentimientos
     document.getElementById('resumenSentimientos').addEventListener('click', () => {
         const resumen = generarResumenSentimientos(sentimientosChart.data);
-        alert(resumen);
+
+        Swal.fire({
+            title: '<h3 style="margin: 0;">Resumen de Sentimientos</h3>',
+            html: `<ul style="text-align: left;">${resumen.replace(/\n/g, '<br>')}</ul>`,
+            icon: null, // Eliminar el ícono
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                popup: 'swal-wide',
+            },
+        });
     });
 
     // Función para generar el resumen de Compras, Ventas y Alquileres
     document.getElementById('resumenComprasVentasAlquileres').addEventListener('click', () => {
         const resumen = generarResumenComprasVentasAlquileres();
-         alert(resumen);
+
+        Swal.fire({
+            title: '<h3 style="margin: 0;">Resumen de Compras, Ventas y Alquileres</h3>',
+            html: `<ul style="text-align: left;">${resumen.replace(/\n/g, '<br>')}</ul>`,
+            icon: null, // Eliminar el ícono
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                popup: 'swal-wide',
+            },
+        });
     });
 
     // Función para generar el resumen de Ingresos y Gastos
@@ -756,39 +820,67 @@ document.addEventListener('DOMContentLoaded', () => {
             const chartData = ingresosGastosChart.data.datasets; // Obtener los datasets de la gráfica
             const labels = ingresosGastosChart.data.labels; // Obtener las etiquetas de la gráfica
 
-            let resumen = 'Resumen de Ingresos y Gastos:\n';
+            let resumen = '<ul style="text-align: left;">';
             chartData.forEach((dataset) => {
                 dataset.data.forEach((value, i) => {
                     if (value > 0) {
-                        resumen += `- ${labels[i]} (${dataset.label}): $${value}\n`; // Mostrar el valor y la etiqueta
+                        resumen += `<li><strong>${labels[i]} (${dataset.label}):</strong> $${value}</li>`;
                     }
                 });
             });
+            resumen += '</ul>';
 
-            alert(resumen); // Mostrar el resumen en un modal o alerta
+            Swal.fire({
+                title: '<h3 style="margin: 0;">Resumen de Ingresos y Gastos</h3>',
+                html: resumen,
+                icon: null, // Eliminar el ícono
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    popup: 'swal-wide',
+                },
+            });
         } else {
-            alert('No se encontraron datos para generar el resumen.');
+            Swal.fire({
+                title: 'Error',
+                text: 'No se encontraron datos para generar el resumen.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
         }
     });
 
     // Función para generar el resumen de Actividad en el Tiempo
     document.getElementById('resumenActividadTiempo').addEventListener('click', () => {
-        if (actividadTiempoChart) { // Asegúrate de que la instancia de la gráfica esté inicializada
+        if (actividadTiempoChart) {
             const chartData = actividadTiempoChart.data.datasets; // Obtener los datasets de la gráfica
             const labels = actividadTiempoChart.data.labels; // Obtener las etiquetas de la gráfica (meses)
 
-            let resumen = 'Resumen de Actividad en el Tiempo:\n';
+            let resumen = '<ul style="text-align: left;">';
             chartData.forEach((dataset) => {
                 dataset.data.forEach((value, i) => {
                     if (value > 0) {
-                        resumen += `- ${dataset.label} en ${labels[i]}: ${value} transacciones\n`; // Mostrar el valor y la etiqueta
+                        resumen += `<li><strong>${dataset.label} en ${labels[i]}:</strong> ${value} transacciones</li>`;
                     }
                 });
             });
+            resumen += '</ul>';
 
-            alert(resumen); // Mostrar el resumen en un modal o alerta
+            Swal.fire({
+                title: '<h3 style="margin: 0;">Resumen de Actividad en el Tiempo</h3>',
+                html: resumen,
+                icon: null, // Eliminar el ícono
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    popup: 'swal-wide',
+                },
+            });
         } else {
-            alert('No se encontraron datos para generar el resumen.');
+            Swal.fire({
+                title: 'Error',
+                text: 'No se encontraron datos para generar el resumen.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
         }
     });
 
@@ -798,25 +890,62 @@ document.addEventListener('DOMContentLoaded', () => {
             const chartData = transaccionesPorEstadoChart.data.datasets; // Obtener los datasets de la gráfica
             const labels = transaccionesPorEstadoChart.data.labels; // Obtener las etiquetas de la gráfica (estados)
 
-            let resumen = 'Resumen de Transacciones por Estado:\n';
+            let resumen = '<ul style="text-align: left;">';
             chartData.forEach((dataset) => {
                 dataset.data.forEach((value, i) => {
                     if (value > 0) {
-                        resumen += `- ${dataset.label} (${labels[i]}): ${value}\n`; // Mostrar el valor y la etiqueta
+                        resumen += `<li><strong>${dataset.label} (${labels[i]}):</strong> ${value}</li>`;
                     }
                 });
             });
+            resumen += '</ul>';
 
-            alert(resumen); // Mostrar el resumen en un modal o alerta
+            Swal.fire({
+                title: '<h3 style="margin: 0;">Resumen de Transacciones por Estado</h3>',
+                html: resumen,
+                icon: null, // Eliminar el ícono
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    popup: 'swal-wide',
+                },
+            });
         } else {
-            alert('No se encontraron datos para generar el resumen.');
+            Swal.fire({
+                title: 'Error',
+                text: 'No se encontraron datos para generar el resumen.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
         }
     });
 
     // Función para generar el resumen de Estilos y Colores
     document.getElementById('resumenEstilosColores').addEventListener('click', () => {
-        const resumen = generarResumenEstilosColores(estilosColoresChart.data.datasets);
-        alert(resumen);
+        if (estilosColoresChart) {
+            let resumen = '<ul style="text-align: left;">';
+            estilosColoresChart.data.datasets.forEach((dataset) => {
+                const total = dataset.data.reduce((sum, point) => sum + point.x, 0);
+                resumen += `<li><strong>${dataset.label}:</strong> ${total}</li>`;
+            });
+            resumen += '</ul>';
+
+            Swal.fire({
+                title: '<h3 style="margin: 0;">Resumen de Estilos y Colores Más Solicitados</h3>',
+                html: resumen,
+                icon: null, // Eliminar el ícono
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    popup: 'swal-wide',
+                },
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se encontraron datos para generar el resumen.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
+        }
     });
 });
 
