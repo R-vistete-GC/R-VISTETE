@@ -31,32 +31,19 @@ class DashboardInterpreter:
 
     def _create_prompt(self, chart_type, data):
         """
-        Crea prompts específicos según el tipo de gráfica para generar análisis más relevantes
+        Crea prompts específicos basados en los datos del resumen
         """
-        base_prompt = "Actúa como un experto analista de moda y comercio electrónico. "
+        base_prompt = "Como experto en análisis de datos de moda, interpreta el siguiente resumen de datos: "
         
-        prompts = {
-            'actividadTiempo': (
-                f"{base_prompt}Analiza la siguiente actividad temporal: {data}. "
-                "Proporciona un análisis conciso que destaque: "
-                "1. Los períodos de mayor actividad "
-                "2. Tendencias en el comportamiento del usuario "
-                "3. Sugerencias para optimizar la actividad"
-            ),
-            'estiloColor': (
-                f"{base_prompt}Interpreta estas estadísticas de colores y estilos: {data}. "
-                "Proporciona un análisis conciso que destaque: "
-                "1. Los colores y estilos más populares "
-                "2. Combinaciones preferidas "
-                "3. Recomendaciones basadas en estas preferencias"
-            ),
-            'sentimientos': (
-                f"{base_prompt}Analiza estos datos de sentimientos en comentarios: {data}. "
-                "Proporciona un análisis conciso que destaque: "
-                "1. La tendencia general de satisfacción "
-                "2. Áreas de mejora potencial "
-                "3. Recomendaciones basadas en los comentarios"
-            )
-        }
-        
-        return prompts.get(chart_type, f"{base_prompt}Analiza estos datos: {data}")
+        if chart_type == 'EstiloColor':
+            prompt = f"{base_prompt}En las recomendaciones por color: "
+            for color, total in data.items():
+                prompt += f"{color}: {total} recomendaciones, "
+            prompt += "\n¿Qué nos dice esto sobre las preferencias de color de los usuarios y qué recomendaciones podrías dar?"
+
+        elif chart_type == 'Sentimientos':
+            prompt = (f"{base_prompt}En los comentarios tenemos: "
+                     f"{data['positivos']} positivos, {data['neutros']} neutros y {data['negativos']} negativos. "
+                     f"\n¿Qué nos indica esto sobre la satisfacción general de los usuarios y qué acciones se podrían tomar?")
+
+        return prompt

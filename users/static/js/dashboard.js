@@ -728,36 +728,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Resumen para la gráfica de Estilo y Color
     document.getElementById('resumenEstiloColor').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
-
+        event.preventDefault();
         if (estiloColorChart) {
-            let resumen = '<ul style="text-align: left;">';
+            // Generar el resumen
+            let resumenText = '';
             estiloColorChart.data.datasets.forEach((dataset) => {
                 const total = dataset.data.reduce((sum, point) => sum + point.y, 0);
-                resumen += `<li><strong>${dataset.label}:</strong> ${total} recomendaciones</li>`;
-            });
-            resumen += '</ul>';
-
-            Swal.fire({
-                title: '<h3 style="margin: 0;">Resumen de Recomendaciones por Estilo y Color</h3>',
-                html: resumen,
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-                customClass: {
-                    popup: 'swal-wide',
-                },
+                resumenText += `${dataset.label}: ${total} recomendaciones\n`;
             });
 
-            const datos = obtenerDatosEstiloColor(estiloColorChart);
-            mostrarInterpretacionAI('estiloColor', datos, 'graficaEstiloColor');
-        } else {
+            // Mostrar el resumen con SweetAlert2
             Swal.fire({
-                title: 'Error',
-                text: 'No se encontraron datos para generar el resumen.',
-                icon: 'error',
+                title: 'Resumen de Recomendaciones por Estilo y Color',
+                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => line ? `<li>${line}</li>` : '').join('')}</ul>`,
                 showConfirmButton: false,
                 showCloseButton: true,
+                customClass: {
+                    popup: 'swal-wide'
+                }
             });
+
+            // Pasar el texto del resumen a la función de interpretación
+            mostrarInterpretacionAI('EstiloColor', resumenText);
         }
     });
 
@@ -1054,21 +1046,27 @@ function generarResumenEstilosColores(datasets) {
 
 // Añadir después de cada evento de resumen
 function mostrarInterpretacionAI(chartType, data, containerId) {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
     fetch('/users/dashboard/interpret-chart/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
+            'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({
             chartType: chartType,
             data: data
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json();
+    })
     .then(result => {
         if (result.interpretation) {
-            // Crear o actualizar el div de interpretación
             let interpretacionDiv = document.getElementById(`interpretacion-${chartType}`);
             if (!interpretacionDiv) {
                 interpretacionDiv = document.createElement('div');
@@ -1081,12 +1079,21 @@ function mostrarInterpretacionAI(chartType, data, containerId) {
                 <p class="mb-0">${result.interpretation}</p>
             `;
             
-            // Añadir al contenedor después del resumen
             const container = document.getElementById(containerId);
             container.appendChild(interpretacionDiv);
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        // Mostrar mensaje de error al usuario
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo generar la interpretación',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    });
 }
 
 // Modificar los event listeners existentes para incluir la interpretación
@@ -1118,4 +1125,79 @@ function obtenerDatosEstiloColor(chart) {
             data: ds.data
         }))
     };
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function mostrarInterpretacionAI(chartType, resumenData) {    
+    // Formatear los datos del resumen para enviar a la API
+    let formattedData = {};
+    
+    // Convertir el contenido del resumen a formato adecuado
+    const resumenItems = resumenData.split('\n');
+    resumenItems.forEach(item => {
+        if (item) {
+            const [key, value] = item.split(':');
+            if (key && value) {
+                formattedData[key.trim()] = value.trim();
+            }
+        }
+    });
+
+    fetch('/users/dashboard/interpret-chart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            chartType: chartType,
+            data: formattedData
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (result.interpretation) {
+            // Encontrar el contenedor del resumen actual
+            const sweetAlert = document.querySelector('.swal2-shown');
+            if (sweetAlert) {
+                // Agregar la interpretación debajo del resumen existente
+                const interpretacionHtml = `
+                    <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+                        <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>
+                        <p style="text-align: left;">${result.interpretation}</p>
+                    </div>
+                `;
+                const contenedorResumen = sweetAlert.querySelector('.swal2-html-container');
+                contenedorResumen.innerHTML += interpretacionHtml;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo generar la interpretación',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    });
 }

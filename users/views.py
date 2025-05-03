@@ -47,6 +47,8 @@ from collections import defaultdict
 import json
 from django.views.decorators.http import require_http_methods
 from django.db.models.functions import TruncDate, TruncMonth
+from django.views.decorators.csrf import csrf_exempt
+from .dashboard_interpreter import DashboardInterpreter
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -63,7 +65,7 @@ def login_view(request):
 
         try:
             usuario = Usuario.objects.get(correo=correo)
-            if usuario.contrasena == contrasena:
+            if (usuario.contrasena == contrasena):
                 # 3. Establecer sesión MANUALMENTE
                 request.session['usuario_id'] = usuario.id
                 request.session['nombre_usuario'] = usuario.nombre
@@ -853,18 +855,27 @@ def dashboard_estilos_colores(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-
+@csrf_exempt
 def interpret_chart_data(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+    
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             chart_type = data.get('chartType')
             chart_data = data.get('data')
             
+            # Imprimir datos para depuración
+            print("Datos recibidos:", data)
+            
             interpreter = DashboardInterpreter()
             interpretation = interpreter.interpret_chart_data(chart_type, chart_data)
             
             return JsonResponse({'interpretation': interpretation})
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': 'Error al decodificar JSON'}, status=400)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
