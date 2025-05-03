@@ -969,6 +969,94 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // Likes y Favoritos
+    document.getElementById('resumenLikesFavoritos').addEventListener('click', (event) => {
+        event.preventDefault();
+        if (likesFavoritosChart) {
+            let resumenText = '';
+            likesFavoritosChart.data.datasets.forEach((dataset) => {
+                const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                resumenText += `${dataset.label}: ${total}\n`;
+            });
+
+            Swal.fire({
+                title: 'Resumen de Likes y Favoritos',
+                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => line ? `<li>${line}</li>` : '').join('')}</ul>`,
+                showConfirmButton: false,
+                showCloseButton: true
+            });
+
+            mostrarInterpretacionAI('LikesFavoritos', resumenText);
+        }
+    });
+
+    // Sentimientos
+    document.getElementById('resumenSentimientos').addEventListener('click', (event) => {
+        event.preventDefault();
+        if (sentimientosChart) {
+            let resumenText = '';
+            const datos = sentimientosChart.data.datasets[0].data;
+            resumenText += `Comentarios Positivos: ${datos[0]}\n`;
+            resumenText += `Comentarios Neutros: ${datos[1]}\n`;
+            resumenText += `Comentarios Negativos: ${datos[2]}`;
+
+            Swal.fire({
+                title: 'Resumen de Sentimientos',
+                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line}</li>`).join('')}</ul>`,
+                showConfirmButton: false,
+                showCloseButton: true
+            });
+
+            mostrarInterpretacionAI('Sentimientos', resumenText);
+        }
+    });
+
+    // Compras, Ventas y Alquileres
+    document.getElementById('resumenComprasVentasAlquileres').addEventListener('click', (event) => {
+        event.preventDefault();
+        const compras = comprasVentasAlquileresCtx.getAttribute('data-compras');
+        const ventas = comprasVentasAlquileresCtx.getAttribute('data-ventas');
+        const alquileres = comprasVentasAlquileresCtx.getAttribute('data-alquileres');
+        
+        const resumenText = `Compras: ${compras}\nVentas: ${ventas}\nAlquileres: ${alquileres}`;
+
+        Swal.fire({
+            title: 'Resumen de Transacciones',
+            html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line}</li>`).join('')}</ul>`,
+            showConfirmButton: false,
+            showCloseButton: true
+        });
+
+        mostrarInterpretacionAI('ComprasVentasAlquileres', resumenText);
+    });
+
+    // Ingresos y Gastos
+    document.getElementById('resumenIngresosGastos').addEventListener('click', (event) => {
+        event.preventDefault();
+        if (ingresosGastosChart) {
+            let resumenText = '';
+            ingresosGastosChart.data.datasets.forEach((dataset, index) => {
+                const datos = dataset.data;
+                if (index === 0) {
+                    resumenText += `Ingresos por Ventas: $${datos[0]}\n`;
+                    resumenText += `Ingresos por Alquileres: $${datos[1]}\n`;
+                } else {
+                    resumenText += `Gastos en Compras: $${datos[2]}`;
+                }
+            });
+
+            Swal.fire({
+                title: 'Resumen de Ingresos y Gastos',
+                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line}</li>`).join('')}</ul>`,
+                showConfirmButton: false,
+                showCloseButton: true
+            });
+
+            mostrarInterpretacionAI('IngresosGastos', resumenText);
+        }
+    });
+
 });
 
 // Función para asignar colores a las líneas
