@@ -133,7 +133,23 @@ def ver_perfil(request):
                     publicacion=OuterRef('pk'),
                     usuario_id=usuario_id
                 )
-            )
+            ),
+            comentarios_positivos_textblob=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_textblob='positivo'),
+                distinct=True
+            ),
+            comentarios_neutros_textblob=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_textblob='neutro'),
+                distinct=True
+            ),
+            comentarios_negativos_textblob=Count(
+                'comentario',
+                filter=Q(comentario__clasificacion_textblob='negativo'),
+                distinct=True
+            ),
+            total_comentarios=Count('comentario', distinct=True)
         ).order_by('-fecha_publicacion')
         
         # Obtener conteos generales
@@ -466,7 +482,23 @@ def ver_perfil_usuario(request, usuario_id):
                 publicacion=OuterRef('pk'),
                 usuario_id=usuario_logueado_id
             )
-        )
+        ),
+        comentarios_positivos_textblob=Count(
+            'comentario',
+            filter=Q(comentario__clasificacion_textblob='positivo'),
+            distinct=True
+        ),
+        comentarios_neutros_textblob=Count(
+            'comentario',
+            filter=Q(comentario__clasificacion_textblob='neutro'),
+            distinct=True
+        ),
+        comentarios_negativos_textblob=Count(
+            'comentario',
+            filter=Q(comentario__clasificacion_textblob='negativo'),
+            distinct=True
+        ),
+        total_comentarios=Count('comentario', distinct=True)
     ).order_by('-fecha_publicacion')
 
     # Para cada publicación, calcular el sentimiento predominante
