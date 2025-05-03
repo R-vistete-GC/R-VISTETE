@@ -727,7 +727,9 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarRecomendaciones();
 
     // Resumen para la gráfica de Estilo y Color
-    document.getElementById('resumenEstiloColor').addEventListener('click', () => {
+    document.getElementById('resumenEstiloColor').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         if (estiloColorChart) {
             let resumen = '<ul style="text-align: left;">';
             estiloColorChart.data.datasets.forEach((dataset) => {
@@ -739,8 +741,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 title: '<h3 style="margin: 0;">Resumen de Recomendaciones por Estilo y Color</h3>',
                 html: resumen,
-                icon: null, // Eliminar el ícono
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
                 customClass: {
                     popup: 'swal-wide',
                 },
@@ -750,13 +752,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: 'Error',
                 text: 'No se encontraron datos para generar el resumen.',
                 icon: 'error',
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false,
+                showCloseButton: true,
             });
         }
     });
 
     // Resumen para la gráfica de Likes y Favoritos
-    document.getElementById('resumenLikesFavoritos').addEventListener('click', () => {
+    document.getElementById('resumenLikesFavoritos').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         if (likesFavoritosChart) {
             let resumen = '<ul style="text-align: left;">';
             likesFavoritosChart.data.datasets.forEach((dataset) => {
@@ -768,8 +773,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 title: '<h3 style="margin: 0;">Resumen de Likes y Favoritos por Estilo y Color</h3>',
                 html: resumen,
-                icon: null, // Eliminar el ícono
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
                 customClass: {
                     popup: 'swal-wide',
                 },
@@ -779,20 +784,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: 'Error',
                 text: 'No se encontraron datos para generar el resumen.',
                 icon: 'error',
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false,
+                showCloseButton: true,
             });
         }
     });
 
     // Función para generar el resumen de Sentimientos
-    document.getElementById('resumenSentimientos').addEventListener('click', () => {
+    document.getElementById('resumenSentimientos').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         const resumen = generarResumenSentimientos(sentimientosChart.data);
 
         Swal.fire({
             title: '<h3 style="margin: 0;">Resumen de Sentimientos</h3>',
             html: `<ul style="text-align: left;">${resumen.replace(/\n/g, '<br>')}</ul>`,
-            icon: null, // Eliminar el ícono
-            confirmButtonText: 'Aceptar',
+            showConfirmButton: false, // Eliminar el botón "Aceptar"
+            showCloseButton: true, // Agregar la "X" para cerrar
             customClass: {
                 popup: 'swal-wide',
             },
@@ -800,14 +808,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Función para generar el resumen de Compras, Ventas y Alquileres
-    document.getElementById('resumenComprasVentasAlquileres').addEventListener('click', () => {
+    document.getElementById('resumenComprasVentasAlquileres').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         const resumen = generarResumenComprasVentasAlquileres();
 
         Swal.fire({
             title: '<h3 style="margin: 0;">Resumen de Compras, Ventas y Alquileres</h3>',
             html: `<ul style="text-align: left;">${resumen.replace(/\n/g, '<br>')}</ul>`,
-            icon: null, // Eliminar el ícono
-            confirmButtonText: 'Aceptar',
+            showConfirmButton: false, // Eliminar el botón "Aceptar"
+            showCloseButton: true, // Agregar la "X" para cerrar
             customClass: {
                 popup: 'swal-wide',
             },
@@ -815,10 +825,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Función para generar el resumen de Ingresos y Gastos
-    document.getElementById('resumenIngresosGastos').addEventListener('click', () => {
+    document.getElementById('resumenIngresosGastos').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         if (ingresosGastosChart) {
-            const chartData = ingresosGastosChart.data.datasets; // Obtener los datasets de la gráfica
-            const labels = ingresosGastosChart.data.labels; // Obtener las etiquetas de la gráfica
+            const chartData = ingresosGastosChart.data.datasets;
+            const labels = ingresosGastosChart.data.labels;
 
             let resumen = '<ul style="text-align: left;">';
             chartData.forEach((dataset) => {
@@ -833,8 +845,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 title: '<h3 style="margin: 0;">Resumen de Ingresos y Gastos</h3>',
                 html: resumen,
-                icon: null, // Eliminar el ícono
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
                 customClass: {
                     popup: 'swal-wide',
                 },
@@ -844,13 +856,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: 'Error',
                 text: 'No se encontraron datos para generar el resumen.',
                 icon: 'error',
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false,
+                showCloseButton: true,
             });
         }
     });
 
     // Función para generar el resumen de Actividad en el Tiempo
-    document.getElementById('resumenActividadTiempo').addEventListener('click', () => {
+    document.getElementById('resumenActividadTiempo').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         if (actividadTiempoChart) {
             const chartData = actividadTiempoChart.data.datasets; // Obtener los datasets de la gráfica
             const labels = actividadTiempoChart.data.labels; // Obtener las etiquetas de la gráfica (meses)
@@ -868,8 +883,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 title: '<h3 style="margin: 0;">Resumen de Actividad en el Tiempo</h3>',
                 html: resumen,
-                icon: null, // Eliminar el ícono
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
                 customClass: {
                     popup: 'swal-wide',
                 },
@@ -879,16 +894,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: 'Error',
                 text: 'No se encontraron datos para generar el resumen.',
                 icon: 'error',
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
             });
         }
     });
 
     // Función para generar el resumen de Transacciones por Estado
-    document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', () => {
+    document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         if (transaccionesPorEstadoChart) {
-            const chartData = transaccionesPorEstadoChart.data.datasets; // Obtener los datasets de la gráfica
-            const labels = transaccionesPorEstadoChart.data.labels; // Obtener las etiquetas de la gráfica (estados)
+            const chartData = transaccionesPorEstadoChart.data.datasets;
+            const labels = transaccionesPorEstadoChart.data.labels;
 
             let resumen = '<ul style="text-align: left;">';
             chartData.forEach((dataset) => {
@@ -903,8 +921,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 title: '<h3 style="margin: 0;">Resumen de Transacciones por Estado</h3>',
                 html: resumen,
-                icon: null, // Eliminar el ícono
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
                 customClass: {
                     popup: 'swal-wide',
                 },
@@ -914,13 +932,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: 'Error',
                 text: 'No se encontraron datos para generar el resumen.',
                 icon: 'error',
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
             });
         }
     });
 
     // Función para generar el resumen de Estilos y Colores
-    document.getElementById('resumenEstilosColores').addEventListener('click', () => {
+    document.getElementById('resumenEstilosColores').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
+
         if (estilosColoresChart) {
             let resumen = '<ul style="text-align: left;">';
             estilosColoresChart.data.datasets.forEach((dataset) => {
@@ -932,8 +953,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 title: '<h3 style="margin: 0;">Resumen de Estilos y Colores Más Solicitados</h3>',
                 html: resumen,
-                icon: null, // Eliminar el ícono
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
                 customClass: {
                     popup: 'swal-wide',
                 },
@@ -943,7 +964,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: 'Error',
                 text: 'No se encontraron datos para generar el resumen.',
                 icon: 'error',
-                confirmButtonText: 'Aceptar',
+                showConfirmButton: false, // Eliminar el botón "Aceptar"
+                showCloseButton: true, // Agregar la "X" para cerrar
             });
         }
     });
