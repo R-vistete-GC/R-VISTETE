@@ -747,6 +747,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     popup: 'swal-wide',
                 },
             });
+
+            const datos = obtenerDatosEstiloColor(estiloColorChart);
+            mostrarInterpretacionAI('estiloColor', datos, 'graficaEstiloColor');
         } else {
             Swal.fire({
                 title: 'Error',
@@ -805,6 +808,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 popup: 'swal-wide',
             },
         });
+
+        if (sentimientosChart) {
+            const datos = obtenerDatosSentimientos(sentimientosChart);
+            mostrarInterpretacionAI('sentimientos', datos, 'graficaSentimientos');
+        }
     });
 
     // Función para generar el resumen de Compras, Ventas y Alquileres
@@ -1042,4 +1050,72 @@ function generarResumenEstilosColores(datasets) {
         resumen += `- ${dataset.label}: ${total}\n`;
     });
     return resumen;
+}
+
+// Añadir después de cada evento de resumen
+function mostrarInterpretacionAI(chartType, data, containerId) {
+    fetch('/users/dashboard/interpret-chart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            chartType: chartType,
+            data: data
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.interpretation) {
+            // Crear o actualizar el div de interpretación
+            let interpretacionDiv = document.getElementById(`interpretacion-${chartType}`);
+            if (!interpretacionDiv) {
+                interpretacionDiv = document.createElement('div');
+                interpretacionDiv.id = `interpretacion-${chartType}`;
+                interpretacionDiv.className = 'mt-3 p-3 border-left bg-light';
+            }
+            
+            interpretacionDiv.innerHTML = `
+                <h6 class="font-weight-bold"><i class="fas fa-robot"></i> Análisis AI:</h6>
+                <p class="mb-0">${result.interpretation}</p>
+            `;
+            
+            // Añadir al contenedor después del resumen
+            const container = document.getElementById(containerId);
+            container.appendChild(interpretacionDiv);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Modificar los event listeners existentes para incluir la interpretación
+document.getElementById('resumenEstiloColor').addEventListener('click', (event) => {
+    event.preventDefault();
+    if (estiloColorChart) {
+        const datos = obtenerDatosEstiloColor(estiloColorChart);
+        mostrarResumen('Resumen de Estilo y Color', datos);
+        mostrarInterpretacionAI('estiloColor', datos, 'graficaEstiloColor');
+    }
+});
+
+// Hacer lo mismo para los otros botones de resumen
+document.getElementById('resumenSentimientos').addEventListener('click', (event) => {
+    event.preventDefault();
+    if (sentimientosChart) {
+        const datos = obtenerDatosSentimientos(sentimientosChart);
+        mostrarResumen('Resumen de Sentimientos', datos);
+        mostrarInterpretacionAI('sentimientos', datos, 'graficaSentimientos');
+    }
+});
+
+// Función auxiliar para obtener datos de la gráfica en formato adecuado
+function obtenerDatosEstiloColor(chart) {
+    return {
+        labels: chart.data.labels,
+        datasets: chart.data.datasets.map(ds => ({
+            label: ds.label,
+            data: ds.data
+        }))
+    };
 }

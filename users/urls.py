@@ -35,4 +35,7 @@ urlpatterns = [
 
     # Nueva ruta para la gráfica de estilos y colores
     path('dashboard/estilos-colores/', views.dashboard_estilos_colores, name='dashboard_estilos_colores'),
+
+    # Agregar a las URLs existentes
+    path('dashboard/interpret-chart/', views.interpret_chart_data, name='interpret_chart_data'),
 ]

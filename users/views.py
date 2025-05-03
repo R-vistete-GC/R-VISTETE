@@ -852,3 +852,19 @@ def dashboard_estilos_colores(request):
         return JsonResponse({'data': data})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+def interpret_chart_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            chart_type = data.get('chartType')
+            chart_data = data.get('data')
+            
+            interpreter = DashboardInterpreter()
+            interpretation = interpreter.interpret_chart_data(chart_type, chart_data)
+            
+            return JsonResponse({'interpretation': interpretation})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
