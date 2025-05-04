@@ -27,47 +27,47 @@ class DashboardInterpreter:
 
     def _create_prompt(self, chart_type, data):
         """
-        Crea prompts específicos y personalizados para el usuario solicitando respuestas concisas
+        Crea prompts específicos para describir el comportamiento del usuario
         """
-        base_prompt = "Como experto en moda, genera un análisis breve y conciso (máximo 2-3 oraciones) sobre: "
+        base_prompt = "Como analista, describe de manera simple y directa "
         
         prompts = {
             'EstiloColor': (
-                f"{base_prompt}las siguientes preferencias de color: {data}. "
-                "Enfócate en las tendencias principales y una recomendación específica."
+                f"{base_prompt}el patrón de colores en las recomendaciones del usuario: {data}. "
+                "Enfócate en explicar qué colores han sido más relevantes en su experiencia."
             ),
             'LikesFavoritos': (
-                f"{base_prompt}estos patrones de likes y favoritos: {data}. "
-                "Menciona las preferencias más destacadas y una sugerencia."
+                f"{base_prompt}cómo ha interactuado el usuario con likes y favoritos: {data}. "
+                "Explica las tendencias en sus preferencias."
             ),
             'Sentimientos': (
-                f"{base_prompt}la distribución de comentarios: {data}. "
-                "Indica el sentimiento predominante y una recomendación clave."
+                f"{base_prompt}cómo ha sido el balance de sentimientos en los comentarios: {data}. "
+                "Explica el panorama general de su experiencia."
             ),
             'ComprasVentasAlquileres': (
-                f"{base_prompt}estas estadísticas de transacciones: {data}. "
-                "Identifica el patrón principal y una sugerencia de mejora."
+                f"{base_prompt}el balance entre las diferentes transacciones realizadas: {data}. "
+                "Describe cómo ha sido su participación en la plataforma."
             ),
             'IngresosGastos': (
-                f"{base_prompt}este balance financiero: {data}. "
-                "Destaca el aspecto más relevante y un consejo financiero."
+                f"{base_prompt}el panorama de sus movimientos financieros: {data}. "
+                "Explica cómo se han distribuido sus transacciones."
             ),
             'ActividadTiempo': (
-                f"{base_prompt}esta actividad temporal: {data}. "
-                "Señala el período más activo y una recomendación."
+                f"{base_prompt}sus patrones de actividad temporal: {data}. "
+                "Identifica los momentos de mayor actividad."
             ),
             'TransaccionesEstado': (
-                f"{base_prompt}el estado de las transacciones: {data}. "
-                "Resalta el estado predominante y una sugerencia de optimización."
+                f"{base_prompt}cómo se han desarrollado sus transacciones: {data}. "
+                "Explica la distribución de los diferentes estados."
             ),
             'EstilosColores': (
-                f"{base_prompt}estas preferencias de estilos y colores: {data}. "
-                "Menciona la combinación más popular y una recomendación de estilo."
+                f"{base_prompt}sus preferencias en estilos y colores: {data}. "
+                "Describe las combinaciones que han sido más significativas."
             )
         }
         
         prompt = prompts.get(chart_type, f"{base_prompt}estos datos: {data}")
-        prompt += "\nPor favor, mantén tu respuesta breve y directa, comenzando con 'Basándome en tu actividad...' "
-        prompt += "y limitándola a 2-3 oraciones que incluyan una observación principal y una recomendación concreta."
+        prompt += "\nPor favor, genera una descripción breve y clara, comenzando con 'Basándome en tu actividad...' "
+        prompt += "y limítala a 2-3 oraciones que expliquen los patrones observados, sin incluir recomendaciones."
         
         return prompt
