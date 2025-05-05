@@ -290,30 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Calcular precio final
             const envio = 5.00;
             const precioFinal = precio + envio;
-            modalCompra.querySelector('#precioFinal').value = precioFinal;
+            
+            // Actualizar el campo oculto del precio final
+            modalCompra.querySelector('#precioFinal').value = precioFinal.toFixed(2);
             
             // Actualizar displays
             modalCompra.querySelector('#modalPrecioPrenda').textContent = `$${precio.toFixed(2)}`;
-            modalCompra.querySelector('#subtotal').textContent = `$${precio.toFixed(2)}`;
+            modalCompra.querySelector('#costoEnvio').textContent = `$${envio.toFixed(2)}`;
             modalCompra.querySelector('#total').textContent = `$${precioFinal.toFixed(2)}`;
-        });
-    }
-
-    // Para el modal de alquiler
-    if (modalAlquiler) {
-        modalAlquiler.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const publicacionId = button.getAttribute('data-publicacion-id');
-            const precioDia = parseFloat(button.getAttribute('data-precio'));
-            const deposito = parseFloat(button.getAttribute('data-deposito'));
-            const propietarioId = button.getAttribute('data-propietario');
-            
-            // Actualizar campos ocultos
-            modalAlquiler.querySelector('#alquilerPublicacionId').value = publicacionId;
-            modalAlquiler.querySelector('#propietarioId').value = propietarioId;
-            modalAlquiler.querySelector('#depositoAlquiler').value = deposito;
-            
-            // ... resto del código del modal ...
         });
     }
 });
@@ -357,5 +341,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Elimina el event listener duplicado al final del archivo
     // document.getElementById('formCompraAlquiler').addEventListener('submit', procesarCompra);
+});
+
+const modalCompra = document.getElementById('modalCompra');
+modalCompra.addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    const publicacionId = button.getAttribute('data-publicacion-id');
+    const precio = parseFloat(button.getAttribute('data-precio'));
+    const vendedorId = button.getAttribute('data-vendedor');
+    
+    // Calcular precio final
+    const envio = 5.00;
+    const precioFinal = precio + envio;
+    
+    // Actualizar campos
+    document.getElementById('publicacionId').value = publicacionId;
+    document.getElementById('vendedorId').value = vendedorId;
+    document.getElementById('precioFinal').value = precioFinal.toFixed(2); // Asegurar que se asigne el precio final
+    document.getElementById('tracking_envio').value = ''; // Inicializar tracking
+    
+    // Actualizar displays
+    document.getElementById('modalPrecioPrenda').textContent = `$${precio.toFixed(2)}`;
+    document.getElementById('costoEnvio').textContent = `$${envio.toFixed(2)}`;
+    document.getElementById('total').textContent = `$${precioFinal.toFixed(2)}`;
 });
 

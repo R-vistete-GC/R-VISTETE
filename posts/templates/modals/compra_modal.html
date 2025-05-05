@@ -9,10 +9,11 @@
             <div class="modal-body">
                 <form id="formCompra" method="post" action="{% url 'posts:procesar_compra' %}">
                     {% csrf_token %}
-                    <!-- Campos ocultos requeridos -->
+                    <!-- Campos ocultos al inicio del form -->
                     <input type="hidden" id="publicacionId" name="publicacion_id">
                     <input type="hidden" id="vendedorId" name="vendedor_id">
                     <input type="hidden" id="precioFinal" name="precio_final">
+                    <input type="hidden" id="tracking_envio" name="tracking_envio" value="">
                     <input type="hidden" id="estado" name="estado" value="pendiente">
 
                     <!-- Imagen y título de la prenda -->

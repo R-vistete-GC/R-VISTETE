@@ -836,7 +836,9 @@ def get_publicacion(request, publicacion_id):
 @require_http_methods(["POST"])
 def procesar_compra(request):
     try:
-        # Obtener todos los campos del formulario
+        # Imprimir datos recibidos para debugging
+        print("Datos recibidos:", request.POST)
+        
         datos = {
             'publicacion_id': request.POST.get('publicacion_id'),
             'vendedor_id': request.POST.get('vendedor_id'),
@@ -855,7 +857,17 @@ def procesar_compra(request):
         if campos_faltantes:
             return JsonResponse({
                 'success': False,
-                'error': f'Faltan datos requeridos: {", ".join(campos_faltantes)}',
+                'error': f'Faltan campos requeridos: {", ".join(campos_faltantes)}',
+                'datos_recibidos': datos
+            })
+
+        # Validar que el precio_final sea un número válido
+        try:
+            precio_final = Decimal(datos['precio_final'])
+        except:
+            return JsonResponse({
+                'success': False,
+                'error': 'El precio final no es válido',
                 'datos_recibidos': datos
             })
 
@@ -865,7 +877,7 @@ def procesar_compra(request):
                 comprador_id=request.session.get('usuario_id'),
                 publicacion_id=datos['publicacion_id'],
                 vendedor_id=datos['vendedor_id'],
-                precio_final=Decimal(datos['precio_final']),
+                precio_final=precio_final,
                 estado=datos['estado'],
                 metodo_pago=datos['metodo_pago'],
                 direccion_envio=datos['direccion_envio'],
@@ -878,7 +890,7 @@ def procesar_compra(request):
                 publicacion_id=datos['publicacion_id'],
                 vendedor_id=datos['vendedor_id'],
                 comprador_id=request.session.get('usuario_id'),
-                precio_final=Decimal(datos['precio_final']),
+                precio_final=precio_final,
                 estado=datos['estado'],
                 metodo_pago=datos['metodo_pago'],
                 direccion_envio=datos['direccion_envio'],
