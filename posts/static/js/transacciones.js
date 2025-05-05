@@ -58,24 +58,28 @@ async function mostrarModalCompra(publicacionId) {
 async function procesarCompra(event) {
     event.preventDefault();
     
-    // Crear FormData con los datos del formulario
+    // Obtener los valores de los campos
+    const publicacionId = document.getElementById('publicacionId').value;
+    const vendedorId = document.getElementById('vendedorId').value;
+    const direccionEnvio = document.getElementById('direccion_envio').value;
+    const metodoPago = document.getElementById('metodo_pago').value;
+    const notas = document.getElementById('notas').value || '';
+    const precioFinal = document.getElementById('precioFinal').value;
+
+    // Crear FormData
     const formData = new FormData();
-    
-    // Agregar los campos manualmente
-    formData.append('publicacion_id', document.getElementById('publicacionId').value);
-    formData.append('vendedor_id', document.getElementById('vendedorId').value);
-    formData.append('direccion_envio', document.getElementById('direccion_envio').value);
-    formData.append('metodo_pago', document.getElementById('metodo_pago').value);
-    formData.append('notas', document.getElementById('notas').value || '');
-    
-    // Obtener el token CSRF
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
+    formData.append('publicacion_id', publicacionId);
+    formData.append('vendedor_id', vendedorId);
+    formData.append('direccion_envio', direccionEnvio);
+    formData.append('metodo_pago', metodoPago);
+    formData.append('notas', notas);
+    formData.append('precio_final', precioFinal);
+
     try {
         const response = await fetch('/posts/procesar_compra/', {
             method: 'POST',
             headers: {
-                'X-CSRFToken': csrftoken
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
             body: formData
         });
@@ -83,21 +87,18 @@ async function procesarCompra(event) {
         const data = await response.json();
         
         if (data.success) {
-            // Cerrar el modal usando Bootstrap
+            // Cerrar el modal
             const modalElement = document.getElementById('modalCompra');
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
             
-            // Mostrar mensaje de éxito
             alert('¡Compra realizada con éxito!');
-            
-            // Recargar la página
             window.location.reload();
         } else {
             alert(data.error || 'Hubo un error al procesar la compra');
         }
     } catch (error) {
-        console.error('Error al procesar la compra:', error);
+        console.error('Error:', error);
         alert('Error al procesar la compra');
     }
 }
@@ -227,5 +228,89 @@ document.addEventListener('DOMContentLoaded', function() {
             modalAlquiler.querySelector('#fechaFin').min = today;
         });
     }
+
+    // Para el modal de compra
+    const modalCompra = document.getElementById('modalCompra');
+    if (modalCompra) {
+        modalCompra.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const publicacionId = button.getAttribute('data-publicacion-id');
+            const precio = parseFloat(button.getAttribute('data-precio'));
+            const vendedorId = button.getAttribute('data-vendedor');
+            
+            // Actualizar campos ocultos
+            modalCompra.querySelector('#publicacionId').value = publicacionId;
+            modalCompra.querySelector('#vendedorId').value = vendedorId;
+            
+            // Calcular precio final
+            const envio = 5.00;
+            const precioFinal = precio + envio;
+            modalCompra.querySelector('#precioFinal').value = precioFinal;
+            
+            // Actualizar displays
+            modalCompra.querySelector('#modalPrecioPrenda').textContent = `$${precio.toFixed(2)}`;
+            modalCompra.querySelector('#subtotal').textContent = `$${precio.toFixed(2)}`;
+            modalCompra.querySelector('#total').textContent = `$${precioFinal.toFixed(2)}`;
+        });
+    }
+
+    // Para el modal de alquiler
+    if (modalAlquiler) {
+        modalAlquiler.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const publicacionId = button.getAttribute('data-publicacion-id');
+            const precioDia = parseFloat(button.getAttribute('data-precio'));
+            const deposito = parseFloat(button.getAttribute('data-deposito'));
+            const propietarioId = button.getAttribute('data-propietario');
+            
+            // Actualizar campos ocultos
+            modalAlquiler.querySelector('#alquilerPublicacionId').value = publicacionId;
+            modalAlquiler.querySelector('#propietarioId').value = propietarioId;
+            modalAlquiler.querySelector('#depositoAlquiler').value = deposito;
+            
+            // ... resto del código del modal ...
+        });
+    }
+});
+
+// Asegúrate de que el formulario existe antes de agregar el event listener
+document.addEventListener('DOMContentLoaded', function() {
+    const formCompra = document.getElementById('formCompra');
+    
+    if (formCompra) {
+        formCompra.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(this);
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch('/posts/procesar_compra/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const modalCompra = bootstrap.Modal.getInstance(document.getElementById('modalCompra'));
+                    modalCompra.hide();
+                    alert('¡Compra realizada con éxito!');
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Error al procesar la compra');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al procesar la compra');
+            }
+        });
+    }
+
+    // Elimina el event listener duplicado al final del archivo
+    // document.getElementById('formCompraAlquiler').addEventListener('submit', procesarCompra);
 });
 

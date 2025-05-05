@@ -16,6 +16,7 @@ from decimal import Decimal
 from datetime import datetime
 from django.db import connection
 from sentiment_analysis.utils import SentimentAnalyzer  # Importar el analizador de sentimientos
+from django.db import transaction  # Agregar este import si no está
 
 #inicio - publicaciones
 
@@ -115,6 +116,7 @@ def crear_comentario(request):
         comentario_texto = request.POST.get('comentario')
         publicacion_id = request.POST.get('publicacion_id')
         
+        # Corregir el operador 'o' por 'or'
         if not comentario_texto or not publicacion_id:
             return JsonResponse({
                 'error': 'Faltan datos requeridos',
@@ -514,7 +516,7 @@ def agregar_comentario(request, publicacion_id):
 @require_http_methods(["POST"])
 def publicar_prenda(request):
     try:
-        # Verificar que los campos requeridos existan
+        # Corregir el operador 'o' por 'or'
         if not request.POST.get('titulo') or not request.FILES.get('imagen'):
             return JsonResponse({
                 'success': False,
@@ -830,58 +832,72 @@ def get_publicacion(request, publicacion_id):
             'error': str(e)
         }, status=500)
 
-@login_required
+
 @require_http_methods(["POST"])
 def procesar_compra(request):
     try:
+        # Obtener el usuario de la sesión
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({
+                'success': False,
+                'error': 'Usuario no autenticado'
+            }, status=401)
+
         # Obtener datos del formulario
         publicacion_id = request.POST.get('publicacion_id')
         vendedor_id = request.POST.get('vendedor_id')
+        precio_final = request.POST.get('precio_final')
         direccion_envio = request.POST.get('direccion_envio')
         metodo_pago = request.POST.get('metodo_pago')
-        notas = request.POST.get('notas')
+        notas = request.POST.get('notas', '')
 
-        # Obtener la publicación
-        publicacion = get_object_or_404(Publicacion, id=publicacion_id)
+        # Validar datos requeridos según la estructura de la base de datos
+        if not all([publicacion_id, vendedor_id, precio_final, direccion_envio, metodo_pago]):
+            return JsonResponse({
+                'success': False, 
+                'error': 'Faltan datos requeridos'
+            })
+
+        # Crear la compra y la venta simultáneamente
+        with transaction.atomic():
+            # Crear registro de compra
+            compra = Compra.objects.create(
+                comprador_id=usuario_id,  # Usar el ID directamente
+                publicacion_id=publicacion_id,
+                vendedor_id=vendedor_id,
+                precio_final=Decimal(precio_final),
+                estado='pendiente',
+                metodo_pago=metodo_pago,
+                direccion_envio=direccion_envio,
+                notas=notas
+            )
+            
+            # Crear registro de venta
+            venta = Venta.objects.create(
+                publicacion_id=publicacion_id,
+                vendedor_id=vendedor_id,
+                comprador_id=usuario_id,  # Usar el ID directamente
+                precio_final=Decimal(precio_final),
+                estado='pendiente',
+                metodo_pago=metodo_pago,
+                direccion_envio=direccion_envio,
+                notas=notas
+            )
         
-        # Calcular precio final (precio de venta + envío)
-        precio_final = publicacion.precio_venta + Decimal('5.00')  # $5 de envío
-
-        # Crear registro de compra
-        compra = Compra.objects.create(
-            publicacion=publicacion,
-            comprador=request.user,
-            vendedor_id=vendedor_id,
-            precio_final=precio_final,
-            estado='pendiente',
-            metodo_pago=metodo_pago,
-            direccion_envio=direccion_envio,
-            notas=notas
-        )
-
-        # Crear registro de venta
-        venta = Venta.objects.create(
-            publicacion=publicacion,
-            vendedor_id=vendedor_id,
-            comprador=request.user,
-            precio_final=precio_final,
-            estado='pendiente',
-            metodo_pago=metodo_pago,
-            direccion_envio=direccion_envio,
-            notas=notas
-        )
-
         return JsonResponse({
             'success': True,
+            'message': 'Compra procesada exitosamente',
             'compra_id': compra.id,
             'venta_id': venta.id
         })
-
+        
     except Exception as e:
+        print("Error en procesar_compra:", str(e))
         return JsonResponse({
-            'success': False,
+            'success': False, 
             'error': str(e)
-        }, status=400)
+        })
 
 @login_required
 @require_http_methods(["POST"])
@@ -924,26 +940,29 @@ def procesar_alquiler(request):
         
         # Calcular precio total
         dias = (fecha_fin - fecha_inicio).days
-        precio_total = publicacion.precio * dias
+        precio_total = publicacion.precio_alquiler * dias
         
         # Crear el alquiler
         alquiler = Alquiler.objects.create(
             publicacion=publicacion,
-            arrendador=publicacion.usuario,
-            arrendatario=usuario,
+            usuario=usuario,
+            propietario=publicacion.usuario,
             fecha_inicio=fecha_inicio,
             fecha_fin=fecha_fin,
+            precio_por_dia=publicacion.precio_alquiler,
             precio_total=precio_total,
             deposito=publicacion.deposito,
-            estado='pendiente'
+            estado='reservado',
+            metodo_pago=metodo_pago,
+            direccion_envio=direccion
         )
-        
+
         return JsonResponse({
             'success': True,
             'message': 'Alquiler procesado exitosamente',
             'alquiler_id': alquiler.id
         })
-        
+
     except Publicacion.DoesNotExist:
         return JsonResponse({
             'success': False,
@@ -966,13 +985,13 @@ def obtener_metricas_publicacion(request, publicacion_id):
         # Obtener la publicación
         publicacion = Publicacion.objects.get(id=publicacion_id)
         comentarios = Comentario.objects.filter(publicacion=publicacion)
-
+        
         # Calcular métricas
         comentarios_positivos = comentarios.filter(clasificacion_chatgpt='positivo').count()
         comentarios_neutros = comentarios.filter(clasificacion_chatgpt='neutro').count()
         comentarios_negativos = comentarios.filter(clasificacion_chatgpt='negativo').count()
         total_comentarios = comentarios.count()
-
+        
         # Responder con las métricas
         return JsonResponse({
             'success': True,
@@ -997,22 +1016,20 @@ def editar_publicacion(request):
         # Obtener datos del formulario
         publicacion_id = request.POST.get('publicacion_id')
         publicacion = get_object_or_404(Publicacion, id=publicacion_id)
-        
+        # Verificar autenticación
         # Verificar que el usuario sea el dueño de la publicación
         if str(publicacion.usuario.id) != str(usuario_id):
             return JsonResponse({'success': False, 'error': 'No autorizado'}, status=403)
-        
+            
         # Actualizar datos básicos
         publicacion.titulo = request.POST.get('titulo')
         publicacion.descripcion = request.POST.get('descripcion')
         publicacion.tipo = request.POST.get('tipo')
         publicacion.publico = request.POST.get('publico')
         publicacion.talla = request.POST.get('talla')
-        
         # Actualizar precios según el tipo
         if publicacion.tipo in ['venta', 'venta y alquiler']:
             publicacion.precio_venta = request.POST.get('precio_venta')
-        
         if publicacion.tipo in ['alquiler', 'venta y alquiler']:
             publicacion.precio_alquiler = request.POST.get('precio_alquiler')
             publicacion.deposito = request.POST.get('deposito')
@@ -1031,14 +1048,11 @@ def editar_publicacion(request):
             'success': True,
             'message': 'Publicación actualizada exitosamente'
         })
-        
     except Exception as e:
         return JsonResponse({
             'success': False,
             'error': str(e)
         }, status=500)
-
-from .models import Publicacion
 
 @require_http_methods(["POST"])
 def borrar_publicacion(request, publicacion_id):

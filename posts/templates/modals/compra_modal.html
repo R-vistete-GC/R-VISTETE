@@ -7,11 +7,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="formCompraAlquiler" method="post" action="{% url 'posts:procesar_compra' %}">
+                <form id="formCompra" method="post" action="{% url 'posts:procesar_compra' %}">
                     {% csrf_token %}
                     <!-- Campos ocultos necesarios -->
                     <input type="hidden" id="publicacionId" name="publicacion_id">
                     <input type="hidden" id="vendedorId" name="vendedor_id">
+                    <input type="hidden" id="precioFinal" name="precio_final">
                     
                     <!-- Campos existentes -->
                     <div class="text-center mb-3">
@@ -29,15 +30,16 @@
                     <!-- Estado inicial -->
                     <input type="hidden" name="estado" value="pendiente">
                     
-                    <!-- Campos requeridos según el modelo -->
+                    <!-- Campos requeridos según la base de datos -->
                     <div class="mb-3">
-                        <label for="direccion_envio" class="form-label">Dirección de Envío</label>
+                        <label for="direccion_envio" class="form-label">Dirección de Envío *</label>
                         <input type="text" class="form-control" id="direccion_envio" name="direccion_envio" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="metodo_pago" class="form-label">Método de Pago</label>
+                        <label for="metodo_pago" class="form-label">Método de Pago *</label>
                         <select class="form-select" id="metodo_pago" name="metodo_pago" required>
+                            <option value="">Seleccione un método de pago</option>
                             <option value="tarjeta">Tarjeta de Crédito</option>
                             <option value="paypal">PayPal</option>
                         </select>
@@ -45,7 +47,7 @@
 
                     <div class="mb-3">
                         <label for="notas" class="form-label">Notas Adicionales</label>
-                        <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
+                        <textarea class="form-control" id="notas" name="notas"></textarea>
                     </div>
 
                     <!-- Botones -->

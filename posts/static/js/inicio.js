@@ -187,6 +187,19 @@ function mostrarModalCompra(publicacionId, tipo) {
     modalCompra.show();
 }
 
+function mostrarModalCompra(publicacionId) {
+    const modalCompra = document.getElementById('modalCompra');
+    const form = document.getElementById('formCompra');
+    
+    if (modalCompra && form) {
+        form.querySelector('#publicacionId').value = publicacionId;
+        // ...resto del código...
+        
+        const modal = new bootstrap.Modal(modalCompra);
+        modal.show();
+    }
+}
+
 // Función para calcular días entre fechas
 function calcularDias(fechaInicio, fechaFin) {
     const inicio = new Date(fechaInicio);
