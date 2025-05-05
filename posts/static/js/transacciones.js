@@ -53,12 +53,25 @@ function mostrarModalCompra(publicacionId) {
 document.getElementById('formCompra').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    if (!document.getElementById('terminos').checked) {
-        alert('Debes aceptar los términos y condiciones para continuar.');
-        return;
-    }
-
+    // Obtener todos los campos necesarios
     const formData = new FormData(this);
+    const publicacionId = document.getElementById('publicacionId').value;
+    const vendedorId = document.getElementById('vendedorId').value;
+    const precioFinal = document.getElementById('precioFinal').value;
+    const metodoPago = document.getElementById('metodo_pago').value;
+    const direccionEnvio = document.getElementById('direccion_envio').value;
+    const notas = document.getElementById('notas').value || '';
+    
+    // Agregar todos los campos necesarios al FormData
+    formData.append('publicacion_id', publicacionId);
+    formData.append('vendedor_id', vendedorId);
+    formData.append('precio_final', precioFinal);
+    formData.append('estado', 'pendiente');
+    formData.append('metodo_pago', metodoPago);
+    formData.append('direccion_envio', direccionEnvio);
+    formData.append('notas', notas);
+    formData.append('tracking_envio', ''); // Campo opcional para compras
+
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     try {
@@ -71,6 +84,7 @@ document.getElementById('formCompra').addEventListener('submit', async function(
         });
 
         const data = await response.json();
+        console.log('Respuesta del servidor:', data); // Para debugging
         
         if (data.success) {
             const modalCompra = bootstrap.Modal.getInstance(document.getElementById('modalCompra'));

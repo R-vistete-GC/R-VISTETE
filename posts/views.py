@@ -836,70 +836,71 @@ def get_publicacion(request, publicacion_id):
 @require_http_methods(["POST"])
 def procesar_compra(request):
     try:
-        # Obtener el usuario de la sesión
-        usuario_id = request.session.get('usuario_id')
-        if not usuario_id:
+        # Obtener todos los campos del formulario
+        datos = {
+            'publicacion_id': request.POST.get('publicacion_id'),
+            'vendedor_id': request.POST.get('vendedor_id'),
+            'precio_final': request.POST.get('precio_final'),
+            'metodo_pago': request.POST.get('metodo_pago'),
+            'direccion_envio': request.POST.get('direccion_envio'),
+            'notas': request.POST.get('notas', ''),
+            'estado': 'pendiente',
+            'tracking_envio': request.POST.get('tracking_envio', '')
+        }
+
+        # Validar campos requeridos
+        campos_requeridos = ['publicacion_id', 'vendedor_id', 'precio_final', 'metodo_pago', 'direccion_envio']
+        campos_faltantes = [campo for campo in campos_requeridos if not datos[campo]]
+        
+        if campos_faltantes:
             return JsonResponse({
                 'success': False,
-                'error': 'Usuario no autenticado'
-            }, status=401)
-
-        # Obtener datos del formulario
-        publicacion_id = request.POST.get('publicacion_id')
-        vendedor_id = request.POST.get('vendedor_id')
-        precio_final = request.POST.get('precio_final')
-        direccion_envio = request.POST.get('direccion_envio')
-        metodo_pago = request.POST.get('metodo_pago')
-        notas = request.POST.get('notas', '')
-
-        # Validar datos requeridos según la estructura de la base de datos
-        if not all([publicacion_id, vendedor_id, precio_final, direccion_envio, metodo_pago]):
-            return JsonResponse({
-                'success': False, 
-                'error': 'Faltan datos requeridos'
+                'error': f'Faltan datos requeridos: {", ".join(campos_faltantes)}',
+                'datos_recibidos': datos
             })
 
-        # Crear la compra y la venta simultáneamente
         with transaction.atomic():
-            # Crear registro de compra
+            # Crear registro en compras
             compra = Compra.objects.create(
-                comprador_id=usuario_id,  # Usar el ID directamente
-                publicacion_id=publicacion_id,
-                vendedor_id=vendedor_id,
-                precio_final=Decimal(precio_final),
-                estado='pendiente',
-                metodo_pago=metodo_pago,
-                direccion_envio=direccion_envio,
-                notas=notas
+                comprador_id=request.session.get('usuario_id'),
+                publicacion_id=datos['publicacion_id'],
+                vendedor_id=datos['vendedor_id'],
+                precio_final=Decimal(datos['precio_final']),
+                estado=datos['estado'],
+                metodo_pago=datos['metodo_pago'],
+                direccion_envio=datos['direccion_envio'],
+                tracking_envio=datos['tracking_envio'],
+                notas=datos['notas']
             )
             
-            # Crear registro de venta
+            # Crear registro en ventas
             venta = Venta.objects.create(
-                publicacion_id=publicacion_id,
-                vendedor_id=vendedor_id,
-                comprador_id=usuario_id,  # Usar el ID directamente
-                precio_final=Decimal(precio_final),
-                estado='pendiente',
-                metodo_pago=metodo_pago,
-                direccion_envio=direccion_envio,
-                notas=notas
+                publicacion_id=datos['publicacion_id'],
+                vendedor_id=datos['vendedor_id'],
+                comprador_id=request.session.get('usuario_id'),
+                precio_final=Decimal(datos['precio_final']),
+                estado=datos['estado'],
+                metodo_pago=datos['metodo_pago'],
+                direccion_envio=datos['direccion_envio'],
+                notas=datos['notas']
             )
-        
+
         return JsonResponse({
             'success': True,
-            'message': 'Compra procesada exitosamente',
+            'message': 'Compra y venta registradas exitosamente',
             'compra_id': compra.id,
-            'venta_id': venta.id
+            'venta_id': venta.id,
+            'datos_procesados': datos  # Para debugging
         })
         
     except Exception as e:
         print("Error en procesar_compra:", str(e))
         return JsonResponse({
-            'success': False, 
-            'error': str(e)
+            'success': False,
+            'error': str(e),
+            'datos_recibidos': request.POST
         })
 
-@login_required
 @require_http_methods(["POST"])
 def procesar_alquiler(request):
     try:
