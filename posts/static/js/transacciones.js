@@ -23,37 +23,68 @@ async function getPublicacionData(publicacionId) {
 }
 
 // Función para mostrar el modal de compra
-async function mostrarModalCompra(publicacionId) {
+function mostrarModalCompra(publicacionId) {
+    fetch(`/posts/get_publicacion/${publicacionId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const modalCompra = document.getElementById('modalCompra');
+                const form = document.getElementById('formCompra');
+                
+                // Establecer los valores en los campos ocultos
+                form.querySelector('#publicacionId').value = publicacionId;
+                form.querySelector('#vendedorId').value = data.usuario_id;
+                form.querySelector('#precioFinal').value = data.precio_venta;
+                
+                // Actualizar otros elementos del modal
+                document.getElementById('modalImagenPrenda').src = data.imagen;
+                document.getElementById('modalTituloPrenda').textContent = data.titulo;
+                document.getElementById('modalPrecioPrenda').textContent = `$${data.precio_venta}`;
+                
+                // Mostrar el modal
+                const modal = new bootstrap.Modal(modalCompra);
+                modal.show();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Manejar el envío del formulario
+document.getElementById('formCompra').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!document.getElementById('terminos').checked) {
+        alert('Debes aceptar los términos y condiciones para continuar.');
+        return;
+    }
+
+    const formData = new FormData(this);
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
     try {
-        const publicacionData = await getPublicacionData(publicacionId);
+        const response = await fetch('/posts/procesar_compra/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            body: formData
+        });
+
+        const data = await response.json();
         
-        if (publicacionData && publicacionData.success) {
-            // Actualizar campos del modal
-            document.getElementById('publicacionId').value = publicacionId;
-            document.getElementById('vendedorId').value = publicacionData.usuario_id;
-            document.getElementById('modalImagenPrenda').src = publicacionData.imagen;
-            document.getElementById('modalPrecioPrenda').textContent = `$${publicacionData.precio_venta}`;
-
-            // Calcular totales
-            const precioVenta = parseFloat(publicacionData.precio_venta) || 0;
-            const envio = 5.00;
-            const subtotal = precioVenta;
-            const total = subtotal + envio;
-
-            // Actualizar campos de precios
-            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
-
-            // Mostrar el modal
-            const modalCompra = new bootstrap.Modal(document.getElementById('modalCompra'));
-            modalCompra.show();
+        if (data.success) {
+            const modalCompra = bootstrap.Modal.getInstance(document.getElementById('modalCompra'));
+            modalCompra.hide();
+            alert('¡Compra realizada con éxito!');
+            window.location.reload();
         } else {
-            console.error('No se pudieron obtener los datos de la publicación');
+            alert(data.error || 'Error al procesar la compra');
         }
     } catch (error) {
-        console.error('Error al mostrar el modal:', error);
+        console.error('Error:', error);
+        alert('Error al procesar la compra');
     }
-}
+});
 
 async function procesarCompra(event) {
     event.preventDefault();
