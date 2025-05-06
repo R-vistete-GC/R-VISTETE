@@ -882,7 +882,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event Listener para Actividad en el Tiempo
+// Event Listener para Actividad en el Tiempo
     document.getElementById('resumenActividadTiempo').addEventListener('click', (event) => {
         event.preventDefault();
         if (actividadTiempoChart) {
@@ -951,7 +951,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-// Función para asignar colores a las líneas
+    // Función para asignar colores a las líneas
 function getColorForLabel(label, isLight = false) {
     const colorMap = {
         'azul': isLight ? '#A8D5F2' : '#36A2EB',
@@ -1024,54 +1024,7 @@ function generarResumenEstilosColores(datasets) {
     return resumen;
 }
 
-// Añadir después de cada evento de resumen
-function mostrarInterpretacionAI(chartType, data) {
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    fetch('/users/dashboard/interpret-chart/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({
-            chartType: chartType,
-            data: data
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
-        }
-        return response.json();
-    })
-    .then(result => {
-        if (result.interpretation) {
-            // Encontrar el contenedor del SweetAlert2 actual
-            const sweetAlert = document.querySelector('.swal2-shown');
-            if (sweetAlert) {
-                const interpretacionHtml = `
-                    <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
-                        <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>
-                        <p style="text-align: left;">${result.interpretation}</p>
-                    </div>
-                `;
-                const contenedorResumen = sweetAlert.querySelector('.swal2-html-container');
-                contenedorResumen.innerHTML += interpretacionHtml;
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo generar la interpretación',
-            showConfirmButton: false,
-            timer: 3000
-        });
-    });
-}
+
 
 // Modificar los event listeners existentes para incluir la interpretación
 document.getElementById('resumenEstiloColor').addEventListener('click', (event) => {
@@ -1186,47 +1139,8 @@ function mostrarResumenEInterpretacion(titulo, resumenText, chartType) {
         html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line.trim()}</li>`).join('')}</ul>`,
         showConfirmButton: false,
         showCloseButton: true
-    });
-
-    // Obtener el CSRF token
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-    // Enviar datos para interpretación
-    fetch('/users/dashboard/interpret-chart/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({
-            chartType: chartType,
-            data: resumenText
-        })
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.interpretation) {
-            const sweetAlert = document.querySelector('.swal2-shown');
-            if (sweetAlert) {
-                const interpretacionHtml = `
-                    <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
-                        <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>
-                        <p style="text-align: left;">${result.interpretation}</p>
-                    </div>
-                `;
-                const contenedorResumen = sweetAlert.querySelector('.swal2-html-container');
-                contenedorResumen.innerHTML += interpretacionHtml;
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo generar la interpretación',
-            showConfirmButton: false,
-            timer: 3000
-        });
+    }).then(() => {
+        // Llamar a mostrarInterpretacionAI solo una vez
+        mostrarInterpretacionAI(chartType, resumenText);
     });
 }
