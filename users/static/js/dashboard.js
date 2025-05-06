@@ -1073,24 +1073,29 @@ function getCookie(name) {
 }
 
 function mostrarInterpretacionAI(chartType, resumenData) {    
-    // Formatear los datos del resumen para enviar a la API
-    let formattedData = {};
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
-    // Convertir el contenido del resumen a formato adecuado
-    const resumenItems = resumenData.split('\n');
-    resumenItems.forEach(item => {
-        if (item) {
-            const [key, value] = item.split(':');
-            if (key && value) {
-                formattedData[key.trim()] = value.trim();
-            }
-        }
-    });
+    // Asegurarse de que los datos están en el formato correcto
+    let formattedData = resumenData;
+    
+    // Verificar si es una de las tres últimas gráficas
+    if (['ActividadTiempo', 'TransaccionesEstado', 'EstilosColores'].includes(chartType)) {
+        formattedData = resumenData.split('\n')
+            .filter(line => line.trim())
+            .reduce((acc, line) => {
+                const [key, value] = line.split(':').map(str => str.trim());
+                if (key && value) {
+                    acc[key] = value;
+                }
+                return acc;
+            }, {});
+    }
 
     fetch('/users/dashboard/interpret-chart/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({
             chartType: chartType,
@@ -1105,18 +1110,20 @@ function mostrarInterpretacionAI(chartType, resumenData) {
     })
     .then(result => {
         if (result.interpretation) {
-            // Encontrar el contenedor del resumen actual
             const sweetAlert = document.querySelector('.swal2-shown');
             if (sweetAlert) {
-                // Agregar la interpretación debajo del resumen existente
-                const interpretacionHtml = `
-                    <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
-                        <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>
-                        <p style="text-align: left;">${result.interpretation}</p>
-                    </div>
-                `;
-                const contenedorResumen = sweetAlert.querySelector('.swal2-html-container');
-                contenedorResumen.innerHTML += interpretacionHtml;
+                // Verificar si ya existe una interpretación
+                const existingInterpretation = sweetAlert.querySelector('.interpretacion-ai');
+                if (!existingInterpretation) {
+                    const interpretacionHtml = `
+                        <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+                            <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>
+                            <p style="text-align: left;">${result.interpretation}</p>
+                        </div>
+                    `;
+                    const contenedorResumen = sweetAlert.querySelector('.swal2-html-container');
+                    contenedorResumen.innerHTML += interpretacionHtml;
+                }
             }
         }
     })
@@ -1138,9 +1145,10 @@ function mostrarResumenEInterpretacion(titulo, resumenText, chartType) {
         title: `Resumen de ${titulo}`,
         html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line.trim()}</li>`).join('')}</ul>`,
         showConfirmButton: false,
-        showCloseButton: true
-    }).then(() => {
-        // Llamar a mostrarInterpretacionAI solo una vez
-        mostrarInterpretacionAI(chartType, resumenText);
+        showCloseButton: true,
+        didOpen: () => {
+            // Llamar a mostrarInterpretacionAI inmediatamente después de que se abra el modal
+            mostrarInterpretacionAI(chartType, resumenText);
+        }
     });
 }
