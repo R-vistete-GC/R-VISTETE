@@ -439,6 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.error) {
                     console.error('Error al cargar datos de actividad en el tiempo:', data.error);
                     return;
+
                 }
 
                 const mesesCompras = data.compras.map(item => item.mes);
@@ -737,19 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 resumenText += `${dataset.label}: ${total} recomendaciones\n`;
             });
 
-            // Mostrar el resumen con SweetAlert2
-            Swal.fire({
-                title: 'Resumen de Recomendaciones por Estilo y Color',
-                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => line ? `<li>${line}</li>` : '').join('')}</ul>`,
-                showConfirmButton: false,
-                showCloseButton: true,
-                customClass: {
-                    popup: 'swal-wide'
-                }
-            });
-
-            // Pasar el texto del resumen a la función de interpretación
-            mostrarInterpretacionAI('EstiloColor', resumenText);
+            mostrarResumenEInterpretacion('Recomendaciones por Estilo y Color', resumenText, 'EstiloColor');
         }
     });
 
@@ -765,15 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             resumen += '</ul>';
 
-            Swal.fire({
-                title: '<h3 style="margin: 0;">Resumen de Likes y Favoritos por Estilo y Color</h3>',
-                html: resumen,
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-                customClass: {
-                    popup: 'swal-wide',
-                },
-            });
+            mostrarResumenEInterpretacion('Likes y Favoritos por Estilo y Color', resumen, 'LikesFavoritos');
         } else {
             Swal.fire({
                 title: 'Error',
@@ -791,15 +772,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const resumen = generarResumenSentimientos(sentimientosChart.data);
 
-        Swal.fire({
-            title: '<h3 style="margin: 0;">Resumen de Sentimientos</h3>',
-            html: `<ul style="text-align: left;">${resumen.replace(/\n/g, '<br>')}</ul>`,
-            showConfirmButton: false, // Eliminar el botón "Aceptar"
-            showCloseButton: true, // Agregar la "X" para cerrar
-            customClass: {
-                popup: 'swal-wide',
-            },
-        });
+        mostrarResumenEInterpretacion('Sentimientos', resumen, 'Sentimientos');
 
         if (sentimientosChart) {
             const datos = obtenerDatosSentimientos(sentimientosChart);
@@ -813,15 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const resumen = generarResumenComprasVentasAlquileres();
 
-        Swal.fire({
-            title: '<h3 style="margin: 0;">Resumen de Compras, Ventas y Alquileres</h3>',
-            html: `<ul style="text-align: left;">${resumen.replace(/\n/g, '<br>')}</ul>`,
-            showConfirmButton: false, // Eliminar el botón "Aceptar"
-            showCloseButton: true, // Agregar la "X" para cerrar
-            customClass: {
-                popup: 'swal-wide',
-            },
-        });
+        mostrarResumenEInterpretacion('Compras, Ventas y Alquileres', resumen, 'ComprasVentasAlquileres');
     });
 
     // Función para generar el resumen de Ingresos y Gastos
@@ -842,15 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             resumen += '</ul>';
 
-            Swal.fire({
-                title: '<h3 style="margin: 0;">Resumen de Ingresos y Gastos</h3>',
-                html: resumen,
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-                customClass: {
-                    popup: 'swal-wide',
-                },
-            });
+            mostrarResumenEInterpretacion('Ingresos y Gastos', resumen, 'IngresosGastos');
         } else {
             Swal.fire({
                 title: 'Error',
@@ -862,113 +819,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Función para generar el resumen de Actividad en el Tiempo
-    document.getElementById('resumenActividadTiempo').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
-
-        if (actividadTiempoChart) {
-            const chartData = actividadTiempoChart.data.datasets; // Obtener los datasets de la gráfica
-            const labels = actividadTiempoChart.data.labels; // Obtener las etiquetas de la gráfica (meses)
-
-            let resumen = '<ul style="text-align: left;">';
-            chartData.forEach((dataset) => {
-                dataset.data.forEach((value, i) => {
-                    if (value > 0) {
-                        resumen += `<li><strong>${dataset.label} en ${labels[i]}:</strong> ${value} transacciones</li>`;
-                    }
-                });
-            });
-            resumen += '</ul>';
-
-            Swal.fire({
-                title: '<h3 style="margin: 0;">Resumen de Actividad en el Tiempo</h3>',
-                html: resumen,
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-                customClass: {
-                    popup: 'swal-wide',
-                },
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: 'No se encontraron datos para generar el resumen.',
-                icon: 'error',
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-            });
-        }
-    });
-
-    // Función para generar el resumen de Transacciones por Estado
-    document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
-
-        if (transaccionesPorEstadoChart) {
-            const chartData = transaccionesPorEstadoChart.data.datasets;
-            const labels = transaccionesPorEstadoChart.data.labels;
-
-            let resumen = '<ul style="text-align: left;">';
-            chartData.forEach((dataset) => {
-                dataset.data.forEach((value, i) => {
-                    if (value > 0) {
-                        resumen += `<li><strong>${dataset.label} (${labels[i]}):</strong> ${value}</li>`;
-                    }
-                });
-            });
-            resumen += '</ul>';
-
-            Swal.fire({
-                title: '<h3 style="margin: 0;">Resumen de Transacciones por Estado</h3>',
-                html: resumen,
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-                customClass: {
-                    popup: 'swal-wide',
-                },
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: 'No se encontraron datos para generar el resumen.',
-                icon: 'error',
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-            });
-        }
-    });
-
-    // Función para generar el resumen de Estilos y Colores
-    document.getElementById('resumenEstilosColores').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevenir el comportamiento predeterminado del botón
-
-        if (estilosColoresChart) {
-            let resumen = '<ul style="text-align: left;">';
-            estilosColoresChart.data.datasets.forEach((dataset) => {
-                const total = dataset.data.reduce((sum, point) => sum + point.x, 0);
-                resumen += `<li><strong>${dataset.label}:</strong> ${total}</li>`;
-            });
-            resumen += '</ul>';
-
-            Swal.fire({
-                title: '<h3 style="margin: 0;">Resumen de Estilos y Colores Más Solicitados</h3>',
-                html: resumen,
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-                customClass: {
-                    popup: 'swal-wide',
-                },
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: 'No se encontraron datos para generar el resumen.',
-                icon: 'error',
-                showConfirmButton: false, // Eliminar el botón "Aceptar"
-                showCloseButton: true, // Agregar la "X" para cerrar
-            });
-        }
-    });
+   
+  
+   
 
     // Likes y Favoritos
     document.getElementById('resumenLikesFavoritos').addEventListener('click', (event) => {
@@ -980,14 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 resumenText += `${dataset.label}: ${total}\n`;
             });
 
-            Swal.fire({
-                title: 'Resumen de Likes y Favoritos',
-                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => line ? `<li>${line}</li>` : '').join('')}</ul>`,
-                showConfirmButton: false,
-                showCloseButton: true
-            });
-
-            mostrarInterpretacionAI('LikesFavoritos', resumenText);
+            mostrarResumenEInterpretacion('Likes y Favoritos', resumenText, 'LikesFavoritos');
         }
     });
 
@@ -1001,14 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resumenText += `Comentarios Neutros: ${datos[1]}\n`;
             resumenText += `Comentarios Negativos: ${datos[2]}`;
 
-            Swal.fire({
-                title: 'Resumen de Sentimientos',
-                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line}</li>`).join('')}</ul>`,
-                showConfirmButton: false,
-                showCloseButton: true
-            });
-
-            mostrarInterpretacionAI('Sentimientos', resumenText);
+            mostrarResumenEInterpretacion('Sentimientos', resumenText, 'Sentimientos');
         }
     });
 
@@ -1021,14 +860,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const resumenText = `Compras: ${compras}\nVentas: ${ventas}\nAlquileres: ${alquileres}`;
 
-        Swal.fire({
-            title: 'Resumen de Transacciones',
-            html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line}</li>`).join('')}</ul>`,
-            showConfirmButton: false,
-            showCloseButton: true
-        });
-
-        mostrarInterpretacionAI('ComprasVentasAlquileres', resumenText);
+        mostrarResumenEInterpretacion('Compras, Ventas y Alquileres', resumenText, 'ComprasVentasAlquileres');
     });
 
     // Ingresos y Gastos
@@ -1046,14 +878,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            Swal.fire({
-                title: 'Resumen de Ingresos y Gastos',
-                html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line}</li>`).join('')}</ul>`,
-                showConfirmButton: false,
-                showCloseButton: true
+            mostrarResumenEInterpretacion('Ingresos y Gastos', resumenText, 'IngresosGastos');
+        }
+    });
+
+    // Event Listener para Actividad en el Tiempo
+    document.getElementById('resumenActividadTiempo').addEventListener('click', (event) => {
+        event.preventDefault();
+        if (actividadTiempoChart) {
+            const datasets = actividadTiempoChart.data.datasets;
+            const labels = actividadTiempoChart.data.labels;
+            
+            let resumenText = 'Resumen de actividad por período:\n';
+            datasets.forEach(dataset => {
+                const total = dataset.data.reduce((a, b) => a + b, 0);
+                resumenText += `${dataset.label}: ${total} transacciones\n`;
+                
+                // Añadir detalles por período
+                dataset.data.forEach((valor, index) => {
+                    if (valor > 0) {
+                        resumenText += `- ${labels[index]}: ${valor}\n`;
+                    }
+                });
             });
 
-            mostrarInterpretacionAI('IngresosGastos', resumenText);
+            mostrarResumenEInterpretacion('Actividad en el Tiempo', resumenText, 'ActividadTiempo');
+        }
+    });
+
+    // Event Listener para Transacciones por Estado
+    document.getElementById('resumenTransaccionesPorEstado').addEventListener('click', (event) => {
+        event.preventDefault();
+        if (transaccionesPorEstadoChart) {
+            const datasets = transaccionesPorEstadoChart.data.datasets;
+            const labels = transaccionesPorEstadoChart.data.labels;
+            
+            let resumenText = 'Resumen de transacciones por estado:\n';
+            datasets.forEach(dataset => {
+                resumenText += `${dataset.label}:\n`;
+                dataset.data.forEach((valor, index) => {
+                    if (valor > 0) {
+                        resumenText += `- ${labels[index]}: ${valor}\n`;
+                    }
+                });
+            });
+
+            mostrarResumenEInterpretacion('Transacciones por Estado', resumenText, 'TransaccionesEstado');
+        }
+    });
+
+    // Event Listener para Estilos y Colores Más Solicitados
+    document.getElementById('resumenEstilosColores').addEventListener('click', (event) => {
+        event.preventDefault();
+        if (estilosColoresChart) {
+            const datasets = estilosColoresChart.data.datasets;
+            
+            let resumenText = 'Resumen de estilos y colores más solicitados:\n';
+            datasets.forEach(dataset => {
+                const total = dataset.data.reduce((sum, point) => sum + (point.x || 0), 0);
+                resumenText += `${dataset.label}:\n`;
+                dataset.data.forEach(point => {
+                    if (point.x > 0) {
+                        resumenText += `- ${point.y}: ${point.x} solicitudes\n`;
+                    }
+                });
+                resumenText += `Total: ${total} solicitudes\n`;
+            });
+
+            mostrarResumenEInterpretacion('Estilos y Colores', resumenText, 'EstilosColores');
         }
     });
 
@@ -1133,7 +1025,7 @@ function generarResumenEstilosColores(datasets) {
 }
 
 // Añadir después de cada evento de resumen
-function mostrarInterpretacionAI(chartType, data, containerId) {
+function mostrarInterpretacionAI(chartType, data) {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
     fetch('/users/dashboard/interpret-chart/', {
@@ -1155,25 +1047,22 @@ function mostrarInterpretacionAI(chartType, data, containerId) {
     })
     .then(result => {
         if (result.interpretation) {
-            let interpretacionDiv = document.getElementById(`interpretacion-${chartType}`);
-            if (!interpretacionDiv) {
-                interpretacionDiv = document.createElement('div');
-                interpretacionDiv.id = `interpretacion-${chartType}`;
-                interpretacionDiv.className = 'mt-3 p-3 border-left bg-light';
+            // Encontrar el contenedor del SweetAlert2 actual
+            const sweetAlert = document.querySelector('.swal2-shown');
+            if (sweetAlert) {
+                const interpretacionHtml = `
+                    <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+                        <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>
+                        <p style="text-align: left;">${result.interpretation}</p>
+                    </div>
+                `;
+                const contenedorResumen = sweetAlert.querySelector('.swal2-html-container');
+                contenedorResumen.innerHTML += interpretacionHtml;
             }
-            
-            interpretacionDiv.innerHTML = `
-                <h6 class="font-weight-bold"><i class="fas fa-robot"></i> Análisis AI:</h6>
-                <p class="mb-0">${result.interpretation}</p>
-            `;
-            
-            const container = document.getElementById(containerId);
-            container.appendChild(interpretacionDiv);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        // Mostrar mensaje de error al usuario
         Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -1267,6 +1156,58 @@ function mostrarInterpretacionAI(chartType, resumenData) {
             const sweetAlert = document.querySelector('.swal2-shown');
             if (sweetAlert) {
                 // Agregar la interpretación debajo del resumen existente
+                const interpretacionHtml = `
+                    <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+                        <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>
+                        <p style="text-align: left;">${result.interpretation}</p>
+                    </div>
+                `;
+                const contenedorResumen = sweetAlert.querySelector('.swal2-html-container');
+                contenedorResumen.innerHTML += interpretacionHtml;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo generar la interpretación',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    });
+}
+
+function mostrarResumenEInterpretacion(titulo, resumenText, chartType) {
+    // Mostrar el resumen
+    Swal.fire({
+        title: `Resumen de ${titulo}`,
+        html: `<ul style="text-align: left;">${resumenText.split('\n').map(line => `<li>${line.trim()}</li>`).join('')}</ul>`,
+        showConfirmButton: false,
+        showCloseButton: true
+    });
+
+    // Obtener el CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Enviar datos para interpretación
+    fetch('/users/dashboard/interpret-chart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+            chartType: chartType,
+            data: resumenText
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.interpretation) {
+            const sweetAlert = document.querySelector('.swal2-shown');
+            if (sweetAlert) {
                 const interpretacionHtml = `
                     <div class="interpretacion-ai mt-3" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
                         <h6 style="color: #28a745;"><i class="fas fa-robot"></i> Análisis AI:</h6>

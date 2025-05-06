@@ -53,21 +53,21 @@ class DashboardInterpreter:
                 "Explica cómo se han distribuido sus transacciones."
             ),
             'ActividadTiempo': (
-                f"{base_prompt}sus patrones de actividad temporal: {data}. "
-                "Identifica los momentos de mayor actividad."
+                f"{base_prompt}los patrones de actividad temporal: {data}. "
+                "Identifica las tendencias y períodos de mayor actividad."
             ),
             'TransaccionesEstado': (
-                f"{base_prompt}cómo se han desarrollado sus transacciones: {data}. "
-                "Explica la distribución de los diferentes estados."
+                f"{base_prompt}el estado de las transacciones: {data}. "
+                "Analiza la distribución de los diferentes estados de las transacciones."
             ),
             'EstilosColores': (
-                f"{base_prompt}sus preferencias en estilos y colores: {data}. "
-                "Describe las combinaciones que han sido más significativas."
+                f"{base_prompt}las preferencias en estilos y colores: {data}. "
+                "Identifica las tendencias más significativas en las solicitudes."
             )
         }
         
         prompt = prompts.get(chart_type, f"{base_prompt}estos datos: {data}")
         prompt += "\nPor favor, genera una descripción breve y clara, comenzando con 'Basándome en tu actividad...' "
-        prompt += "y limítala a 2-3 oraciones que expliquen los patrones observados, sin incluir recomendaciones."
+        prompt += "y limítala a 2-3 oraciones que expliquen los patrones observados."
         
         return prompt
