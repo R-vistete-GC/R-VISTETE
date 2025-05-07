@@ -38,4 +38,5 @@ urlpatterns = [
 
     # Agregar a las URLs existentes
     path('dashboard/interpret-chart/', views.interpret_chart_data, name='interpret_chart_data'),
+    path('dashboard/kmeans-analysis/', views.dashboard_kmeans_analysis, name='dashboard_kmeans_analysis'),
 ]

@@ -49,6 +49,9 @@ from django.views.decorators.http import require_http_methods
 from django.db.models.functions import TruncDate, TruncMonth
 from django.views.decorators.csrf import csrf_exempt
 from .dashboard_interpreter import DashboardInterpreter
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 def login_view(request):
     # 1. Verificar si YA está autenticado (evita bucles)
@@ -879,3 +882,50 @@ def interpret_chart_data(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def dashboard_kmeans_analysis(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+    try:
+        # Obtener datos del usuario
+        compras = Compra.objects.filter(comprador_id=usuario_id)
+        ventas = Venta.objects.filter(publicacion__usuario_id=usuario_id)
+        alquileres = Alquiler.objects.filter(cliente_id=usuario_id)
+        likes = Like.objects.filter(usuario_id=usuario_id)
+        favoritos = Favorito.objects.filter(usuario_id=usuario_id)
+
+        # Crear matriz de características
+        features = []
+        for pub in Publicacion.objects.all():
+            row = [
+                compras.filter(publicacion=pub).count(),
+                ventas.filter(publicacion=pub).count(),
+                alquileres.filter(publicacion=pub).count(),
+                likes.filter(publicacion=pub).count(),
+                favoritos.filter(publicacion=pub).count()
+            ]
+            features.append(row)
+
+        if not features:
+            return JsonResponse({'error': 'No hay suficientes datos'}, status=400)
+
+        # Normalizar datos
+        scaler = StandardScaler()
+        features_scaled = scaler.fit_transform(features)
+
+        # Aplicar K-means
+        kmeans = KMeans(n_clusters=3, random_state=42)
+        clusters = kmeans.fit_predict(features_scaled)
+
+        # Preparar datos para la visualización
+        data = {
+            'clusters': clusters.tolist(),
+            'centers': kmeans.cluster_centers_.tolist(),
+            'features': features_scaled.tolist()
+        }
+
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

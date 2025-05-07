@@ -949,6 +949,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const kmeansCtx = document.getElementById('graficaKMeans');
+    let kmeansChart;
+
+    if (kmeansCtx) {
+        fetch('/users/dashboard/kmeans-analysis/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
+                const colors = ['#FF6384', '#36A2EB', '#FFCE56'];
+                const datasets = data.clusters.map((cluster, i) => ({
+                    label: `Grupo ${i + 1}`,
+                    data: data.features[i],
+                    backgroundColor: colors[i],
+                }));
+
+                kmeansChart = new Chart(kmeansCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Análisis de Patrones de Comportamiento'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Actividad de Compra'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Interacción Social'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Añadir el event listener para el resumen
+    document.getElementById('resumenKMeans').addEventListener('click', (event) => {
+        event.preventDefault();
+        if (kmeansChart) {
+            const resumenText = generateKMeansAnalysis(kmeansChart.data);
+            mostrarResumenEInterpretacion('Análisis de Patrones', resumenText, 'KMeans');
+        }
+    });
+
 });
 
     // Función para asignar colores a las líneas
@@ -1151,4 +1215,12 @@ function mostrarResumenEInterpretacion(titulo, resumenText, chartType) {
             mostrarInterpretacionAI(chartType, resumenText);
         }
     });
+}
+
+function generateKMeansAnalysis(data) {
+    let resumenText = 'Análisis de Patrones de Comportamiento:\n';
+    data.datasets.forEach((dataset, index) => {
+        resumenText += `Grupo ${index + 1}: ${dataset.data.length} elementos\n`;
+    });
+    return resumenText;
 }
